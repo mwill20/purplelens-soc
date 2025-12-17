@@ -682,7 +682,7 @@ Overall Confidence: 0.80
 ## Appendix B: Repository Information
 
 **GitHub Repository:** https://github.com/mwill20/purplelens-soc  
-**Project Name:** Bespin AI Security Analyst Assistant  
+**Project Name:** PurpleLens AI SOC Assistant  
 **Alternative Name:** PurpleLens SOC  
 **Purpose:** SOC analyst assistant for Windows event log analysis using LLM-powered structured extraction
 

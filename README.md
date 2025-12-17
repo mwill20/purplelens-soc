@@ -2,7 +2,7 @@
   <img src="docs/PurpleLens-SOC-Logo.png" alt="PurpleLens SOC Logo" width="400"/>
 </div>
 
-# Bespin AI Security Analyst Assistant
+# PurpleLens AI SOC Assistant
 
 ## Overview
 - CLI-driven SOC assistant that ingests parsed Windows EVTX telemetry (JSONL).

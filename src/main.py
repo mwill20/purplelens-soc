@@ -1,4 +1,4 @@
-"""CLI entrypoint for the Bespin AI Security Analyst Assistant."""
+"""CLI entrypoint for the PurpleLens AI SOC Assistant."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Bespin AI Security Analyst Assistant")
+    parser = argparse.ArgumentParser(description="PurpleLens AI SOC Assistant")
     parser.add_argument(
         "--input",
         required=True,

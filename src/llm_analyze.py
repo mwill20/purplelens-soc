@@ -31,7 +31,7 @@ BACKOFF_SECONDS = [0, 1, 2]  # after attempt 1,2 re-try doubling; final sleep op
 SCHEMA_JSON = json.dumps(AnalysisOutput.model_json_schema(), indent=2)
 
 SYSTEM_PROMPT = f"""
-You are the Bespin AI Security Analyst Assistant. Analyze provided Windows log
+You are the PurpleLens AI SOC Assistant. Analyze provided Windows log
 events and extract structured intelligence strictly conforming to the following
 JSON schema:
 

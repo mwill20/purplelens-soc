@@ -40,7 +40,7 @@ def test_success_report_structure():
     report = generate_report(analysis)
     
     # Check for all required sections
-    assert "BESPIN AI SECURITY ANALYST ASSISTANT" in report
+    assert "PURPLELENS AI SOC ASSISTANT" in report
     assert "Analysis Report" in report
     assert "## FINDINGS" in report
     assert "## HYPOTHESES" in report

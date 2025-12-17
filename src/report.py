@@ -69,7 +69,7 @@ def generate_error_report(analysis: AnalysisOutput) -> str:
 def _header_lines(subtitle: str) -> List[str]:
     return [
         "=" * 80,
-        "BESPIN AI SECURITY ANALYST ASSISTANT",
+        "PURPLELENS AI SOC ASSISTANT",
         subtitle,
         "=" * 80,
         "",
