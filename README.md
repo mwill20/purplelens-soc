@@ -108,5 +108,11 @@ validation/           # overseer approvals
 ```
 
 ### License & Attribution
-- EVTX dataset courtesy of `https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES` (see repo for license).
-- This repository is for educational/interview purposes; ensure compliance with OpenAI API terms.
+
+**License:** [MIT License](LICENSE) - Free to use for educational, portfolio, and commercial purposes.
+
+**Third-Party Attributions:**
+- **EVTX Dataset:** [sbousseaden/EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES) - Sample Windows event logs for testing
+- **OpenAI API:** Requires valid API key and compliance with [OpenAI Terms of Service](https://openai.com/policies/terms-of-use)
+
+**Purpose:** This project is designed for cybersecurity portfolio demonstration and technical interviews.
