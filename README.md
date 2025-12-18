@@ -70,8 +70,20 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 4. Provider-agnostic LLM abstraction and offline reasoning modes.
 5. MITRE ATT&CK tagging within schemas and reports.
 
-### Architecture (60-second Explanation)
-Input JSONL is ingested with provenance (`source_file`, `record_index`). The tool batches events into a schema-defined LLM prompt, requesting structured JSON only. Pydantic validation and regex guardrails enforce policy compliance. Python renders a deterministic SOC report and persists run metadata to SQLite (`analysis_runs`, `findings`, `hypotheses`, `indicators_of_compromise`, `reports`). CLI remains the primary interface for predictable demos.
+### Architecture
+
+<div align="center">
+  <img src="docs/architecture-overview.png" alt="PurpleLens Architecture Overview" width="900"/>
+</div>
+
+**Quick Overview:** Input JSONL is ingested with provenance (`source_file`, `record_index`). The tool batches events into a schema-defined LLM prompt, requesting structured JSON only. Pydantic validation and regex guardrails enforce policy compliance. Python renders a deterministic SOC report and persists run metadata to SQLite (`analysis_runs`, `findings`, `hypotheses`, `indicators_of_compromise`, `reports`). CLI remains the primary interface for predictable demos.
+
+**Detailed Documentation:** See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for:
+- Complete system architecture diagrams
+- End-to-end data flow trace
+- File responsibility matrix
+- Error handling paths
+- Architecture decision rationale
 
 ### Testing
 ```bash

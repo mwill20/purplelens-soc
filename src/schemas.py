@@ -1,8 +1,8 @@
 """Pydantic models defining the structured analysis contract."""
 
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class Evidence(BaseModel):
@@ -16,6 +16,14 @@ class Evidence(BaseModel):
         None, description="Event identifier if present in the source data"
     )
     excerpt: str = Field(..., description="Relevant snippet extracted from the event")
+    
+    @field_validator('event_id', mode='before')
+    @classmethod
+    def coerce_event_id_to_string(cls, v):
+        """Convert event_id to string if it's an integer."""
+        if v is not None and not isinstance(v, str):
+            return str(v)
+        return v
 
 
 class Finding(BaseModel):
