@@ -61,3 +61,7 @@ EVTX-ATTACK-SAMPLES/
 *.log
 output/
 reports/
+
+# Interview prep materials (not for GitHub)
+Lessons/
+Planning/

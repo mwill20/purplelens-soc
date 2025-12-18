@@ -1,0 +1,3 @@
+{"Event": {"System": {"EventID": 1}}}
+{this is not valid json}
+{"Event": {"System": {"EventID": 2}}}
