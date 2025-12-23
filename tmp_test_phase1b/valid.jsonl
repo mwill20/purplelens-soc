@@ -1,2 +1,0 @@
-{"Event": {"System": {"EventID": 4688}, "EventData": {"ProcessName": "powershell.exe"}}}
-{"Event": {"System": {"EventID": 4624}, "EventData": {"LogonType": 3}}}
