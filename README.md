@@ -9,7 +9,24 @@
 - Uses a constrained LLM only for structured extraction; deterministic Python builds the SOC report.
 - Guardrails enforce evidence-backed findings, policy-compliant narratives, and SQLite persistence for auditability.
 
-### Installation
+### 🌍 The Big Picture: What Problem Are We Solving?
+In plain English:
+You're a SOC analyst drowning in event logs. You need to find suspicious activity, but:
+
+- Reading raw .evtx files is painful (binary format)
+- You have hundreds or thousands of events
+- You need to explain what you found 
+- You want to remember what you analyzed before
+
+### What PurpleLens does:
+It's like having a smart assistant that:
+
+1. Converts messy binary logs into readable text
+2. Reads through all the events looking for patterns
+3. Writes a professional security report
+4. Saves everything in a database so you can search later
+
+## Installation
 1. Clone the repo and enter it.
    ```bash
    git clone https://github.com/mwill20/purplelens-soc.git
@@ -62,6 +79,10 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 - Requires pre-parsed JSONL EVTX files; raw EVTX parsing is out of scope.
 - Windows telemetry focus and single-dataset demo (EVTX-ATTACK-SAMPLES subsets).
 - Single OpenAI model call per run; no automated remediation or determinations.
+- **Guardrail Coverage:** LLM guardrails generally consist of three types:
+  - **Structural/Deterministic:** Validates data structure, types, and constraints using Pydantic schemas (✅ Implemented via `schemas.py`)
+  - **Pattern-Based Policy:** Enforces content policies through regex pattern matching for prohibited language (✅ Implemented via `security.py` - blocks false authority claims like "I have blocked..." or "This is malicious")
+  - **Semantic/Reasoning:** Validates logical coherence, contextual accuracy, and reasoning quality of LLM outputs (❌ Not implemented - would require a second LLM validator, knowledge base of security reasoning patterns, or expert system rules, adding complexity and API costs)
 
 ### Future Enhancements
 1. Streamlit/GUI wrapper for analysts.
@@ -69,6 +90,9 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 3. Streaming/real-time ingestion.
 4. Provider-agnostic LLM abstraction and offline reasoning modes.
 5. MITRE ATT&CK tagging within schemas and reports.
+6. Select an AI Model tuned for analysis of security events or fine-tune a model.
+7. **Semantic Guardrails:** Implement LLM-as-validator pattern (secondary model validates reasoning), rule-based security logic checker (validates findings align with known attack patterns), or confidence score calibration (validates confidence matches evidence strength).
+8. **Event Caching:** Hash-based deduplication to avoid re-analyzing identical events across runs, reducing API costs and latency for repeated analysis workflows.
 
 ### Architecture
 
@@ -76,7 +100,7 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
   <img src="docs/architecture-overview.png" alt="PurpleLens Architecture Overview" width="900"/>
 </div>
 
-**Quick Overview:** Input JSONL is ingested with provenance (`source_file`, `record_index`). The tool batches events into a schema-defined LLM prompt, requesting structured JSON only. Pydantic validation and regex guardrails enforce policy compliance. Python renders a deterministic SOC report and persists run metadata to SQLite (`analysis_runs`, `findings`, `hypotheses`, `indicators_of_compromise`, `reports`). CLI remains the primary interface for predictable demos.
+**Quick Overview:** Input JSONL is ingested with provenance (`source_file`, `record_index`). The tool batches events into a schema-defined LLM prompt, requesting structured JSON only. Pydantic validates structural schema compliance first, then regex guardrails check language policy (preventing false authority claims). Python renders a deterministic SOC report and persists run metadata to SQLite (`analysis_runs`, `findings`, `hypotheses`, `indicators_of_compromise`, `reports`). CLI remains the primary interface for predictable demos.
 
 **Detailed Documentation:** See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for:
 - Complete system architecture diagrams

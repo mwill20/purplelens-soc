@@ -265,13 +265,14 @@
    └─ Output: AnalysisOutput object (typed, validated)
 
 6. SECURITY VALIDATION (src/security.py)
-   ├─ Function: validate_output(analysis_output)
+   ├─ Function: validate_output(response_text)
    ├─ Process:
-   │  ├─ Scan all text fields recursively
-   │  ├─ Check against 5 prohibited patterns (regex)
-   │  └─ Return True or raise ValueError
+   │  ├─ Check raw LLM response text (before JSON parsing)
+   │  ├─ Scan against 5 prohibited language patterns (regex)
+   │  ├─ Patterns block false authority claims (action/certainty/modification)
+   │  └─ Return (True, None) or (False, error_message)
    │
-   └─ Output: Validated AnalysisOutput (no policy violations)
+   └─ Output: Tuple[bool, Optional[str]] - validation result
 
 7. REPORT GENERATION (src/report.py)
    ├─ Function: generate_report(analysis_output)
