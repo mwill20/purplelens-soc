@@ -93,6 +93,8 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 6. Select an AI Model tuned for analysis of security events or fine-tune a model.
 7. **Semantic Guardrails:** Implement LLM-as-validator pattern (secondary model validates reasoning), rule-based security logic checker (validates findings align with known attack patterns), or confidence score calibration (validates confidence matches evidence strength).
 8. **Event Caching:** Hash-based deduplication to avoid re-analyzing identical events across runs, reducing API costs and latency for repeated analysis workflows.
+9. **Advanced Security Scanning:** Extend guardrails to detect PII/PHI leakage (SSNs, credit cards, health data in analyst notes), prompt injection attacks (direct: malicious prompts in event data; indirect: poisoned logs attempting LLM manipulation), and model safety violations (attempts to jailbreak model constraints or elicit harmful outputs). Note: As an internal SOC tool with controlled inputs (parsed telemetry), priority is lower than public-facing systems, but relevant for defense-in-depth against compromised log sources or insider threats.
+10. **Production Database:** Replace SQLite with MySQL or PostgreSQL for multi-user environments, concurrent access, and enterprise-scale deployments requiring RBAC, replication, and performance optimization.
 
 ### Architecture
 
