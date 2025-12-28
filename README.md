@@ -6,7 +6,7 @@
 
 ## Overview
 - CLI-driven SOC assistant that ingests parsed Windows EVTX telemetry (JSONL).
-- Uses a constrained LLM only for structured extraction; deterministic Python builds the SOC report.
+- Uses an LLM strictly as a structured extraction engine; **deterministic Python renders the SOC report and persists run metadata**.
 - Guardrails enforce evidence-backed findings, policy-compliant narratives, and SQLite persistence for auditability.
 
 ### 🌍 The Big Picture: What Problem Are We Solving?
@@ -78,11 +78,12 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 - CLI only; GUI is a future enhancement.
 - Requires pre-parsed JSONL EVTX files; raw EVTX parsing is out of scope.
 - Windows telemetry focus and single-dataset demo (EVTX-ATTACK-SAMPLES subsets).
-- Single OpenAI model call per run; no automated remediation or determinations.
+- Single OpenAI model call per run; no multi-turn reasoning.
+- **This tool does not make determinations or take actions** - it provides structured evidence for analyst review.
 - **Guardrail Coverage:** LLM guardrails generally consist of three types:
   - **Structural/Deterministic:** Validates data structure, types, and constraints using Pydantic schemas (✅ Implemented via `schemas.py`)
   - **Pattern-Based Policy:** Enforces content policies through regex pattern matching for prohibited language (✅ Implemented via `security.py` - blocks false authority claims like "I have blocked..." or "This is malicious")
-  - **Semantic/Reasoning:** Validates logical coherence, contextual accuracy, and reasoning quality of LLM outputs (❌ Not implemented - would require a second LLM validator, knowledge base of security reasoning patterns, or expert system rules, adding complexity and API costs)
+  - **Semantic/Reasoning:** Validates logical coherence, contextual accuracy, and reasoning quality of LLM outputs (⚠️ Intentionally simplified for demo - production deployments should add semantic validation as defense-in-depth via LLM-as-validator, rule-based security logic, or confidence calibration)
 
 ### Future Enhancements
 1. Streamlit/GUI wrapper for analysts.
