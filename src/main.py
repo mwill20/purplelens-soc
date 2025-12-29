@@ -45,8 +45,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--model",
-        default="gpt-4",
-        help="OpenAI model to use (default: gpt-4)",
+        default="gpt-4o",
+        help="OpenAI model to use (default: gpt-4o)",
     )
     parser.add_argument(
         "--db",
@@ -123,7 +123,7 @@ def main() -> int:
         LOGGER.error("Security policy violation: %s", policy_error)
         analysis = _build_error_analysis("validation_error", policy_error)
 
-    report_text = generate_report(analysis)
+    report_text = generate_report(analysis, event_count=len(events))
     _output_report(report_text, args.output, run_id)
 
     run_timestamp = datetime.now(timezone.utc)

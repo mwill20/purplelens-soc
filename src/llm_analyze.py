@@ -57,7 +57,7 @@ STATUS_PRIORITY = {
 _client: OpenAI | None = None
 
 
-def analyze_events(events: List[Dict[str, Any]], model: str = "gpt-4") -> Dict[str, Any]:
+def analyze_events(events: List[Dict[str, Any]], model: str = "gpt-4o") -> Dict[str, Any]:
     """Send batched events to the LLM and merge structured results."""
 
     if not events:

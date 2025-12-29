@@ -183,7 +183,7 @@ def test_cli_arguments_match_spec():
     assert "--output" in result.stdout
     assert "console" in result.stdout
     assert "--model" in result.stdout
-    assert "gpt-4" in result.stdout
+    assert "gpt-4o" in result.stdout
     assert "--db" in result.stdout
     assert "db/analysis.db" in result.stdout
     

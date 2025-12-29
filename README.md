@@ -60,6 +60,16 @@ It's like having a smart assistant that:
 4. Verify JSONL contents using any text viewer.
 
 ### Usage Examples
+
+**Model Selection and JSON Output Compatibility**
+
+PurpleLens relies on OpenAI models that support structured JSON output using the `response_format={"type": "json_object"}` parameter. For best results, use models like `gpt-4o`, `gpt-4-1106-preview`, or `gpt-3.5-turbo-1106`. Older models (e.g., `gpt-4`, `gpt-3.5-turbo`) do not support this parameter and will return an error. Always specify a compatible model using the `--model` argument:
+
+```bash
+python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
+```
+
+If you use an unsupported model, the tool will not generate a report and will return an API error. See OpenAI documentation for the latest list of supported models.
 ```bash
 # Minimal run
 python -m src.main --input data/evtx_parsed/
