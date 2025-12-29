@@ -100,7 +100,7 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 ### Architecture
 
 <div align="center">
-  <img src="docs/architecture-overview.png" alt="PurpleLens Architecture Overview" width="900"/>
+   <img src="docs/PurpleLens_SOC_Architecture.png" alt="PurpleLens Architecture Overview" width="900"/>
 </div>
 
 **Quick Overview:** Input JSONL is ingested with provenance (`source_file`, `record_index`). The tool batches events into a schema-defined LLM prompt, requesting structured JSON only. Pydantic validates structural schema compliance first, then regex guardrails check language policy (preventing false authority claims). Python renders a deterministic SOC report and persists run metadata to SQLite (`analysis_runs`, `findings`, `hypotheses`, `indicators_of_compromise`, `reports`). CLI remains the primary interface for predictable demos.
