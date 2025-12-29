@@ -89,6 +89,7 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 - Requires pre-parsed JSONL EVTX files; raw EVTX parsing is out of scope.
 - Windows telemetry focus and single-dataset demo (EVTX-ATTACK-SAMPLES subsets).
 - Single OpenAI model call per run; no multi-turn reasoning.
+- LLM outputs can still contain redundant summaries or overlapping recommendations; report post-processing mitigates but does not fully eliminate this.
 - **This tool does not make determinations or take actions** - it provides structured evidence for analyst review.
 - **Guardrail Coverage:** LLM guardrails generally consist of three types:
   - **Structural/Deterministic:** Validates data structure, types, and constraints using Pydantic schemas (✅ Implemented via `schemas.py`)
@@ -106,6 +107,8 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 8. **Event Caching:** Hash-based deduplication to avoid re-analyzing identical events across runs, reducing API costs and latency for repeated analysis workflows.
 9. **Advanced Security Scanning:** Extend guardrails to detect PII/PHI leakage (SSNs, credit cards, health data in analyst notes), prompt injection attacks (direct: malicious prompts in event data; indirect: poisoned logs attempting LLM manipulation), and model safety violations (attempts to jailbreak model constraints or elicit harmful outputs). Note: As an internal SOC tool with controlled inputs (parsed telemetry), priority is lower than public-facing systems, but relevant for defense-in-depth against compromised log sources or insider threats.
 10. **Production Database:** Replace SQLite with MySQL or PostgreSQL for multi-user environments, concurrent access, and enterprise-scale deployments requiring RBAC, replication, and performance optimization.
+11. **Report De-duplication:** Improve semantic merging of findings and recommendations (e.g., similarity scoring or LLM-assisted clustering) to reduce overlap without losing detail.
+12. **IOC Enrichment:** Add normalization and context for IOCs (e.g., SID resolution or hash metadata) to improve interpretability in reports.
 
 ### Architecture
 
