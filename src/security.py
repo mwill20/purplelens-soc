@@ -10,6 +10,7 @@ PROHIBITED_PATTERNS = [
     r"Action (taken|executed|completed|performed)",
     r"System (modified|updated|patched|fixed)",
     r"(Confirmed|Certain|Guaranteed) that",
+    r"(?i)\b(powershell|pwsh)(\.exe)?\s+(-enc|-encodedcommand|-e|-ec)\s+[A-Za-z0-9+/=]{20,}",
 ]
 
 
