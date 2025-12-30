@@ -109,6 +109,7 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 10. **Production Database:** Replace SQLite with MySQL or PostgreSQL for multi-user environments, concurrent access, and enterprise-scale deployments requiring RBAC, replication, and performance optimization.
 11. **Report De-duplication:** Improve semantic merging of findings and recommendations (e.g., similarity scoring or LLM-assisted clustering) to reduce overlap without losing detail.
 12. **IOC Enrichment:** Add normalization and context for IOCs (e.g., SID resolution or hash metadata) to improve interpretability in reports.
+13. **Analyst Determinations:** Add a post-run analyst decision record (analyst name, determination, notes, IR/customer notification flags, timestamp) linked to `run_id` for auditability and SLA tracking.
 
 ### Architecture
 
