@@ -41,7 +41,7 @@ def parse_args() -> argparse.Namespace:
         "--output",
         choices=["console", "file"],
         default="console",
-        help="Output destination (default: console)",
+        help="Console output (report is always saved to reports/)",
     )
     parser.add_argument(
         "--model",
@@ -169,14 +169,12 @@ def _build_error_analysis(status: str, message: str | None) -> AnalysisOutput:
 
 
 def _output_report(report_text: str, destination: str, run_id: str) -> None:
-    if destination == "console":
-        print(report_text)
-        return
-
     reports_dir = Path("reports")
     reports_dir.mkdir(parents=True, exist_ok=True)
     output_path = reports_dir / f"analysis_{run_id}.txt"
     output_path.write_text(report_text, encoding="utf-8")
+    if destination == "console":
+        print(report_text)
     print(f"Report written to {output_path}", file=sys.stdout)
 
 
