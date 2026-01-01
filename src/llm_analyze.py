@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+import argparse
 from typing import Any, Dict, Iterable, List
 
 from src.schemas import AnalysisOutput
@@ -265,3 +266,21 @@ def _get_client() -> OpenAI:
             raise RuntimeError("openai package is required but not installed.")
         _client = OpenAI()
     return _client
+
+
+def _main() -> None:
+    parser = argparse.ArgumentParser(description="LLM analysis helpers.")
+    parser.add_argument(
+        "--print-system-prompt",
+        action="store_true",
+        help="Print the system prompt and exit.",
+    )
+    args = parser.parse_args()
+    if args.print_system_prompt:
+        print(SYSTEM_PROMPT)
+        return
+    parser.print_help()
+
+
+if __name__ == "__main__":
+    _main()
