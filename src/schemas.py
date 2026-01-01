@@ -45,6 +45,7 @@ class Hypothesis(BaseModel):
 class AnalysisOutput(BaseModel):
     """Complete structured output expected from the LLM extraction step."""
 
+    # Contract: LLM output must match this JSON shape (fail closed on mismatch).
     status: Literal["success", "validation_error", "llm_error", "timeout"]
     error_message: Optional[str] = None
     findings: List[Finding] = Field(default_factory=list)

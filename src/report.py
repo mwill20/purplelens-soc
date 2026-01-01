@@ -82,6 +82,7 @@ STATUS_EXPLANATIONS: Dict[str, str] = {
 def generate_report(analysis: AnalysisOutput, event_count: int = 0) -> str:
     """Generate deterministic SOC report from the structured analysis object."""
 
+    # Determinism contract: same structured input yields the same report text.
     if analysis.status != "success":
         return generate_error_report(analysis)
 

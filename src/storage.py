@@ -78,6 +78,7 @@ def save_analysis(
 ) -> None:
     """Persist analysis outputs according to the architect-defined schema."""
 
+    # Audit trail contract: every run is stored with metadata to reproduce outcomes.
     conn = _get_connection(db_path)
     try:
         with conn:

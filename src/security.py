@@ -3,7 +3,7 @@
 import re
 from typing import Optional, Tuple
 
-# Exact patterns provided by architect spec.
+# Guardrail contract: no false authority or claimed actions; we only recommend.
 PROHIBITED_PATTERNS = [
     r"I have (blocked|removed|deleted|remediated)",
     r"This (is|was) (benign|malicious|definitely)",
