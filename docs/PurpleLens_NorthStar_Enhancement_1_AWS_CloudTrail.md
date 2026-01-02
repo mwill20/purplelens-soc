@@ -36,6 +36,95 @@ These remain identical to the Windows EVTX branch:
 
 ---
 
+## 2.5) Technical specifications (required for implementation)
+
+### Auto-detect strategy
+```python
+# Detection order:
+# 1. File extension (.evtx, .json, .jsonl)
+# 2. Content sniffing (first 512 bytes)
+# 3. Schema validation (CloudTrail has "Records" array or "eventVersion" field)
+# 4. Fail with clear error if ambiguous
+
+# Acceptance:
+# - Mixed directory (EVTX + JSON) without --source flag must error
+# - Detection decision logged explicitly
+# - --source flag always overrides auto-detection
+```
+
+### LLM configuration
+```python
+LLM_CONFIG = {
+    "model": "gpt-4-turbo",  # or specify actual model
+    "max_tokens": 4096,
+    "temperature": 0.0,  # deterministic extraction
+    "context_window": 128000,  # but batch conservatively for compatibility
+}
+```
+
+### Correlation parameters
+```python
+CORRELATION_CONFIG = {
+    "time_window_seconds": 300,  # 5 minutes
+    "max_cluster_size": 50,      # prevent runaway grouping
+    "cluster_by": ["actor", "resource", "src_ip"],  # separate strategies
+}
+
+# Cluster ID generation:
+# cluster_id = f"{strategy}_{hash(sorted_event_ids)[:8]}"
+
+# Acceptance test:
+# - Same actor, 2 events 4 min apart → same cluster
+# - Same actor, 2 events 6 min apart → different clusters
+# - 51 events same actor → multiple clusters (size cap)
+```
+
+### Prompt batching budget
+```python
+PROMPT_CONFIG = {
+    "max_events_per_batch": 25,  # tune based on model
+    "max_prompt_tokens": 6000,   # leave room for response
+}
+
+# Batching strategy:
+# - Group correlated events into batches
+# - Each batch gets separate LLM call
+# - Merge structured outputs after validation
+# - Track batch_id in evidence for replay
+```
+
+### Error handling policy
+```python
+ERROR_HANDLING = {
+    "malformed_json": "log warning, skip record, continue",
+    "missing_required_field": "log warning, skip record, continue",
+    "llm_response_invalid_json": "fail run with clear error",
+    "llm_response_schema_violation": "fail run with clear error",
+    "llm_response_guardrail_violation": "fail run with clear error",
+}
+
+# Logging:
+# - Structured logs (JSON) with levels
+# - Separate error.log for interview review
+# - Include failure_count in run metadata (SQLite)
+```
+
+### Security and redaction
+```python
+REDACT_FIELDS = [
+    "responseElements.credentials",  # temp creds in AssumeRole
+    "requestParameters.password",
+    "userAgent",  # may contain internal tool names
+]
+
+# Storage:
+# - raw_hash stored, NOT full raw record (except in-memory during run)
+# - Evidence persists only minimal replay fields
+# - No secrets in SQLite database
+```
+
+---
+
 ## 3) Scope (tight for demo purposes)
 
 In scope:
@@ -111,24 +200,63 @@ Engineer tasks:
 - Keep normalized events in memory for prompt context (no new DB tables)
 - Ensure analysis-run persistence remains unchanged (run metadata + structured outputs + report stored)
 
-Example snippet (illustrative):
+**Normalization field handling:**
+```python
+# CloudTrail records have inconsistent field presence
+
+REQUIRED_FIELDS = ["eventTime", "eventSource", "eventName"]
+
+OPTIONAL_WITH_DEFAULTS = {
+    "actor": lambda rec: extract_actor(rec) or "SYSTEM",
+    "actor_type": lambda rec: rec.get("userIdentity", {}).get("type", "Unknown"),
+    "resource": lambda rec: extract_resources(rec) or ["NONE"],
+    "plane": lambda rec: infer_plane(rec) or "unknown",
+}
+
+# Validation:
+# - Skip records missing REQUIRED_FIELDS (log warning with source_file + index)
+# - Populate OPTIONAL_WITH_DEFAULTS deterministically
+
+# Resource extraction (Phase 1: simple; Phase 2: enhanced):
+# CloudTrail resources appear in 3 places:
+# 1. resources[] array (ARNs) - USE THIS IN PHASE 1
+# 2. requestParameters (nested, service-specific) - PHASE 2 HEURISTICS
+# 3. responseElements (often empty or redacted) - IGNORE
+
+def extract_resources(rec: dict) -> list:
+    """Phase 1: resources array only"""
+    resources = rec.get("resources", [])
+    return [r.get("ARN", "UNKNOWN") for r in resources] if resources else []
+
+def extract_actor(rec: dict) -> str:
+    """Fallback chain for actor extraction"""
+    ui = rec.get("userIdentity") or {}
+    return ui.get("arn") or ui.get("principalId") or ui.get("accountId") or None
+```
+
+Example snippet (complete):
 ```python
 def normalize_cloudtrail_record(rec: dict, source_file: str, idx: int) -> dict:
+    # Validate required fields
+    for field in REQUIRED_FIELDS:
+        if not rec.get(field):
+            raise ValueError(f"Missing required field: {field}")
+    
     ui = rec.get("userIdentity") or {}
     return {
         "provider": "aws",
         "source_file": source_file,
         "record_index": idx,
         "event_time": rec.get("eventTime"),
-        "actor": ui.get("arn") or ui.get("principalId"),
-        "actor_type": ui.get("type"),
+        "actor": extract_actor(rec) or "SYSTEM",
+        "actor_type": ui.get("type", "Unknown"),
         "action": f"{rec.get('eventSource')}:{rec.get('eventName')}",
-        "src_ip": rec.get("sourceIPAddress"),
-        "user_agent": rec.get("userAgent"),
+        "src_ip": rec.get("sourceIPAddress", "UNKNOWN"),
+        "user_agent": rec.get("userAgent", "UNKNOWN"),
         "outcome": "failure" if rec.get("errorCode") else "success",
         "raw": rec,
-        "plane": control plane affected,
-        "resource": ...
+        "plane": infer_plane(rec) or "unknown",
+        "resource": extract_resources(rec) or ["NONE"],
     }
 ```
 
@@ -143,14 +271,44 @@ Overseer acceptance checks:
 Goal: Demonstrate cloud security intuition: planes + "connect the dots" basics.
 
 Engineer tasks:
-- Add simple heuristics:
-  - IAM / STS / Organizations / CloudTrail -> control
-  - S3 object-level / DynamoDB item-level (if present) -> data
-  - GuardDuty findings / CloudWatch Logs events -> telemetry
+- Add plane tagging heuristics (deterministic):
+```python
+CONTROL_PLANE_ACTIONS = {
+    "iam.amazonaws.com": "*",  # all IAM actions
+    "sts.amazonaws.com": "*",  # all STS actions
+    "organizations.amazonaws.com": "*",
+    "cloudtrail.amazonaws.com": ["StopLogging", "DeleteTrail", "UpdateTrail"],
+}
+
+DATA_PLANE_INDICATORS = {
+    "eventName_suffix": ["Object", "Item", "Record"],  # GetObject, PutItem
+}
+
+TELEMETRY_SERVICES = [
+    "guardduty.amazonaws.com",
+    "cloudwatch.amazonaws.com",
+    "config.amazonaws.com",
+]
+
+def infer_plane(rec: dict) -> str:
+    event_source = rec.get("eventSource", "")
+    event_name = rec.get("eventName", "")
+    
+    if event_source in TELEMETRY_SERVICES:
+        return "telemetry"
+    if event_source in CONTROL_PLANE_ACTIONS:
+        return "control"
+    if any(event_name.endswith(suffix) for suffix in DATA_PLANE_INDICATORS["eventName_suffix"]):
+        return "data"
+    
+    return "unknown"
+```
+
 - Add minimal correlation in preprocessing (before LLM prompt):
-  - cluster by actor within time window
+  - cluster by actor within time window (300 seconds)
   - cluster by resource identifiers
   - add derived fields: `cluster_id`, `cluster_size`
+  - use correlation config from section 2.5
 
 Overseer acceptance checks:
 - Heuristics are deterministic and unit-tested
@@ -162,10 +320,39 @@ Overseer acceptance checks:
 Goal: Ensure the LLM sees the right context without letting it take control.
 
 Engineer tasks:
+- Define Pydantic schemas (provider-agnostic base):
+```python
+from pydantic import BaseModel, Field
+from typing import List, Literal, Optional
+
+class EvidenceItem(BaseModel):
+    source_file: str
+    record_index: int
+    event_time: str
+    actor: str
+    action: str
+    resource: str
+    raw_hash: str  # SHA-256 of raw record
+    batch_id: Optional[str] = None  # for multi-batch runs
+
+class Finding(BaseModel):
+    finding_id: str
+    severity: Literal["critical", "high", "medium", "low", "info"]
+    title: str = Field(..., max_length=200)
+    description: str = Field(..., max_length=2000)
+    evidence: List[EvidenceItem] = Field(..., min_items=1)  # MUST have evidence
+    
+class AWSFinding(Finding):
+    """AWS-specific extensions (optional)"""
+    account_id: Optional[str] = None  # extracted from ARN
+    region: Optional[str] = None
+```
+
 - Update the extraction prompt template to include:
   - explicit instruction hierarchy
   - event provenance labels
   - "JSON only" response requirement
+  - use prompt batching config from section 2.5
 - Provide event batches with stable formatting using normalized fields:
   - `Event[12] source=... idx=... actor=... action=... resource=...`
   - Include the raw record only as an attached JSON block for evidence
@@ -184,16 +371,44 @@ Goal: Nail the "how and why dataset was chosen" requirement.
 Engineer tasks:
 - Curate a small, stable subset of the Kaggle dataset:
   - documented selection criteria (e.g., "IAM + STS + logging-related actions")
-  - keep it small to avoid prompt overflow
-- Add README section:
-  - dataset source and license
-  - strengths/weaknesses (coverage gaps, synthetic bias if any)
-  - what "correlation" means in this tool (grouping, not proof; proximity-based, not causality)
-  - do not commit the dataset; commit only a small derived sample if the Kaggle license permits
+  - keep it small to avoid prompt overflow (target: 50-100 events)
+- Add README section with **critical limitations disclosure**:
 
-Dataset source:
-- https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud
-- License: use the Kaggle dataset license shown on the dataset page
+```markdown
+## Dataset
+
+### Source
+- URL: https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud
+- Origin: flaws.cloud (Scott Piper's AWS security training CTF)
+- License: [Kaggle dataset license]
+
+### **CRITICAL: This is synthetic data from a security challenge**
+
+**Strengths:**
+- Contains realistic IAM/STS/S3 patterns
+- Known attack scenarios (credential exposure, privilege escalation)
+- Well-structured CloudTrail format
+
+**Weaknesses:**
+- Limited service coverage (no EC2, Lambda, RDS, etc.)
+- No cross-account activity
+- No AWS service events (only user actions)
+- Timing patterns are artificial
+- Single-account perspective only
+
+**This tool demonstrates the harness architecture, not production-grade AWS coverage.**
+
+### Correlation Disclaimer
+
+"Correlation" in this tool means:
+- **Grouping by proximity** (same actor/resource within time window)
+- **NOT proof of causation**
+- **NOT attribution or determination**
+
+Clustered events suggest relationships for analyst review; they do not constitute findings.
+```
+
+- Do not commit the full dataset; commit only a small derived sample if the Kaggle license permits
 
 Overseer acceptance checks:
 - Demo run completes reliably
@@ -206,15 +421,39 @@ Goal: Prevent regressions and prove adapter correctness.
 
 Engineer tasks:
 - Unit tests:
-  - parsing a record
-  - normalization fields present
-  - plane tagging heuristics
+  - parsing a record (valid CloudTrail JSON)
+  - normalization fields present and populated correctly
+  - plane tagging heuristics (all cases: control/data/telemetry/unknown)
+  - resource extraction fallback chain
+  - actor extraction fallback chain
+  - correlation clustering (time windows, cluster size caps)
+
+- Negative test cases (critical):
+  - Empty CloudTrail file (should error gracefully)
+  - Malformed JSON (invalid escape sequences)
+  - CloudTrail record with null userIdentity
+  - Record missing required fields (eventTime, eventSource, eventName)
+  - LLM returns "I blocked this attack" (guardrail violation - should fail)
+  - LLM returns malformed JSON (schema validation - should fail)
+  - LLM returns valid JSON with missing evidence (schema validation - should fail)
+  - Mixed directory (EVTX + JSON) without --source flag (should error)
+
+- Performance test:
+  - 200 events completes in <60 seconds (reasonable for demo)
+
+- Regression test:
+  - Windows EVTX flow still passes after all phases (unchanged behavior)
+
 - End-to-end test with mocked LLM:
   - verifies DB writes and report output
+  - validates batch_id tracking for multi-batch scenarios
+  - confirms error.log created and populated on parsing failures
 
 Overseer acceptance checks:
-- Tests pass locally with a single command
-- Windows tests still pass
+- All tests pass locally with a single command (`pytest` or equivalent)
+- Windows tests still pass (zero regression)
+- Negative tests actually fail appropriately (not false passes)
+- Coverage report shows >80% for new AWS adapter code
 
 ---
 
