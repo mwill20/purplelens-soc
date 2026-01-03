@@ -65,3 +65,6 @@ reports/
 # Interview prep materials (not for GitHub)
 Lessons/
 Planning/
+
+# Test artifacts
+tmp_test_*/
