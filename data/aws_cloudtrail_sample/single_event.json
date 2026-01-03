@@ -1,0 +1,25 @@
+{
+  "eventVersion": "1.04",
+  "userIdentity": {
+    "type": "Root",
+    "principalId": "811596193553", 
+    "arn": "arn:aws:iam::811596193553:root",
+    "accountId": "811596193553",
+    "userName": "Unknown"
+  },
+  "eventTime": "2017-02-01T12:20:00Z",
+  "eventSource": "ec2.amazonaws.com",
+  "eventName": "DescribeInstances",
+  "awsRegion": "us-east-1",
+  "sourceIPAddress": "255.253.0.0",
+  "userAgent": "aws-cli/1.11.34",
+  "requestParameters": {
+    "filterSet": {},
+    "instancesSet": {}
+  },
+  "responseElements": null,
+  "requestID": "a1b2c3d4-e5f6-4789-a012-123456789abc",
+  "eventID": "a1b2c3d4-e5f6-4789-a012-123456789abc",
+  "eventType": "AwsApiCall",
+  "recipientAccountId": "811596193553"
+}

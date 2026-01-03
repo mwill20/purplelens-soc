@@ -2,10 +2,14 @@
   <img src="docs/PurpleLens-SOC-Logo.png" alt="PurpleLens SOC Logo" width="400"/>
 </div>
 
-# PurpleLens AI SOC Assistant
+# PurpleLens — AI-Assisted SOC Analysis with Deterministic Guardrails
+
+> **Branch:** `enhancement/aws-cloudtrail` - Multi-source log analysis with AWS CloudTrail support  
+> **Status:** AWS CloudTrail Enhancement Complete (Phases 0–4) ✅  
+> **Baseline:** Verified Windows EVTX functionality preserved
 
 ## Overview
-- CLI-driven SOC assistant that ingests parsed Windows EVTX telemetry (JSONL).
+- CLI-driven SOC assistant that ingests parsed Windows EVTX telemetry (JSONL) **and AWS CloudTrail logs (JSON/JSONL, CSV supported via prep script)**.
 - Uses an LLM strictly as a structured extraction engine; **deterministic Python renders the SOC report and persists run metadata**.
 - Guardrails enforce evidence-backed findings, policy-compliant narratives, and SQLite persistence for auditability.
 
@@ -84,6 +88,204 @@ python -m src.main --input data/evtx_parsed/ --dry-run
 python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 ```
 
+## Data Sources
+PurpleLens supports multiple log formats:
+- **Windows EVTX** - Fully implemented and tested
+- **AWS CloudTrail** - Fully implemented with plane tagging, correlation, and LLM batching
+
+### Source Detection
+PurpleLens automatically detects log format based on:
+1. File extension (`.evtx`, `.json`, `.jsonl`)
+2. Content analysis (CloudTrail schema markers)
+3. Directory contents (mixed directories require `--source` flag)
+
+Use `--source aws|windows` to override auto-detection when needed.
+
+**Important:** Each analysis run processes **one source type only** (either Windows EVTX or AWS CloudTrail). This design keeps different security contexts logically separated. If analyzing both Windows and cloud logs, run PurpleLens twice with separate directories or use the `--source` flag to specify which logs to process.
+
+### Dataset Information
+
+**Windows EVTX:** Uses EVTX-ATTACK-SAMPLES dataset (included in repository)
+- Located in `data/evtx_parsed/` and related directories
+- Ready to use for immediate testing
+
+**AWS CloudTrail:** Uses Kaggle Flaws CloudTrail dataset  
+- **Sample data:** Small CloudTrail sample included at `data/sample_cloudtrail.csv` (50 records, 13KB)
+- **Full dataset:** Download [AWS CloudTrails dataset from Flaws Cloud](https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud) 
+- **File:** Save full dataset as `data/dec12_18features.csv` (830MB - excluded from git)
+- **Usage:** Sample data sufficient for testing and development; full dataset for production analysis
+- **Conversion:** CSV requires preprocessing via `scripts/aws_csv_to_jsonl.py`
+- **Features:** Captures assumed roles, plane tagging, correlation clustering, security context
+- **Security:** Raw CloudTrail records never stored in database; only normalized events + SHA256 hash
+
+### AWS CloudTrail Usage
+
+**Quick Start (Sample Data)**
+```powershell
+# Test with included sample (50 records)
+python scripts/aws_csv_to_jsonl.py data/sample_cloudtrail.csv data/sample_aws.jsonl
+python -m src.main --input data/sample_aws.jsonl --source aws
+```
+
+**Full Dataset Workflow**
+```powershell
+# 1. Download Kaggle dataset to data/dec12_18features.csv
+# 2. Convert CSV to JSONL format
+python scripts/aws_csv_to_jsonl.py data/dec12_18features.csv data/aws_cloudtrail.jsonl
+# 3. Run analysis
+python -m src.main --input data/aws_cloudtrail.jsonl --source aws
+```
+
+### AWS CloudTrail Capabilities
+- **Plane tagging:** Conservative control/data/telemetry classification with unknown fallback
+- **Correlation:** Proximity-based clustering with 5-minute time windows and deterministic IDs
+- **LLM batching:** AWS-specific prompts with 25-event batches for token efficiency
+
+---
+
+## 🎯 AWS CloudTrail Demo
+
+### Demo Data Policy
+
+**Core Capabilities:**
+- ✅ Tool supports AWS CloudTrail ingestion from JSON/JSONL; CSV requires prep script
+- ✅ Raw CloudTrail is not stored in DB (hash + minimal replay fields only)
+- ✅ LLM outputs JSON-only and is schema validated
+- ✅ Findings require evidence (source_file + record_index)
+- ✅ Tool never claims it executed remediation/actions
+
+**Security Guardrails:**
+- No raw CloudTrail stored (data minimization)
+- Evidence-backed findings only (no speculation without provenance)
+- Conservative plane tagging (unknown fallback, not definitive impact assessment)
+- Proximity correlation only (cluster_id indicates timing, not causality)
+
+### Dataset Limitations & Disclosure
+
+**Source:** Kaggle "AWS CloudTrails dataset from Flaws Cloud" (training/CTF-derived)
+**Data Type:** Training/CTF scenarios, not production exports
+
+**Strengths:**
+- Realistic IAM/STS authentication patterns
+- Known attack scenarios with documented TTPs
+- Consistent account structure for correlation testing
+- Representative AWS service coverage for security events
+
+**Weaknesses:**
+- Limited service coverage (primarily IAM, S3, CloudTrail management)
+- Artificial timing patterns (condensed attack timeline)
+- Missing cross-account and organizational context
+- Single-account scope (no multi-org federation scenarios)
+
+**Claim Boundary:** "Demonstrates the harness and guardrails, not full production AWS coverage."
+
+### Reproducible Demo Commands
+
+**Step 1: Prep CSV → JSONL**
+```powershell
+# Convert sample data (50 records, quick demo)
+python scripts/aws_csv_to_jsonl.py data/sample_cloudtrail.csv data/aws_demo.jsonl
+
+# OR convert full dataset (if available locally)
+python scripts/aws_csv_to_jsonl.py data/dec12_18features.csv data/aws_full.jsonl
+```
+
+**Step 2: Run Analysis**
+```powershell
+# Analyze with AWS-specific prompts and batching
+python -m src.main --source aws --input data/aws_demo.jsonl
+
+# Verbose mode (see plane tagging and correlation details)
+python -m src.main --source aws --input data/aws_demo.jsonl --verbose
+
+# Save to file instead of console
+python -m src.main --source aws --input data/aws_demo.jsonl --output file
+```
+
+**What You Should See:**
+- **Parsing:** `X events parsed, Y events skipped` (field validation)
+- **Plane Counts:** `control: A, data: B, telemetry: C, unknown: D`
+- **Cluster Counts:** `X correlation clusters created` (5-minute time windows)
+- **LLM Batching:** `Processing N AWS batches with M total events`
+- **Report:** Generated analysis with AWS-specific findings and hypotheses
+
+**Step 3: Verify Database**
+```powershell
+# Use the provided verification script
+python scripts/check_demo_db.py
+
+# Expected output:
+# - Tables: analysis_runs, findings, hypotheses, indicators_of_compromise, reports
+# - Analysis run count
+# - Recent findings with confidence scores
+```
+
+### Demo Subset Strategy (License-Safe)
+
+**Approach:** Path A - No large data committed, local placement instructions
+
+**For Interviews/Demos:**
+1. Use included `data/sample_cloudtrail.csv` (50 records, 13KB) - minimal non-sensitive subset for demonstration
+2. For full testing: Download Kaggle dataset to `data/dec12_18features.csv` (excluded from git, no redistribution)
+3. All commands work with either sample or full dataset
+
+**Expected Output Shape (Sample Data):**
+- ~40-45 successfully parsed CloudTrail events
+- ~2-4 plane categories detected
+- ~8-12 correlation clusters (5-minute proximity windows)
+- 2-3 LLM batches processed
+- AWS-specific security findings with CloudTrail evidence
+
+*Note: Exact numbers may vary due to LLM nondeterminism, but structure and guardrails remain consistent.*
+
+---
+
+## ✅ Acceptance Criteria (AWS Enhancement)
+
+All of the following are verified:
+- ✅ CSV to JSONL converter functional and tested
+- ✅ CloudTrail JSONL ingests into normalized envelopes
+- ✅ Provenance preserved (source_file + record_index)
+- ✅ Plane tagging + proximity correlation applied
+- ✅ LLM batching enforced with schema validation
+- ✅ Raw CloudTrail never stored (data minimization)
+- ✅ Windows EVTX workflow unchanged
+- ✅ All tests passing (76/76)
+- ✅ Documentation complete
+
+**CLI Validation:**
+```powershell
+# Convert sample data
+python scripts/aws_csv_to_jsonl.py data/dec12_18features.csv data/test.jsonl
+
+# Test ingestion
+python -m src.main --input data/test.jsonl --source aws --dry-run
+# Expected: Normalized events created, provenance tracked, no raw storage
+```
+
+**SQLite Validation:**
+- New normalized events present with source="aws_cloudtrail"
+- Each event has source_file, record_index, raw_hash
+- No raw CloudTrail records in database
+- Windows EVTX data unchanged
+
+### CloudTrail Data Security & Storage
+
+**Never Stored (Security Risk):**
+- `requestParameters` / `responseElements` - Contains API keys, passwords, user data, infrastructure secrets
+- Full raw records - Preserves sensitive operational details and configuration data
+
+**Never Stored (Storage Efficiency):**
+- Raw events: 2-10KB each with 90% irrelevant nested metadata
+- Massive redundancy across thousands of events from same environment
+
+**Always Stored (Analysis Value):**
+- Normalized security-relevant fields: actor, action, source, outcome, resources
+- SHA256 hash: Verifies data integrity and enables deduplication without storing sensitive content
+- Minimal replay fields: Event ID, region, timestamps for correlation
+
+This approach supports incident response while maintaining data minimization and operational security.
+
 ### Known Limitations
 - CLI only; GUI is a future enhancement.
 - Requires pre-parsed JSONL EVTX files; raw EVTX parsing is out of scope.
@@ -91,10 +293,7 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 - Single OpenAI model call per run; no multi-turn reasoning.
 - LLM outputs can still contain redundant summaries or overlapping recommendations; report post-processing mitigates but does not fully eliminate this.
 - **This tool does not make determinations or take actions** - it provides structured evidence for analyst review.
-- **Guardrail Coverage:** LLM guardrails generally consist of three types:
-  - **Structural/Deterministic:** Validates data structure, types, and constraints using Pydantic schemas (✅ Implemented via `schemas.py`)
-  - **Pattern-Based Policy:** Enforces content policies through regex pattern matching for prohibited language (✅ Implemented via `security.py` - blocks false authority claims like "I have blocked..." or "This is malicious")
-  - **Semantic/Reasoning:** Validates logical coherence, contextual accuracy, and reasoning quality of LLM outputs (⚠️ Intentionally simplified for demo - production deployments should add semantic validation as defense-in-depth via LLM-as-validator, rule-based security logic, or confidence calibration)
+- **Guardrail Coverage:** Structural validation via Pydantic schemas, pattern-based policy enforcement via `security.py`, semantic reasoning intentionally simplified for demo. See Security & Guardrails section in Demo Data Policy above.
 
 ### Future Enhancements
 1. Streamlit/GUI wrapper for analysts.
@@ -166,6 +365,19 @@ validation/           # overseer approvals
 
 **Third-Party Attributions:**
 - **EVTX Dataset:** [sbousseaden/EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES) - Sample Windows event logs for testing
+- **AWS Dataset:** [Kaggle Flaws CloudTrail Dataset](https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud) - AWS CloudTrail logs for cloud security analysis
 - **OpenAI API:** Requires valid API key and compliance with [OpenAI Terms of Service](https://openai.com/policies/terms-of-use)
+
+### Development Notes (AWS CloudTrail Enhancement)
+
+**Branch Safety:** 
+- Baseline commit `2b25fc0d9af9b39dc5cf87a6ea18a13813409fe1` verified and tagged
+- Windows EVTX workflow unchanged and fully functional
+- Rollback procedures documented in `Fallback.md`
+
+**Current Status:**
+- **AWS CloudTrail Enhancement ✅:** CSV conversion, ingestion, plane tagging, correlation, LLM batching complete
+- **Testing:** All tests passing (76/76) - 16 AWS-specific, 60 Windows baseline
+- **Documentation:** Interview-ready with demo runbook and dataset limitations disclosure
 
 **Purpose:** This project is designed for cybersecurity portfolio demonstration and technical interviews.

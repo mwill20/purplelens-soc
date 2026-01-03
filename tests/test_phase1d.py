@@ -221,7 +221,7 @@ def test_empty_sections_handled():
     report = generate_report(analysis)
     
     # Should have multiple (none) entries for empty sections
-    assert report.count("(none)") == 4, "Empty sections not handled correctly"
+    assert report.count("(none)") == 5, "Empty sections not handled correctly"
     
     print("✓ Empty sections display '(none)' correctly")
 

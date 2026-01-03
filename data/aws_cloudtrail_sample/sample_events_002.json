@@ -1,0 +1,57 @@
+{
+  "Records": [
+    {
+      "eventVersion": "1.02",
+      "userIdentity": {
+        "type": "Root",
+        "principalId": "811596193553",
+        "arn": "arn:aws:iam::811596193553:root",
+        "accountId": "811596193553",
+        "accessKeyId": "ASIA79EXPHZ8SRL55OOE"
+      },
+      "eventTime": "2017-02-01T12:10:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "GetAccountSummary",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "255.253.0.0",
+      "userAgent": "console.amazonaws.com",
+      "requestParameters": {},
+      "responseElements": {
+        "accountUsage": {
+          "Users": 1,
+          "Groups": 0,
+          "Roles": 0,
+          "Policies": 0,
+          "UserPolicySizeQuota": 2048,
+          "GroupPolicySizeQuota": 5120
+        }
+      },
+      "requestID": "9facf7ca-cb76-4b19-940c-3de6803f7efb",
+      "eventID": "9facf7ca-cb76-4b19-940c-3de6803f7efb",
+      "eventType": "AwsApiCall",
+      "recipientAccountId": "811596193553"
+    },
+    {
+      "eventVersion": "1.02",
+      "userIdentity": {
+        "type": "Root",
+        "principalId": "811596193553",
+        "arn": "arn:aws:iam::811596193553:root",
+        "accountId": "811596193553",
+        "accessKeyId": "ASIA79EXPHZ8SRL55OOE"
+      },
+      "eventTime": "2017-02-01T12:15:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "ListAccountAliases",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "255.253.0.0",
+      "userAgent": "console.amazonaws.com",
+      "requestParameters": {},
+      "responseElements": null,
+      "requestID": "6596d3b4-7c98-40b1-867d-f317f1dbdc18",
+      "eventID": "6596d3b4-7c98-40b1-867d-f317f1dbdc18",
+      "eventType": "AwsApiCall",
+      "recipientAccountId": "811596193553"
+    }
+  ]
+}

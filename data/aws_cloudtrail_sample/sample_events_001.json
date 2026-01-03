@@ -1,0 +1,53 @@
+{
+  "Records": [
+    {
+      "eventVersion": "1.04",
+      "userIdentity": {
+        "type": "Root",
+        "principalId": "811596193553",
+        "arn": "arn:aws:iam::811596193553:root",
+        "accountId": "811596193553",
+        "userName": "Unknown"
+      },
+      "eventTime": "2017-02-01T12:00:00Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "ListBuckets",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "255.253.0.0",
+      "userAgent": "S3Console",
+      "requestParameters": {},
+      "responseElements": null,
+      "requestID": "3038ebd2-c98a-4c65-9b6e-e22506292313",
+      "eventID": "3038ebd2-c98a-4c65-9b6e-e22506292313",
+      "eventType": "AwsApiCall",
+      "recipientAccountId": "811596193553",
+      "serviceEventDetails": null,
+      "sharedEventID": null,
+      "vpcEndpointId": null
+    },
+    {
+      "eventVersion": "1.02",
+      "userIdentity": {
+        "type": "Root",
+        "principalId": "811596193553",
+        "arn": "arn:aws:iam::811596193553:root",
+        "accountId": "811596193553",
+        "accessKeyId": "ASIA79EXPHZ8SRL55OOE"
+      },
+      "eventTime": "2017-02-01T12:05:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "GetAccountPasswordPolicy",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "255.253.0.0",
+      "userAgent": "console.amazonaws.com",
+      "errorCode": "NoSuchEntityException",
+      "errorMessage": "The Password Policy with domain name 811596193553 cannot be found.",
+      "requestParameters": {},
+      "responseElements": null,
+      "requestID": "22a0d9b1-deea-4d39-827b-2af7050ed3f3",
+      "eventID": "22a0d9b1-deea-4d39-827b-2af7050ed3f3",
+      "eventType": "AwsApiCall",
+      "recipientAccountId": "811596193553"
+    }
+  ]
+}

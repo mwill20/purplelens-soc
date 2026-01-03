@@ -65,3 +65,13 @@ reports/
 # Interview prep materials (not for GitHub)
 Lessons/
 Planning/
+validation/
+
+# Test artifacts
+tmp_test_*/
+
+# Kaggle dataset - too large for git (but allow small samples)
+data/dec12_18features.csv
+data/*_features.csv
+# Allow sample files
+!data/sample_*.csv
