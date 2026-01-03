@@ -4,8 +4,12 @@
 
 # PurpleLens AI SOC Assistant
 
+> **Branch:** `enhancement/aws-cloudtrail` - Multi-source log analysis with AWS CloudTrail support  
+> **Status:** Phase 0 Complete ✅ | Phase 1 Development Ready ⏳  
+> **Baseline:** Verified Windows EVTX functionality preserved
+
 ## Overview
-- CLI-driven SOC assistant that ingests parsed Windows EVTX telemetry (JSONL).
+- CLI-driven SOC assistant that ingests parsed Windows EVTX telemetry (JSONL) **and AWS CloudTrail logs (JSON)**.
 - Uses an LLM strictly as a structured extraction engine; **deterministic Python renders the SOC report and persists run metadata**.
 - Guardrails enforce evidence-backed findings, policy-compliant narratives, and SQLite persistence for auditability.
 
@@ -97,6 +101,18 @@ PurpleLens automatically detects log format based on:
 
 Use `--source aws|windows` to override auto-detection when needed.
 
+### Dataset Information
+
+**Windows EVTX:** Uses EVTX-ATTACK-SAMPLES dataset (included in repository)
+- Located in `data/evtx_parsed/` and related directories
+- Ready to use for immediate testing
+
+**AWS CloudTrail:** Uses Kaggle Flaws CloudTrail dataset (not committed)
+- **Sample data:** Small CloudTrail files included in `data/aws_cloudtrail_sample/` (5 events)
+- **Full dataset:** Download [AWS CloudTrails dataset from Flaws Cloud](https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud) 
+- **File:** Save as `data/dec12_18features.csv` (830MB - excluded from git via .gitignore)
+- **Usage:** Sample data sufficient for Phase 0 testing; full dataset needed for Phase 1 development
+
 ### Known Limitations
 - CLI only; GUI is a future enhancement.
 - Requires pre-parsed JSONL EVTX files; raw EVTX parsing is out of scope.
@@ -179,6 +195,19 @@ validation/           # overseer approvals
 
 **Third-Party Attributions:**
 - **EVTX Dataset:** [sbousseaden/EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES) - Sample Windows event logs for testing
+- **AWS Dataset:** [Kaggle Flaws CloudTrail Dataset](https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud) - AWS CloudTrail logs for cloud security analysis
 - **OpenAI API:** Requires valid API key and compliance with [OpenAI Terms of Service](https://openai.com/policies/terms-of-use)
+
+### Development Notes (AWS CloudTrail Enhancement)
+
+**Branch Safety:** 
+- Baseline commit `2b25fc0d9af9b39dc5cf87a6ea18a13813409fe1` verified and tagged
+- Windows EVTX workflow unchanged and fully functional
+- Rollback procedures documented in `Fallback.md`
+
+**Current Status:**
+- **Phase 0 ✅:** Source detection + AWS adapter stub implemented
+- **Phase 1 ⏳:** CloudTrail parsing + normalization (next development phase)
+- **Testing:** All source detection tests passing, baseline regression tests verified
 
 **Purpose:** This project is designed for cybersecurity portfolio demonstration and technical interviews.
