@@ -107,26 +107,30 @@ Use `--source aws|windows` to override auto-detection when needed.
 - Located in `data/evtx_parsed/` and related directories
 - Ready to use for immediate testing
 
-**AWS CloudTrail:** Uses Kaggle Flaws CloudTrail dataset (not committed)
-- **Sample data:** Small CloudTrail files included in `data/aws_cloudtrail_sample/` (5 events)
+**AWS CloudTrail:** Uses Kaggle Flaws CloudTrail dataset  
+- **Sample data:** Small CloudTrail sample included at `data/sample_cloudtrail.csv` (50 records, 13KB)
 - **Full dataset:** Download [AWS CloudTrails dataset from Flaws Cloud](https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud) 
-- **File:** Save as `data/dec12_18features.csv` (830MB - excluded from git via .gitignore)
-- **Usage:** Sample data sufficient for Phase 0 testing; full dataset needed for Phase 1 development
-- **Conversion:** CSV requires preprocessing via `scripts/aws_csv_to_jsonl.py` (Phase 1)
-- **Enhanced mapping:** Captures assumed roles, org context, telemetry tampering signals
-- **Security:** Raw CloudTrail records never stored in database; only normalized events + SHA256 hash for integrity verification
+- **File:** Save full dataset as `data/dec12_18features.csv` (830MB - excluded from git)
+- **Usage:** Sample data sufficient for testing and development; full dataset for production analysis
+- **Conversion:** CSV requires preprocessing via `scripts/aws_csv_to_jsonl.py`
+- **Features:** Captures assumed roles, plane tagging, correlation clustering, security context
+- **Security:** Raw CloudTrail records never stored in database; only normalized events + SHA256 hash
 
 ### AWS CloudTrail Usage
 
-**Step 1: Convert Kaggle Dataset**
+**Quick Start (Sample Data)**
 ```powershell
-# Convert CSV to JSONL format
-python scripts/aws_csv_to_jsonl.py data/dec12_18features.csv data/aws_cloudtrail.jsonl
+# Test with included sample (50 records)
+python scripts/aws_csv_to_jsonl.py data/sample_cloudtrail.csv data/sample_aws.jsonl
+python -m src.main --input data/sample_aws.jsonl --source aws
 ```
 
-**Step 2: Run Analysis**
+**Full Dataset Workflow**
 ```powershell
-# Analyze CloudTrail events
+# 1. Download Kaggle dataset to data/dec12_18features.csv
+# 2. Convert CSV to JSONL format
+python scripts/aws_csv_to_jsonl.py data/dec12_18features.csv data/aws_cloudtrail.jsonl
+# 3. Run analysis
 python -m src.main --input data/aws_cloudtrail.jsonl --source aws
 ```
 
