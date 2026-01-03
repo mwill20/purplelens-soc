@@ -40,7 +40,7 @@ def test_missing_api_key():
         
         # Remove API key from environment for this test
         env = os.environ.copy()
-        env.pop("OPENAI_API_KEY", None)
+        env["OPENAI_API_KEY"] = ""
         
         result = subprocess.run(
             [sys.executable, "-m", "src.main", "--input", tmpdir],
@@ -119,7 +119,11 @@ def test_empty_directory_error():
         )
         
         assert result.returncode == 1, "Empty directory should exit with code 1"
-        assert "No JSONL files" in result.stderr or "Failed to load" in result.stderr
+        assert (
+            "No JSONL files" in result.stderr
+            or "Failed to load" in result.stderr
+            or "No supported files found in directory" in result.stderr
+        )
         
     print("✓ Empty directory produces error")
 

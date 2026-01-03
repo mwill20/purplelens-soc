@@ -130,6 +130,10 @@ python scripts/aws_csv_to_jsonl.py data/dec12_18features.csv data/aws_cloudtrail
 python -m src.main --input data/aws_cloudtrail.jsonl --source aws
 ```
 
+### Phase 2 Capabilities (AWS)
+- **Plane tagging:** conservative control/data/telemetry labeling with unknown fallback
+- **Correlation:** time-window clustering (5 minutes) with deterministic cluster IDs
+
 ---
 
 ## ✅ Acceptance Criteria

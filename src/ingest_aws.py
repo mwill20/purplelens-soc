@@ -8,6 +8,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
+from src.aws_plane_tagging import tag_plane
+
 logger = logging.getLogger(__name__)
 
 REQUIRED_CLOUDTRAIL_FIELDS = ["eventTime", "eventSource", "eventName"]
@@ -173,6 +175,10 @@ def _normalize_record(
             "event_type": _extract_optional(record, "eventType"),
             "read_only": _parse_bool(record.get("readOnly")),
             "management_event": _parse_bool(record.get("managementEvent")),
+            "plane": tag_plane(
+                safe_extract(record, "eventSource"),
+                safe_extract(record, "eventName"),
+            ),
         }
     except Exception as exc:  # noqa: BLE001
         logger.error(

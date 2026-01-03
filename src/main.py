@@ -214,6 +214,12 @@ def main() -> int:                                 # for the one-pass orchestrat
         LOGGER.error("Failed to load events: %s", exc)
         return 1
 
+    if len([e for e in events if e.get("raw_event", {}).get("source") == "aws_cloudtrail"]) > 1:
+        from src.aws_correlate import correlate_events
+        from src.config_aws import CORRELATION_CONFIG
+
+        events = correlate_events(events, CORRELATION_CONFIG)
+
     if args.dry_run:
         print(
             f"Validation successful. Loaded {len(events)} events from {args.input}.",
