@@ -116,6 +116,50 @@ Use `--source aws|windows` to override auto-detection when needed.
 - **Enhanced mapping:** Captures assumed roles, org context, telemetry tampering signals
 - **Security:** Raw CloudTrail records never stored in database; only normalized events + SHA256 hash for integrity verification
 
+### AWS CloudTrail Usage
+
+**Step 1: Convert Kaggle Dataset**
+```powershell
+# Convert CSV to JSONL format
+python scripts/aws_csv_to_jsonl.py data/dec12_18features.csv data/aws_cloudtrail.jsonl
+```
+
+**Step 2: Run Analysis**
+```powershell
+# Analyze CloudTrail events
+python -m src.main --input data/aws_cloudtrail.jsonl --source aws
+```
+
+---
+
+## ✅ Acceptance Criteria
+
+**Phase 1 Complete When:**
+- [ ] CSV to JSONL converter functional and tested
+- [ ] CloudTrail JSONL ingests into normalized envelopes
+- [ ] Provenance tracking (`source_file` + `record_index`) preserved
+- [ ] Required field validation with skip/warning behavior
+- [ ] Raw hash generation (no raw record storage)
+- [ ] Windows EVTX workflow unchanged
+- [ ] All tests passing (new + regression)
+- [ ] Documentation updated
+
+**CLI Validation:**
+```powershell
+# Convert sample data
+python scripts/aws_csv_to_jsonl.py data/dec12_18features.csv data/test.jsonl
+
+# Test ingestion
+python -m src.main --input data/test.jsonl --source aws --dry-run
+# Expected: Normalized events created, provenance tracked, no raw storage
+```
+
+**SQLite Validation:**
+- New normalized events present with source="aws_cloudtrail"
+- Each event has source_file, record_index, raw_hash
+- No raw CloudTrail records in database
+- Windows EVTX data unchanged
+
 ### CloudTrail Data Security & Storage
 
 **Never Stored (Security Risk):**
