@@ -84,6 +84,19 @@ python -m src.main --input data/evtx_parsed/ --dry-run
 python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 ```
 
+## Data Sources
+PurpleLens supports multiple log formats:
+- **Windows EVTX** - Fully implemented and tested
+- **AWS CloudTrail** - Adapter scaffolded (Phase 1 implementation pending)
+
+### Source Detection
+PurpleLens automatically detects log format based on:
+1. File extension (`.evtx`, `.json`, `.jsonl`)
+2. Content analysis (CloudTrail schema markers)
+3. Directory contents (mixed directories require `--source` flag)
+
+Use `--source aws|windows` to override auto-detection when needed.
+
 ### Known Limitations
 - CLI only; GUI is a future enhancement.
 - Requires pre-parsed JSONL EVTX files; raw EVTX parsing is out of scope.
