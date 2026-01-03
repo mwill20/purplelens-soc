@@ -112,6 +112,26 @@ Use `--source aws|windows` to override auto-detection when needed.
 - **Full dataset:** Download [AWS CloudTrails dataset from Flaws Cloud](https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud) 
 - **File:** Save as `data/dec12_18features.csv` (830MB - excluded from git via .gitignore)
 - **Usage:** Sample data sufficient for Phase 0 testing; full dataset needed for Phase 1 development
+- **Conversion:** CSV requires preprocessing via `scripts/aws_csv_to_jsonl.py` (Phase 1)
+- **Enhanced mapping:** Captures assumed roles, org context, telemetry tampering signals
+- **Security:** Raw CloudTrail records never stored in database; only normalized events + SHA256 hash for integrity verification
+
+### CloudTrail Data Security & Storage
+
+**Never Stored (Security Risk):**
+- `requestParameters` / `responseElements` - Contains API keys, passwords, user data, infrastructure secrets
+- Full raw records - Preserves sensitive operational details and configuration data
+
+**Never Stored (Storage Efficiency):**
+- Raw events: 2-10KB each with 90% irrelevant nested metadata
+- Massive redundancy across thousands of events from same environment
+
+**Always Stored (Analysis Value):**
+- Normalized security-relevant fields: actor, action, source, outcome, resources
+- SHA256 hash: Verifies data integrity and enables deduplication without storing sensitive content
+- Minimal replay fields: Event ID, region, timestamps for correlation
+
+This approach supports incident response while maintaining data minimization and operational security.
 
 ### Known Limitations
 - CLI only; GUI is a future enhancement.
