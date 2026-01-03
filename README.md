@@ -101,6 +101,8 @@ PurpleLens automatically detects log format based on:
 
 Use `--source aws|windows` to override auto-detection when needed.
 
+**Important:** Each analysis run processes **one source type only** (either Windows EVTX or AWS CloudTrail). This design keeps different security contexts logically separated. If analyzing both Windows and cloud logs, run PurpleLens twice with separate directories or use the `--source` flag to specify which logs to process.
+
 ### Dataset Information
 
 **Windows EVTX:** Uses EVTX-ATTACK-SAMPLES dataset (included in repository)
