@@ -2,7 +2,7 @@
   <img src="docs/PurpleLens-SOC-Logo.png" alt="PurpleLens SOC Logo" width="400"/>
 </div>
 
-# PurpleLens AI SOC Assistant
+# PurpleLens — AI-Assisted SOC Analysis with Deterministic Guardrails
 
 > **Branch:** `enhancement/aws-cloudtrail` - Multi-source log analysis with AWS CloudTrail support  
 > **Status:** AWS CloudTrail Enhancement Complete (Phases 0–4) ✅  
@@ -210,7 +210,7 @@ python -m src.main --source aws --input data/aws_demo.jsonl --output file
 **Step 3: Verify Database**
 ```powershell
 # Use the provided verification script
-python check_demo_db.py
+python scripts/check_demo_db.py
 
 # Expected output:
 # - Tables: analysis_runs, findings, hypotheses, indicators_of_compromise, reports
