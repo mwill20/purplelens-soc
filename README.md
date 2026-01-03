@@ -140,6 +140,103 @@ python -m src.main --input data/aws_cloudtrail.jsonl --source aws
 
 ---
 
+## 🎯 AWS CloudTrail Demo
+
+### Demo Data Policy
+
+**Core Capabilities:**
+- ✅ Tool supports AWS CloudTrail ingestion from JSON/JSONL; CSV requires prep script
+- ✅ Raw CloudTrail is not stored in DB (hash + minimal replay fields only)
+- ✅ LLM outputs JSON-only and is schema validated
+- ✅ Findings require evidence (source_file + record_index)
+- ✅ Tool never claims it executed remediation/actions
+
+**Security Guardrails:**
+- No raw CloudTrail stored (data minimization)
+- Evidence-backed findings only (no speculation without provenance)
+- Conservative plane tagging (unknown fallback, not definitive impact assessment)
+- Proximity correlation only (cluster_id indicates timing, not causality)
+
+### Dataset Limitations & Disclosure
+
+**Source:** Kaggle "AWS CloudTrails dataset from Flaws Cloud" (training/CTF-derived)
+**Data Type:** Training/CTF scenarios, not production exports
+
+**Strengths:**
+- Realistic IAM/STS authentication patterns
+- Known attack scenarios with documented TTPs
+- Consistent account structure for correlation testing
+- Representative AWS service coverage for security events
+
+**Weaknesses:**
+- Limited service coverage (primarily IAM, S3, CloudTrail management)
+- Artificial timing patterns (condensed attack timeline)
+- Missing cross-account and organizational context
+- Single-account scope (no multi-org federation scenarios)
+
+**Claim Boundary:** "Demonstrates the harness and guardrails, not full production AWS coverage."
+
+### Reproducible Demo Commands
+
+**Step 1: Prep CSV → JSONL**
+```powershell
+# Convert sample data (50 records, quick demo)
+python scripts/aws_csv_to_jsonl.py data/sample_cloudtrail.csv data/aws_demo.jsonl
+
+# OR convert full dataset (if available locally)
+python scripts/aws_csv_to_jsonl.py data/dec12_18features.csv data/aws_full.jsonl
+```
+
+**Step 2: Run Analysis**
+```powershell
+# Analyze with AWS-specific prompts and batching
+python -m src.main --source aws --input data/aws_demo.jsonl
+
+# Verbose mode (see plane tagging and correlation details)
+python -m src.main --source aws --input data/aws_demo.jsonl --verbose
+
+# Save to file instead of console
+python -m src.main --source aws --input data/aws_demo.jsonl --output file
+```
+
+**What You Should See:**
+- **Parsing:** `X events parsed, Y events skipped` (field validation)
+- **Plane Counts:** `control: A, data: B, telemetry: C, unknown: D`
+- **Cluster Counts:** `X correlation clusters created` (5-minute time windows)
+- **LLM Batching:** `Processing N AWS batches with M total events` (Phase 3)
+- **Report:** Generated analysis with AWS-specific findings and hypotheses
+
+**Step 3: Verify Database**
+```powershell
+# Use the provided verification script
+python check_demo_db.py
+
+# Expected output:
+# - Tables: analysis_runs, findings, hypotheses, indicators_of_compromise, reports
+# - Analysis run count
+# - Recent findings with confidence scores
+```
+
+### Demo Subset Strategy (License-Safe)
+
+**Approach:** Path A - No large data committed, local placement instructions
+
+**For Interviews/Demos:**
+1. Use included `data/sample_cloudtrail.csv` (50 records, 13KB, committed)
+2. For full testing: Download Kaggle dataset to `data/dec12_18features.csv` (excluded from git)
+3. All commands work with either sample or full dataset
+
+**Expected Output Shape (Sample Data):**
+- ~40-45 successfully parsed CloudTrail events
+- ~2-4 plane categories detected
+- ~8-12 correlation clusters (5-minute proximity windows)
+- 2-3 LLM batches processed
+- AWS-specific security findings with CloudTrail evidence
+
+*Note: Exact numbers may vary due to LLM nondeterminism, but structure and guardrails remain consistent.*
+
+---
+
 ## ✅ Acceptance Criteria
 
 **Phase 1 Complete When:**
