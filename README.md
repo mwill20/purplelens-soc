@@ -294,6 +294,7 @@ This approach supports incident response while maintaining data minimization and
 - LLM outputs can still contain redundant summaries or overlapping recommendations; report post-processing mitigates but does not fully eliminate this.
 - **This tool does not make determinations or take actions** - it provides structured evidence for analyst review.
 - **Guardrail Coverage:** Structural validation via Pydantic schemas, pattern-based policy enforcement via `security.py`, semantic reasoning intentionally simplified for demo. See Security & Guardrails section in Demo Data Policy above.
+- **AWS CloudTrail Dataset Anonymization:** The Kaggle CloudTrail dataset contains anonymized/truncated IP addresses (e.g., "255.253" instead of full IPs like "255.253.176.24"). This limits geolocation analysis but is typical for security training datasets that protect user privacy.
 
 ### Future Enhancements
 1. Streamlit/GUI wrapper for analysts.
