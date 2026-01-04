@@ -12,6 +12,7 @@ import json
 import logging
 import os
 import sys
+import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -63,7 +64,6 @@ def detect_source(input_path: Path) -> tuple[str, str]:
                         break
                     except PermissionError:
                         if attempt < max_retries - 1:
-                            import time
                             time.sleep(0.1)  # Brief delay for file handle release
                             continue
                         raise
