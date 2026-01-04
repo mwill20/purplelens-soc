@@ -35,7 +35,10 @@ def tag_plane(service: str, action: str) -> str:
             return "data"
 
     if service == "dynamodb.amazonaws.com":
-        if any(action.startswith(prefix) for prefix in {"Get", "Put", "Update", "Delete", "Query", "Scan"}):
+        if any(
+            action.startswith(prefix)
+            for prefix in {"Get", "Put", "Update", "Delete", "Query", "Scan"}
+        ):
             return "data"
 
     return "unknown"  # Conservative default

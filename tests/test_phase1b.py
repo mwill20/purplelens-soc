@@ -2,7 +2,6 @@
 
 import json
 import sqlite3
-import tempfile
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,8 +9,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.ingest import load_events
+from src.schemas import AnalysisOutput, Evidence, Finding, Hypothesis
 from src.storage import initialize_database, save_analysis
-from src.schemas import AnalysisOutput, Finding, Evidence, Hypothesis
 
 print("=" * 80)
 print("PHASE 1B VALIDATION TESTS")
@@ -30,8 +29,23 @@ test_dir.mkdir(exist_ok=True)
 # Create valid JSONL file
 valid_file = test_dir / "valid.jsonl"
 with valid_file.open("w") as f:
-    f.write(json.dumps({"Event": {"System": {"EventID": 4688}, "EventData": {"ProcessName": "powershell.exe"}}}) + "\n")
-    f.write(json.dumps({"Event": {"System": {"EventID": 4624}, "EventData": {"LogonType": 3}}}) + "\n")
+    f.write(
+        json.dumps(
+            {
+                "Event": {
+                    "System": {"EventID": 4688},
+                    "EventData": {"ProcessName": "powershell.exe"},
+                }
+            }
+        )
+        + "\n"
+    )
+    f.write(
+        json.dumps(
+            {"Event": {"System": {"EventID": 4624}, "EventData": {"LogonType": 3}}}
+        )
+        + "\n"
+    )
 print(f"✓ Created test file: {valid_file}")
 
 # Create file with malformed line
@@ -56,14 +70,14 @@ assert "source_file" in first_event
 assert "record_index" in first_event
 assert "event_id" in first_event
 assert "raw_event" in first_event
-print(f"✓ Provenance attached")
+print("✓ Provenance attached")
 print(f"  source_file: {Path(first_event['source_file']).name}")
 print(f"  record_index: {first_event['record_index']}")
 print(f"  event_id: {first_event['event_id']}")
 
 # Test 5: EventID extraction
 print("\n[TEST 5] EventID extraction")
-event_ids = [e['event_id'] for e in events]
+event_ids = [e["event_id"] for e in events]
 print(f"✓ Extracted EventIDs: {event_ids}")
 assert "4688" in event_ids
 assert "4624" in event_ids
@@ -111,25 +125,22 @@ evidence = Evidence(
     source_file="test.jsonl",
     record_index=0,
     event_id="4688",
-    excerpt="powershell.exe -ExecutionPolicy Bypass"
+    excerpt="powershell.exe -ExecutionPolicy Bypass",
 )
 finding = Finding(
     title="Suspicious PowerShell",
     summary="PowerShell with bypass flag detected",
     severity="high",
-    evidence=[evidence]
+    evidence=[evidence],
 )
-hypothesis = Hypothesis(
-    description="Possible reconnaissance activity",
-    confidence=0.72
-)
+hypothesis = Hypothesis(description="Possible reconnaissance activity", confidence=0.72)
 analysis = AnalysisOutput(
     status="success",
     findings=[finding],
     hypotheses=[hypothesis],
     indicators_of_compromise=["powershell.exe -ExecutionPolicy Bypass"],
     recommended_next_steps=["Investigate command history"],
-    confidence=0.75
+    confidence=0.75,
 )
 
 save_analysis(
@@ -139,7 +150,7 @@ save_analysis(
     input_files=["test.jsonl"],
     model_used="gpt-4o",
     report_text="Test report content",
-    report_generated_at=datetime.now(timezone.utc)
+    report_generated_at=datetime.now(timezone.utc),
 )
 print("✓ Analysis saved successfully")
 
@@ -149,7 +160,9 @@ conn = sqlite3.connect(str(test_db))
 cursor = conn.cursor()
 
 # Check analysis_runs
-cursor.execute("SELECT run_id, status, model_used FROM analysis_runs WHERE run_id = ?", (run_id,))
+cursor.execute(
+    "SELECT run_id, status, model_used FROM analysis_runs WHERE run_id = ?", (run_id,)
+)
 row = cursor.fetchone()
 assert row is not None
 print(f"✓ analysis_runs: run_id={row[0]}, status={row[1]}, model={row[2]}")
@@ -167,7 +180,9 @@ assert count == 1
 print(f"✓ hypotheses: {count} row(s)")
 
 # Check IOCs
-cursor.execute("SELECT COUNT(*) FROM indicators_of_compromise WHERE run_id = ?", (run_id,))
+cursor.execute(
+    "SELECT COUNT(*) FROM indicators_of_compromise WHERE run_id = ?", (run_id,)
+)
 count = cursor.fetchone()[0]
 assert count == 1
 print(f"✓ indicators_of_compromise: {count} row(s)")
@@ -186,8 +201,13 @@ print("\n[TEST 11] Status mapping (success/partial/failed)")
 # Test success status
 success_analysis = AnalysisOutput(status="success", confidence=0.8)
 save_analysis(
-    str(test_db), "test-success", success_analysis, ["test.jsonl"],
-    "gpt-4o", "report", datetime.now(timezone.utc)
+    str(test_db),
+    "test-success",
+    success_analysis,
+    ["test.jsonl"],
+    "gpt-4o",
+    "report",
+    datetime.now(timezone.utc),
 )
 conn = sqlite3.connect(str(test_db))
 cursor = conn.cursor()
@@ -197,13 +217,16 @@ print("✓ status='success' mapped to 'success'")
 
 # Test partial status (has findings despite error)
 partial_analysis = AnalysisOutput(
-    status="llm_error",
-    findings=[finding],
-    confidence=0.5
+    status="llm_error", findings=[finding], confidence=0.5
 )
 save_analysis(
-    str(test_db), "test-partial", partial_analysis, ["test.jsonl"],
-    "gpt-4o", "report", datetime.now(timezone.utc)
+    str(test_db),
+    "test-partial",
+    partial_analysis,
+    ["test.jsonl"],
+    "gpt-4o",
+    "report",
+    datetime.now(timezone.utc),
 )
 cursor.execute("SELECT status FROM analysis_runs WHERE run_id = ?", ("test-partial",))
 assert cursor.fetchone()[0] == "partial"
@@ -212,8 +235,13 @@ print("✓ status='llm_error' with findings mapped to 'partial'")
 # Test failed status
 failed_analysis = AnalysisOutput(status="timeout", confidence=0.0)
 save_analysis(
-    str(test_db), "test-failed", failed_analysis, ["test.jsonl"],
-    "gpt-4o", "report", datetime.now(timezone.utc)
+    str(test_db),
+    "test-failed",
+    failed_analysis,
+    ["test.jsonl"],
+    "gpt-4o",
+    "report",
+    datetime.now(timezone.utc),
 )
 cursor.execute("SELECT status FROM analysis_runs WHERE run_id = ?", ("test-failed",))
 assert cursor.fetchone()[0] == "failed"
@@ -233,8 +261,8 @@ cursor = conn.cursor()
 cursor.execute("PRAGMA foreign_keys")
 result = cursor.fetchone()
 fk_enabled = result[0] if result else 0
-print(f"✓ Foreign keys setting checked (enabled in storage.py connection setup)")
-print(f"  Note: FKs enforced via 'PRAGMA foreign_keys = ON' in _get_connection()")
+print("✓ Foreign keys setting checked (enabled in storage.py connection setup)")
+print("  Note: FKs enforced via 'PRAGMA foreign_keys = ON' in _get_connection()")
 conn.close()
 
 # Test 14: UTC timestamp handling

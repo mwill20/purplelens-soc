@@ -1,13 +1,13 @@
-
 """Test the new executive summary section."""
 
 # Allow running from tests/ by adding parent dir to sys.path
-import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import sys
 
-from src.schemas import AnalysisOutput, Finding
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from src.report import generate_report
+from src.schemas import AnalysisOutput
 
 # Test Case 1: All critical (should be HIGH risk)
 print("=" * 60)
@@ -22,24 +22,34 @@ critical_data = {
             "summary": "Files encrypted by ransomware.",
             "severity": "critical",
             "evidence": [
-                {"source_file": "log1.jsonl", "record_index": 0, "event_id": "evt1", "excerpt": "Suspicious encryption activity"}
+                {
+                    "source_file": "log1.jsonl",
+                    "record_index": 0,
+                    "event_id": "evt1",
+                    "excerpt": "Suspicious encryption activity",
+                }
             ],
-            "id": "1"
+            "id": "1",
         },
         {
             "title": "Data exfiltration to external IP",
             "summary": "Sensitive data sent to 8.8.8.8.",
             "severity": "critical",
             "evidence": [
-                {"source_file": "log2.jsonl", "record_index": 5, "event_id": "evt2", "excerpt": "Data sent to 8.8.8.8"}
+                {
+                    "source_file": "log2.jsonl",
+                    "record_index": 5,
+                    "event_id": "evt2",
+                    "excerpt": "Data sent to 8.8.8.8",
+                }
             ],
-            "id": "2"
+            "id": "2",
         },
     ],
     "hypotheses": [],
     "indicators_of_compromise": [],
     "recommended_next_steps": ["Isolate affected systems immediately"],
-    "confidence": 0.95
+    "confidence": 0.95,
 }
 
 validated = AnalysisOutput.model_validate(critical_data)
@@ -60,33 +70,48 @@ mixed_data = {
             "summary": "User gained admin rights.",
             "severity": "critical",
             "evidence": [
-                {"source_file": "log3.jsonl", "record_index": 2, "event_id": "evt3", "excerpt": "Admin rights granted"}
+                {
+                    "source_file": "log3.jsonl",
+                    "record_index": 2,
+                    "event_id": "evt3",
+                    "excerpt": "Admin rights granted",
+                }
             ],
-            "id": "1"
+            "id": "1",
         },
         {
             "title": "Suspicious PowerShell",
             "summary": "Encoded command executed.",
             "severity": "high",
             "evidence": [
-                {"source_file": "log4.jsonl", "record_index": 7, "event_id": "evt4", "excerpt": "Base64 PowerShell command"}
+                {
+                    "source_file": "log4.jsonl",
+                    "record_index": 7,
+                    "event_id": "evt4",
+                    "excerpt": "Base64 PowerShell command",
+                }
             ],
-            "id": "2"
+            "id": "2",
         },
         {
             "title": "Unusual login time",
             "summary": "Login at 3am.",
             "severity": "medium",
             "evidence": [
-                {"source_file": "log5.jsonl", "record_index": 3, "event_id": "evt5", "excerpt": "Login at 3am"}
+                {
+                    "source_file": "log5.jsonl",
+                    "record_index": 3,
+                    "event_id": "evt5",
+                    "excerpt": "Login at 3am",
+                }
             ],
-            "id": "3"
+            "id": "3",
         },
     ],
     "hypotheses": [],
     "indicators_of_compromise": [],
     "recommended_next_steps": ["Review PowerShell logs"],
-    "confidence": 0.85
+    "confidence": 0.85,
 }
 
 validated = AnalysisOutput.model_validate(mixed_data)
@@ -107,15 +132,20 @@ low_data = {
             "summary": "Process ran at odd time.",
             "severity": "low",
             "evidence": [
-                {"source_file": "log6.jsonl", "record_index": 4, "event_id": "evt6", "excerpt": "Odd time process"}
+                {
+                    "source_file": "log6.jsonl",
+                    "record_index": 4,
+                    "event_id": "evt6",
+                    "excerpt": "Odd time process",
+                }
             ],
-            "id": "1"
+            "id": "1",
         },
     ],
     "hypotheses": [],
     "indicators_of_compromise": [],
     "recommended_next_steps": ["Monitor process activity"],
-    "confidence": 0.60
+    "confidence": 0.60,
 }
 
 validated = AnalysisOutput.model_validate(low_data)
@@ -134,7 +164,7 @@ clean_data = {
     "hypotheses": [],
     "indicators_of_compromise": [],
     "recommended_next_steps": ["No action needed"],
-    "confidence": 0.90
+    "confidence": 0.90,
 }
 
 validated = AnalysisOutput.model_validate(clean_data)

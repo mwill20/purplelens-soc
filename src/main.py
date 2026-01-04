@@ -8,15 +8,14 @@ CLI entrypoint for the PurpleLens AI SOC Assistant.
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import logging
 import os
 import sys
-import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List
 
 from dotenv import load_dotenv
 from pydantic import ValidationError
@@ -26,7 +25,6 @@ from pydantic import ValidationError
 if not os.environ.get("OPENAI_API_KEY"):
     load_dotenv()
 
-from src.ingest import load_events
 from src.llm_analyze import analyze_events
 from src.report import generate_report
 from src.schemas import AnalysisOutput
@@ -34,6 +32,66 @@ from src.security import validate_output
 from src.storage import initialize_database, save_analysis
 
 LOGGER = logging.getLogger(__name__)
+
+
+def _sample_json_record(file_path: Path) -> dict | None:
+    try:
+        if file_path.suffix.lower() == ".jsonl":
+            with file_path.open("r", encoding="utf-8") as handle:
+                for line in handle:
+                    stripped = line.strip()
+                    if not stripped:
+                        continue
+                    return json.loads(stripped)
+            return None
+        if file_path.suffix.lower() == ".json":
+            with file_path.open("r", encoding="utf-8") as handle:
+                data = json.load(handle)
+            if isinstance(data, list):
+                return data[0] if data else None
+            if isinstance(data, dict):
+                return data
+            return None
+    except (OSError, json.JSONDecodeError):
+        return None
+    return None
+
+
+def _unwrap_pubsub_record(record: dict) -> dict | None:
+    message = record.get("message")
+    if isinstance(message, dict) and "data" in message:
+        try:
+            decoded = base64.b64decode(message["data"])
+            nested = json.loads(decoded)
+            return nested if isinstance(nested, dict) else None
+        except (ValueError, json.JSONDecodeError, base64.binascii.Error):
+            return None
+    return None
+
+
+def _detect_json_source(file_path: Path) -> str | None:
+    record = _sample_json_record(file_path)
+    if not isinstance(record, dict):
+        return None
+
+    unwrapped = _unwrap_pubsub_record(record)
+    if isinstance(unwrapped, dict):
+        record = unwrapped
+
+    if (
+        "Records" in record
+        or "eventVersion" in record
+        or ("eventSource" in record and "eventName" in record)
+    ):
+        return "aws"
+
+    if "protoPayload" in record or "insertId" in record or "logName" in record:
+        return "gcp"
+
+    if "Event" in record:
+        return "windows"
+
+    return None
 
 
 def detect_source(input_path: Path) -> tuple[str, str]:
@@ -52,30 +110,14 @@ def detect_source(input_path: Path) -> tuple[str, str]:
         if input_path.suffix.lower() == ".evtx":
             return "windows", f"EVTX extension detected: {input_path.suffix}"
         elif input_path.suffix.lower() in [".json", ".jsonl"]:
-            # Step 2: Content sniff (first 512 bytes)
-            try:
-                # Add explicit file closing and retry logic for Windows
-                content = ""
-                max_retries = 3
-                for attempt in range(max_retries):
-                    try:
-                        with open(input_path, 'r', encoding='utf-8') as f:
-                            content = f.read(512)
-                        break
-                    except PermissionError:
-                        if attempt < max_retries - 1:
-                            time.sleep(0.1)  # Brief delay for file handle release
-                            continue
-                        raise
-                
-                # Step 3: Schema hints
-                if '"Records"' in content or '"eventVersion"' in content:
-                    return "aws", "CloudTrail schema markers detected"
-                else:
-                    return "windows", "JSON without CloudTrail markers"
-            except Exception as exc:
-                LOGGER.warning(f"Content sniff failed: {exc}")
-                return "windows", "JSON content sniff failed, defaulting to windows"
+            detected = _detect_json_source(input_path)
+            if detected == "aws":
+                return "aws", "CloudTrail schema markers detected"
+            if detected == "gcp":
+                return "gcp", "GCP schema markers detected"
+            if input_path.name.lower().startswith("gcp_"):
+                return "gcp", "GCP filename prefix detected"
+            return "windows", "JSON without CloudTrail/GCP markers"
         else:
             raise SystemExit(f"Unsupported file extension: {input_path.suffix}")
     elif input_path.is_dir():
@@ -91,15 +133,24 @@ def detect_source(input_path: Path) -> tuple[str, str]:
         elif evtx_files:
             return "windows", f"Directory contains {len(evtx_files)} EVTX files"
         elif json_files:
-            sample_path = json_files[0]
-            try:
-                with open(sample_path, "r", encoding="utf-8") as handle:
-                    content = handle.read(512)
-                    if '"Records"' in content or '"eventVersion"' in content:
-                        return "aws", "CloudTrail schema markers detected"
-            except Exception as exc:
-                LOGGER.warning(f"Content sniff failed: {exc}")
+            detected_sources = set()
+            for json_file in json_files:
+                detected = _detect_json_source(json_file)
+                if detected is None and json_file.name.lower().startswith("gcp_"):
+                    detected = "gcp"
+                detected_sources.add(detected or "windows")
 
+            if len(detected_sources) > 1:
+                raise SystemExit(
+                    "Ambiguous input directory contains multiple JSON source types. "
+                    "Use --source gcp|aws|windows to specify data type."
+                )
+
+            detected = detected_sources.pop()
+            if detected == "aws":
+                return "aws", "CloudTrail schema markers detected"
+            if detected == "gcp":
+                return "gcp", "GCP schema markers detected"
             return "windows", f"Directory contains {len(json_files)} JSON files"
         else:
             raise SystemExit(f"No supported files found in directory: {input_path}")
@@ -107,16 +158,18 @@ def detect_source(input_path: Path) -> tuple[str, str]:
         raise SystemExit(f"Input path does not exist: {input_path}")
 
 
-def parse_args() -> argparse.Namespace:    # for CLI options (input path, output mode, model, db)
+def parse_args() -> (
+    argparse.Namespace
+):  # for CLI options (input path, output mode, model, db)
     parser = argparse.ArgumentParser(description="PurpleLens AI SOC Assistant")
     parser.add_argument(
         "--input",
         required=True,
-        help="Path to directory containing EVTX or CloudTrail files",
+        help="Path to directory containing EVTX, CloudTrail, or GCP audit logs",
     )
     parser.add_argument(
         "--source",
-        choices=["auto", "windows", "aws"],
+        choices=["auto", "windows", "aws", "gcp"],
         default="auto",
         help="Data source type (default: auto-detect)",
     )
@@ -142,6 +195,11 @@ def parse_args() -> argparse.Namespace:    # for CLI options (input path, output
         help="Enable verbose logging",
     )
     parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug logging (includes enrichment details)",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Validate inputs only, do not call LLM",
@@ -149,8 +207,8 @@ def parse_args() -> argparse.Namespace:    # for CLI options (input path, output
     return parser.parse_args()
 
 
-def configure_logging(verbose: bool) -> None:
-    level = logging.INFO if verbose else logging.WARNING
+def configure_logging(verbose: bool, debug: bool) -> None:
+    level = logging.DEBUG if debug else logging.INFO if verbose else logging.WARNING
     logging.basicConfig(
         level=level,
         format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
@@ -158,7 +216,9 @@ def configure_logging(verbose: bool) -> None:
     )
 
 
-def ensure_environment(args: argparse.Namespace) -> bool:    # for API key checks and DB path setup
+def ensure_environment(
+    args: argparse.Namespace,
+) -> bool:  # for API key checks and DB path setup
     if not args.dry_run and not os.environ.get("OPENAI_API_KEY"):
         LOGGER.error("OPENAI_API_KEY environment variable not set.")
         return False
@@ -166,9 +226,9 @@ def ensure_environment(args: argparse.Namespace) -> bool:    # for API key check
     return True
 
 
-def main() -> int:                                 # for the one-pass orchestration sequence.
+def main() -> int:  # for the one-pass orchestration sequence.
     args = parse_args()
-    configure_logging(args.verbose)
+    configure_logging(args.verbose, args.debug)
 
     run_id = str(uuid.uuid4())
     LOGGER.info(
@@ -198,12 +258,39 @@ def main() -> int:                                 # for the one-pass orchestrat
                 "input": str(args.input),
             },
         )
+        LOGGER.info("Detected source type: %s | Reason: %s", decision, reason)
 
         # Route to appropriate ingestion
         if decision == "aws":
             from src.ingest_aws import ingest_cloudtrail
 
             events = ingest_cloudtrail(args.input)  # Will raise NotImplementedError
+        elif decision == "gcp":
+            from src.ingest_gcp import load_gcp_log_file, normalize_gcp_audit
+
+            input_path = Path(args.input)
+            if input_path.is_file():
+                file_paths = [input_path]
+            elif input_path.is_dir():
+                file_paths = sorted(input_path.glob("*.jsonl")) + sorted(
+                    input_path.glob("*.json")
+                )
+            else:
+                raise ValueError(f"Input path is not a file or directory: {input_path}")
+
+            if not file_paths:
+                raise ValueError(f"No JSON or JSONL files found in {input_path}")
+
+            events = []
+            for file_path in file_paths:
+                records = load_gcp_log_file(file_path)
+                for idx, record in enumerate(records):
+                    events.append(normalize_gcp_audit(record, str(file_path), idx))
+
+            if not events:
+                raise ValueError(
+                    "No valid GCP events were loaded from the provided input"
+                )
         elif decision == "windows":
             from src.ingest import load_events
 
@@ -214,7 +301,16 @@ def main() -> int:                                 # for the one-pass orchestrat
         LOGGER.error("Failed to load events: %s", exc)
         return 1
 
-    if len([e for e in events if e.get("raw_event", {}).get("source") == "aws_cloudtrail"]) > 1:
+    if (
+        len(
+            [
+                e
+                for e in events
+                if e.get("raw_event", {}).get("source") == "aws_cloudtrail"
+            ]
+        )
+        > 1
+    ):
         from src.aws_correlate import correlate_events
         from src.config_aws import CORRELATION_CONFIG
 

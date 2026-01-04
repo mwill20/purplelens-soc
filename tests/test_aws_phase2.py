@@ -66,7 +66,9 @@ class TestCorrelation:
 
         result = correlate_events(events, CORRELATION_CONFIG)
         cluster_ids = [e["raw_event"]["cluster_id"] for e in result]
-        assert cluster_ids[0] != cluster_ids[1], "6min gap should create separate clusters"
+        assert (
+            cluster_ids[0] != cluster_ids[1]
+        ), "6min gap should create separate clusters"
 
     def test_strategy_priority(self):
         """Test actor_src_ip beats actor_resource when both match."""
@@ -83,7 +85,9 @@ class TestCorrelation:
         """Test 51 events split into multiple clusters."""
         events = []
         for i in range(51):
-            events.append(_create_test_event("alice", "2020-01-01T12:00:00Z", "1.1.1.1", ["res1"]))
+            events.append(
+                _create_test_event("alice", "2020-01-01T12:00:00Z", "1.1.1.1", ["res1"])
+            )
 
         result = correlate_events(events, CORRELATION_CONFIG)
         cluster_ids = set(e["raw_event"]["cluster_id"] for e in result)
@@ -101,7 +105,9 @@ class TestCorrelation:
         assert cluster_strategy == "actor_only"
 
 
-def _create_test_event(actor: str, event_time: str, src_ip: str, resources: list) -> dict:
+def _create_test_event(
+    actor: str, event_time: str, src_ip: str, resources: list
+) -> dict:
     """Create synthetic event envelope for testing."""
     return {
         "source_file": "test.jsonl",

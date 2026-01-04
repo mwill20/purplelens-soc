@@ -5,11 +5,14 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
-def correlate_events(events: List[Dict[str, Any]], config: Dict[str, Any]) -> List[Dict[str, Any]]:
+def correlate_events(
+    events: List[Dict[str, Any]], config: Dict[str, Any]
+) -> List[Dict[str, Any]]:
     """Add correlation fields to events using time proximity clustering."""
     # Sort by event_time ascending
     sorted_events = sorted(
-        events, key=lambda e: _parse_event_time(e.get("raw_event", {}).get("event_time", ""))
+        events,
+        key=lambda e: _parse_event_time(e.get("raw_event", {}).get("event_time", "")),
     )
     clusters = []
     for event in sorted_events:
@@ -33,7 +36,9 @@ def correlate_events(events: List[Dict[str, Any]], config: Dict[str, Any]) -> Li
                     "first_time": raw_event.get("event_time", ""),
                     "actor": raw_event.get("actor", ""),
                     "src_ip": raw_event.get("src_ip", ""),
-                    "primary_resource": _get_primary_resource(raw_event.get("resources", [])),
+                    "primary_resource": _get_primary_resource(
+                        raw_event.get("resources", [])
+                    ),
                 }
             )
 
@@ -53,7 +58,9 @@ def _parse_event_time(time_str: str) -> datetime:
         return datetime.min.replace(tzinfo=timezone.utc)
 
 
-def _can_join_cluster(event: Dict[str, Any], cluster: Dict[str, Any], config: Dict[str, Any]) -> bool:
+def _can_join_cluster(
+    event: Dict[str, Any], cluster: Dict[str, Any], config: Dict[str, Any]
+) -> bool:
     """Check if event can join existing cluster."""
     if len(cluster["events"]) >= config["max_cluster_size"]:
         return False
@@ -76,8 +83,12 @@ def _can_join_cluster(event: Dict[str, Any], cluster: Dict[str, Any], config: Di
     if strategy == "actor_src_ip":
         return actor == cluster["actor"] and src_ip == cluster["src_ip"]
     if strategy == "actor_resource":
-        cluster_resources = [e.get("raw_event", {}).get("resources", []) for e in cluster["events"]]
-        return actor == cluster["actor"] and _shares_resource(resources, cluster_resources)
+        cluster_resources = [
+            e.get("raw_event", {}).get("resources", []) for e in cluster["events"]
+        ]
+        return actor == cluster["actor"] and _shares_resource(
+            resources, cluster_resources
+        )
     if strategy == "actor_only":
         return actor == cluster["actor"]
 
@@ -112,7 +123,9 @@ def _shares_resource(resources1: List[str], cluster_resources: List[List[str]]) 
         return False
 
     for cluster_res_list in cluster_resources:
-        cluster_clean = [resource for resource in cluster_res_list if resource != "NONE"]
+        cluster_clean = [
+            resource for resource in cluster_res_list if resource != "NONE"
+        ]
         if set(res1_clean) & set(cluster_clean):
             return True
 
@@ -125,7 +138,9 @@ def _get_primary_resource(resources: List[str]) -> str:
     return clean_resources[0] if clean_resources else "NONE"
 
 
-def _apply_size_limits(clusters: List[Dict[str, Any]], max_size: int) -> List[Dict[str, Any]]:
+def _apply_size_limits(
+    clusters: List[Dict[str, Any]], max_size: int
+) -> List[Dict[str, Any]]:
     """Split oversized clusters deterministically."""
     final_clusters = []
 
@@ -168,7 +183,9 @@ def _assign_cluster_ids(clusters: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         if seed_counts[seed_base] > 1:
             seed = f"{seed_base}|dup_{seed_counts[seed_base] - 1}"
 
-        cluster_id = f"{cluster['strategy']}_{hashlib.sha1(seed.encode()).hexdigest()[:10]}"
+        cluster_id = (
+            f"{cluster['strategy']}_{hashlib.sha1(seed.encode()).hexdigest()[:10]}"
+        )
         cluster_size = len(cluster["events"])
 
         # Add correlation fields to each event

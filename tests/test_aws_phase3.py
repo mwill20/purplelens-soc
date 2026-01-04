@@ -3,7 +3,7 @@
 from unittest.mock import patch
 
 from src.aws_batching import build_aws_batches
-from src.llm_analyze import analyze_events, _deduplicate_findings, _merge_batch_results
+from src.llm_analyze import analyze_events
 
 
 class TestAWSBatching:
@@ -13,7 +13,10 @@ class TestAWSBatching:
         for i in range(30):
             events.append(
                 _create_test_event(
-                    "alice", f"2020-01-01T12:00:{i:02d}Z", "1.1.1.1", cluster_id="cluster_123"
+                    "alice",
+                    f"2020-01-01T12:00:{i:02d}Z",
+                    "1.1.1.1",
+                    cluster_id="cluster_123",
                 )
             )
 
@@ -27,8 +30,12 @@ class TestAWSBatching:
     def test_deterministic_batch_ids(self):
         """Test same input produces same batch IDs."""
         events = [
-            _create_test_event("alice", "2020-01-01T12:00:00Z", "1.1.1.1", cluster_id="c1"),
-            _create_test_event("bob", "2020-01-01T12:00:00Z", "2.2.2.2", cluster_id="c2"),
+            _create_test_event(
+                "alice", "2020-01-01T12:00:00Z", "1.1.1.1", cluster_id="c1"
+            ),
+            _create_test_event(
+                "bob", "2020-01-01T12:00:00Z", "2.2.2.2", cluster_id="c2"
+            ),
         ]
 
         batches1 = build_aws_batches(events, 25)
@@ -41,8 +48,12 @@ class TestAWSBatching:
     def test_unclustered_events(self):
         """Test events with cluster_id=None are handled."""
         events = [
-            _create_test_event("alice", "2020-01-01T12:00:00Z", "1.1.1.1", cluster_id=None),
-            _create_test_event("bob", "2020-01-01T12:00:00Z", "2.2.2.2", cluster_id=None),
+            _create_test_event(
+                "alice", "2020-01-01T12:00:00Z", "1.1.1.1", cluster_id=None
+            ),
+            _create_test_event(
+                "bob", "2020-01-01T12:00:00Z", "2.2.2.2", cluster_id=None
+            ),
         ]
 
         batches = build_aws_batches(events, 25)
@@ -92,7 +103,9 @@ class TestPolicyValidation:
     def test_policy_violation_fails_run(self, mock_llm_call):
         """Test LLM response with prohibited patterns fails."""
         mock_response = _mock_llm_response()
-        mock_response["findings"][0]["summary"] = "I have blocked this malicious activity"
+        mock_response["findings"][0][
+            "summary"
+        ] = "I have blocked this malicious activity"
         mock_llm_call.return_value = mock_response
 
         events = [_create_test_event("alice", "2020-01-01T12:00:00Z", "1.1.1.1")]
@@ -103,7 +116,10 @@ class TestPolicyValidation:
     @patch("src.llm_analyze._call_with_retry")
     def test_malformed_json_fails_run(self, mock_llm_call):
         """Test malformed JSON triggers llm_error status."""
-        mock_llm_call.return_value = {"status": "llm_error", "error_message": "Malformed JSON"}
+        mock_llm_call.return_value = {
+            "status": "llm_error",
+            "error_message": "Malformed JSON",
+        }
 
         events = [_create_test_event("alice", "2020-01-01T12:00:00Z", "1.1.1.1")]
         result = analyze_events(events)

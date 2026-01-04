@@ -82,7 +82,9 @@ def save_analysis(
     conn = _get_connection(db_path)
     try:
         with conn:
-            _insert_analysis_run(conn, run_id, analysis, input_files, model_used, run_timestamp)
+            _insert_analysis_run(
+                conn, run_id, analysis, input_files, model_used, run_timestamp
+            )
             _insert_findings(conn, run_id, analysis)
             _insert_hypotheses(conn, run_id, analysis)
             _insert_iocs(conn, run_id, analysis)
@@ -127,7 +129,9 @@ def _insert_analysis_run(
     )
 
 
-def _insert_findings(conn: sqlite3.Connection, run_id: str, analysis: AnalysisOutput) -> None:
+def _insert_findings(
+    conn: sqlite3.Connection, run_id: str, analysis: AnalysisOutput
+) -> None:
     """Persist findings and their evidence arrays."""
 
     for finding in analysis.findings:
@@ -141,7 +145,9 @@ def _insert_findings(conn: sqlite3.Connection, run_id: str, analysis: AnalysisOu
         )
 
 
-def _insert_hypotheses(conn: sqlite3.Connection, run_id: str, analysis: AnalysisOutput) -> None:
+def _insert_hypotheses(
+    conn: sqlite3.Connection, run_id: str, analysis: AnalysisOutput
+) -> None:
     """Persist hypotheses collected from the analysis."""
 
     for hypothesis in analysis.hypotheses:
@@ -154,7 +160,9 @@ def _insert_hypotheses(conn: sqlite3.Connection, run_id: str, analysis: Analysis
         )
 
 
-def _insert_iocs(conn: sqlite3.Connection, run_id: str, analysis: AnalysisOutput) -> None:
+def _insert_iocs(
+    conn: sqlite3.Connection, run_id: str, analysis: AnalysisOutput
+) -> None:
     """Persist indicators of compromise."""
 
     for indicator in analysis.indicators_of_compromise:

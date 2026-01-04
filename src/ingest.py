@@ -9,9 +9,9 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB cap 
-                                        # prevent excessive memory usage
-                                        # must split huge logs into chunks
+MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB cap
+# prevent excessive memory usage
+# must split huge logs into chunks
 
 
 def load_events(input_path: str) -> List[Dict[str, Any]]:
@@ -19,7 +19,9 @@ def load_events(input_path: str) -> List[Dict[str, Any]]:
 
     base_path = Path(input_path)
     if not base_path.exists() or not base_path.is_dir():
-        raise FileNotFoundError(f"Input path does not exist or is not a directory: {input_path}")
+        raise FileNotFoundError(
+            f"Input path does not exist or is not a directory: {input_path}"
+        )
 
     jsonl_files = sorted(base_path.glob("*.jsonl"))
     if not jsonl_files:

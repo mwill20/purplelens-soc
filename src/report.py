@@ -1,7 +1,7 @@
-
 from __future__ import annotations
 
 import re
+
 
 def _generate_executive_summary(analysis: AnalysisOutput, event_count: int = 0) -> str:
     """
@@ -46,7 +46,6 @@ def _generate_executive_summary(analysis: AnalysisOutput, event_count: int = 0) 
         for f in high_issues[:3]:
             critical_lines.append(f"- **HIGH**: {f.title}")
 
-
     lines = [
         "## Executive Summary",
         f"- **Risk Level**: {risk_level} {risk_detail}",
@@ -66,7 +65,6 @@ def _generate_executive_summary(analysis: AnalysisOutput, event_count: int = 0) 
     return "\n".join(lines)
 
 
-
 from typing import Dict, List
 
 from src.schemas import AnalysisOutput, Evidence, Finding, Hypothesis
@@ -78,6 +76,7 @@ STATUS_EXPLANATIONS: Dict[str, str] = {
     "timeout": "LLM call exceeded the 60-second timeout limit.",
     "validation_error": "LLM output violated schema or security policies.",
 }
+
 
 def generate_report(analysis: AnalysisOutput, event_count: int = 0) -> str:
     """Generate deterministic SOC report from the structured analysis object."""
@@ -131,7 +130,17 @@ def generate_error_report(analysis: AnalysisOutput) -> str:
     )
     sections.append(f"ERROR: {analysis.error_message or explanation}")
     sections.append("")
-    sections.append(f"PARTIAL FINDINGS: {len(analysis.findings)} extracted before failure")
+    # Provide a minimal Executive Summary for consistency with successful reports
+    sections.append("## Executive Summary")
+    sections.append(f"- **Risk Level**: UNKNOWN")
+    sections.append(f"- **Analysis Scope**: {len(analysis.findings) + len(analysis.indicators_of_compromise)} events (partial)")
+    sections.append(f"- **Key Findings**: {len(analysis.findings)} security findings identified (partial)")
+    sections.append(f"- **Hypotheses**: {len(analysis.hypotheses)} investigative theories (partial)")
+    sections.append(f"- **Indicators of Compromise**: {len(analysis.indicators_of_compromise)} IOCs detected (partial)")
+    sections.append("\n---\n")
+    sections.append(
+        f"PARTIAL FINDINGS: {len(analysis.findings)} extracted before failure"
+    )
     if analysis.findings:
         sections.extend(_format_findings(analysis.findings))
 
@@ -171,8 +180,9 @@ def _format_findings(findings: List[Finding]) -> List[str]:
         sections.append(f"Summary: {finding.summary}")
         sections.append("Evidence:")
         for ev in finding.evidence:
+            event_id_part = f" | event_id={ev.event_id}" if ev.event_id else ""
             sections.append(
-                f"  - {ev.source_file}:{ev.record_index} | {ev.excerpt}"
+                f"  - {ev.source_file}:{ev.record_index}{event_id_part} | {ev.excerpt}"
             )
         sections.append("")
 
@@ -182,9 +192,9 @@ def _format_findings(findings: List[Finding]) -> List[str]:
 def _format_hypotheses(hypotheses: List[Hypothesis]) -> List[str]:
     if not hypotheses:
         return ["(none)", ""]
-    return [f"- {h.description} (confidence: {h.confidence:.2f})" for h in hypotheses] + [
-        ""
-    ]
+    return [
+        f"- {h.description} (confidence: {h.confidence:.2f})" for h in hypotheses
+    ] + [""]
 
 
 def _format_list(items: List[str]) -> List[str]:
@@ -241,7 +251,9 @@ def _dedupe_actions(items: List[str]) -> List[str]:
         tokens = _action_tokens(item)
         if not tokens:
             continue
-        if any(_jaccard_similarity(tokens, existing) >= 0.6 for existing in seen_tokens):
+        if any(
+            _jaccard_similarity(tokens, existing) >= 0.6 for existing in seen_tokens
+        ):
             continue
         seen_tokens.append(tokens)
         deduped.append(item)
@@ -323,6 +335,9 @@ def _merge_findings(findings: List[Finding]) -> List[Finding]:
 
 def _merge_key(title: str) -> str:
     normalized = _normalize_text(title)
+    # Normalize common variants to consistent keys for merging and display
+    if "crypto" in normalized and ("key" in normalized or "keyversion" in normalized):
+        return "destruction of cryptokeyversion"
     if "credential dump" in normalized or "credential dumping" in normalized:
         return "credential dumping"
     if "user account" in normalized and (
@@ -342,7 +357,9 @@ def _merge_key(title: str) -> str:
         return "group policy change"
     if "security policy" in normalized:
         return "security policy change"
-    if "object access" in normalized or ("object" in normalized and "access" in normalized):
+    if "object access" in normalized or (
+        "object" in normalized and "access" in normalized
+    ):
         return "object access"
     return normalized
 

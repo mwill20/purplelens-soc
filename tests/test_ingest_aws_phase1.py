@@ -51,7 +51,9 @@ def test_json_records_wrapper(tmp_path: Path) -> None:
     assert events[1]["record_index"] == 1
 
 
-def test_missing_required_fields(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+def test_missing_required_fields(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
     caplog.set_level(logging.WARNING)
     file_path = tmp_path / "missing.jsonl"
     missing_time = {**_base_record()}

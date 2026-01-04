@@ -5,8 +5,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.schemas import AnalysisOutput, Finding, Evidence, Hypothesis
-from src.security import validate_output, PROHIBITED_PATTERNS
+from src.schemas import AnalysisOutput, Evidence, Finding, Hypothesis
+from src.security import PROHIBITED_PATTERNS, validate_output
 
 print("=" * 80)
 print("PHASE 1A VALIDATION TESTS")
@@ -26,9 +26,9 @@ valid_analysis = AnalysisOutput(
     hypotheses=[],
     indicators_of_compromise=[],
     recommended_next_steps=[],
-    confidence=0.75
+    confidence=0.75,
 )
-print(f"✓ Valid AnalysisOutput created")
+print("✓ Valid AnalysisOutput created")
 print(f"  Status: {valid_analysis.status}")
 print(f"  Confidence: {valid_analysis.confidence}")
 
@@ -45,7 +45,7 @@ test_cases = [
     "This is definitely malicious",
     "Action taken to block the threat",
     "System modified to prevent attack",
-    "Confirmed that this is a threat"
+    "Confirmed that this is a threat",
 ]
 for test_text in test_cases:
     valid, msg = validate_output(test_text)
@@ -75,15 +75,10 @@ except Exception as e:
 print("\n[TEST 7] Schema validation - reject invalid severity")
 try:
     evidence = Evidence(
-        source_file="test.jsonl",
-        record_index=0,
-        excerpt="test excerpt"
+        source_file="test.jsonl", record_index=0, excerpt="test excerpt"
     )
     bad = Finding(
-        title="test",
-        summary="test",
-        severity="ultra-critical",
-        evidence=[evidence]
+        title="test", summary="test", severity="ultra-critical", evidence=[evidence]
     )
     print("✗ FAILED: Should reject invalid severity")
 except Exception as e:
@@ -95,7 +90,7 @@ evidence = Evidence(
     source_file="data/test.jsonl",
     record_index=42,
     event_id="4688",
-    excerpt="powershell.exe -ExecutionPolicy Bypass"
+    excerpt="powershell.exe -ExecutionPolicy Bypass",
 )
 print(f"✓ Evidence created: {evidence.source_file}:{evidence.record_index}")
 
@@ -105,17 +100,14 @@ finding = Finding(
     title="Suspicious PowerShell",
     summary="PowerShell with bypass flag",
     severity="high",
-    evidence=[evidence]
+    evidence=[evidence],
 )
 print(f"✓ Finding created: [{finding.severity.upper()}] {finding.title}")
 print(f"  Evidence count: {len(finding.evidence)}")
 
 # Test 10: Hypothesis with confidence
 print("\n[TEST 10] Hypothesis with confidence")
-hypothesis = Hypothesis(
-    description="Possible reconnaissance activity",
-    confidence=0.68
-)
+hypothesis = Hypothesis(description="Possible reconnaissance activity", confidence=0.68)
 print(f"✓ Hypothesis created with confidence: {hypothesis.confidence}")
 
 # Test 11: Complete AnalysisOutput with all fields
@@ -126,9 +118,9 @@ complete = AnalysisOutput(
     hypotheses=[hypothesis],
     indicators_of_compromise=["powershell.exe -ExecutionPolicy Bypass"],
     recommended_next_steps=["Investigate PowerShell command history"],
-    confidence=0.72
+    confidence=0.72,
 )
-print(f"✓ Complete AnalysisOutput created")
+print("✓ Complete AnalysisOutput created")
 print(f"  Status: {complete.status}")
 print(f"  Findings: {len(complete.findings)}")
 print(f"  Hypotheses: {len(complete.hypotheses)}")

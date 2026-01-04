@@ -2,14 +2,14 @@
   <img src="docs/PurpleLens-SOC-Logo.png" alt="PurpleLens SOC Logo" width="400"/>
 </div>
 
-# PurpleLens — AI-Assisted SOC Analysis with Deterministic Guardrails
+# PurpleLens - AI-Assisted SOC Analysis with Deterministic Guardrails
 
-> **Branch:** `enhancement/aws-cloudtrail` - Multi-source log analysis with AWS CloudTrail support  
-> **Status:** AWS CloudTrail Enhancement Complete (Phases 0–4) ✅  
+> **Branch:** `enhancement/gcp-mini-lab` - Multi-source log analysis with AWS CloudTrail + GCP Audit Logs (Mini-Lab)  
+> **Status:** AWS CloudTrail Enhancement Complete (Phases 0-4) | GCP Mini-Lab Complete (Phases 1-3, GCP prompt, enrichment, deterministic IOCs)  
 > **Baseline:** Verified Windows EVTX functionality preserved
 
 ## Overview
-- CLI-driven SOC assistant that ingests parsed Windows EVTX telemetry (JSONL) **and AWS CloudTrail logs (JSON/JSONL, CSV supported via prep script)**.
+- CLI-driven SOC assistant that ingests parsed Windows EVTX telemetry (JSONL), **AWS CloudTrail logs (JSON/JSONL, CSV supported via prep script)**, and **GCP Audit Logs (JSON/JSONL)**.
 - Uses an LLM strictly as a structured extraction engine; **deterministic Python renders the SOC report and persists run metadata**.
 - Guardrails enforce evidence-backed findings, policy-compliant narratives, and SQLite persistence for auditability.
 
@@ -92,6 +92,7 @@ python -m src.main --input data/evtx_parsed/ --model gpt-4o --output file
 PurpleLens supports multiple log formats:
 - **Windows EVTX** - Fully implemented and tested
 - **AWS CloudTrail** - Fully implemented with plane tagging, correlation, and LLM batching
+- **GCP Audit Logs (Mini-Lab)** - Ingestion + enrichment + GCP prompt + deterministic IOC extraction
 
 ### Source Detection
 PurpleLens automatically detects log format based on:
@@ -99,9 +100,9 @@ PurpleLens automatically detects log format based on:
 2. Content analysis (CloudTrail schema markers)
 3. Directory contents (mixed directories require `--source` flag)
 
-Use `--source aws|windows` to override auto-detection when needed.
+Use `--source aws|windows|gcp` to override auto-detection when needed.
 
-**Important:** Each analysis run processes **one source type only** (either Windows EVTX or AWS CloudTrail). This design keeps different security contexts logically separated. If analyzing both Windows and cloud logs, run PurpleLens twice with separate directories or use the `--source` flag to specify which logs to process.
+**Important:** Each analysis run processes **one source type only** (Windows EVTX, AWS CloudTrail, or GCP Audit Logs). This design keeps different security contexts logically separated. If analyzing multiple sources, run PurpleLens separately per source.
 
 ### Dataset Information
 
@@ -140,6 +141,31 @@ python -m src.main --input data/aws_cloudtrail.jsonl --source aws
 - **Plane tagging:** Conservative control/data/telemetry classification with unknown fallback
 - **Correlation:** Proximity-based clustering with 5-minute time windows and deterministic IDs
 - **LLM batching:** AWS-specific prompts with 25-event batches for token efficiency
+
+### GCP Audit Logs Usage (Mini-Lab)
+
+**Quick Start (Synthetic JSONL)**
+```powershell
+# Validate input only (no LLM calls) against the 3-event synthetic JSONL
+python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --dry-run
+```
+
+**Quick Start (Mini-Lab Data)**
+```powershell
+# Validate input only (no LLM calls) against the consolidated mini-lab dataset
+python -m src.main --input data/gcp_log_pack/minilab_ground_truth_complete.json --source gcp --dry-run
+
+# Debug mode (prints one enrichment line per event)
+python -m src.main --input data/gcp_log_pack/minilab_ground_truth_complete.json --source gcp --dry-run --debug
+```
+
+**Notes:**
+- `--debug` sets log level to DEBUG (overrides `--verbose`/default).
+- Evidence citations include `event_id` (insertId) for GCP runs.
+- Enrichment debug lines are emitted by the GCP ingestion adapter.
+
+**Mini-Lab Procedure (How the dataset was generated):**
+- See [docs/GCP_LAB_PROCEDURE.md](docs/GCP_LAB_PROCEDURE.md)
 
 ---
 
@@ -314,17 +340,17 @@ This approach supports incident response while maintaining data minimization and
 ### Architecture
 
 <div align="center">
-   <img src="docs/PurpleLens_SOC_Architecture.png" alt="PurpleLens Architecture Overview" width="900"/>
+   <img src="docs/PurpleLens_SOC_Architecture.svg" alt="PurpleLens Architecture Overview" width="900"/>
 </div>
 
-**Quick Overview:** Input JSONL is ingested with provenance (`source_file`, `record_index`). The tool batches events into a schema-defined LLM prompt, requesting structured JSON only. Pydantic validates structural schema compliance first, then regex guardrails check language policy (preventing false authority claims). Python renders a deterministic SOC report and persists run metadata to SQLite (`analysis_runs`, `findings`, `hypotheses`, `indicators_of_compromise`, `reports`). CLI remains the primary interface for predictable demos.
+See the full architecture guide for details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+**GCP Mini-Lab Docs:**
+- [docs/gcp/PHASE_1_IMPLEMENTATION.md](docs/gcp/PHASE_1_IMPLEMENTATION.md)
+- [docs/gcp/PHASE_2_IMPLEMENTATION.md](docs/gcp/PHASE_2_IMPLEMENTATION.md)
+- [docs/gcp/PHASE_3_IMPLEMENTATION.md](docs/gcp/PHASE_3_IMPLEMENTATION.md)
 
-**Detailed Documentation:** See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for:
-- Complete system architecture diagrams
-- End-to-end data flow trace
-- File responsibility matrix
-- Error handling paths
-- Architecture decision rationale
+**GCP Mini-Lab Log Pack:**
+- [data/gcp_log_pack/README.md](data/gcp_log_pack/README.md)
 
 ### Testing
 ```bash
