@@ -5,187 +5,97 @@
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         PURPLELENS AI SOC ASSISTANT                          │
-│                    Windows Event Log Analysis System                         │
+│                     Multi-Source Cloud & Host Analysis                        │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 ┌───────────────────────────────────────────────────────────────────────────────┐
 │                           INPUT LAYER (Data Preparation)                       │
 ├───────────────────────────────────────────────────────────────────────────────┤
 │                                                                                │
-│  ┌──────────────┐      PowerShell Script                                      │
-│  │ .evtx Files  │────► scripts/prep_evtx.ps1 ────────┐                       │
-│  │ (Binary)     │      [Get-WinEvent]                 │                       │
-│  └──────────────┘      [ConvertTo-Json]               ▼                       │
-│                                                  ┌──────────────┐              │
-│                                                  │  .jsonl      │              │
-│                                                  │  Files       │              │
-│                                                  │ (Text-based) │              │
-│                                                  └──────┬───────┘              │
-│                                                         │                      │
-│  Dataset: data/evtx_parsed/*.jsonl                     │                      │
-│  - Execution_wmic.jsonl    (8 events)                  │                      │
-│  - Credential_hashdump.jsonl (2 events)                │                      │
-│  - Lateral_wmic.jsonl     (5 events)                   │                      │
-│                                                         │                      │
-└─────────────────────────────────────────────────────────┼──────────────────────┘
-                                                          │
-                                                          ▼
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                        APPLICATION LAYER (Python 3.13.5)                       │
-├───────────────────────────────────────────────────────────────────────────────┤
+│  Sources supported (examples):                                                 │
 │                                                                                │
-│  ┌─────────────────────────────────────────────────────────────────────────┐ │
-│  │                         CLI ENTRYPOINT                                   │ │
-│  │  src/main.py                                                             │ │
-│  │  ┌────────────────────────────────────────────────────────────────┐     │ │
-│  │  │ parse_args()      → CLI flag parsing (argparse)                │     │ │
-│  │  │ ensure_environment() → API key validation, dir creation        │     │ │
-│  │  │ run()             → Full pipeline orchestration                │     │ │
-│  │  └────────────────────────────────────────────────────────────────┘     │ │
-│  └─────────────────────────────────────────────────────────────────────────┘ │
-│                                   │                                            │
-│                                   │ Orchestrates ▼                             │
-│  ┌────────────────────────────────┴─────────────────────────────────────┐    │
-│  │                                                                        │    │
-│  │  PHASE 1: INGEST                    PHASE 2: ANALYZE                  │    │
-│  │  ┌──────────────────┐               ┌──────────────────┐             │    │
-│  │  │ src/ingest.py    │               │ src/llm_analyze  │             │    │
-│  │  ├──────────────────┤               │      .py         │             │    │
-│  │  │ load_events()    │───events[]───►│ analyze_events() │             │    │
-│  │  │                  │               │                  │             │    │
-│  │  │ • Scan dir for   │               │ • Batch events   │             │    │
-│  │  │   .jsonl files   │               │ • Build prompt   │             │    │
-│  │  │ • Parse JSON     │               │ • Call OpenAI    │             │    │
-│  │  │ • Attach         │               │ • Retry logic    │             │    │
-│  │  │   provenance:    │               │ • Parse response │             │    │
-│  │  │   - source_file  │               │                  │             │    │
-│  │  │   - record_index │               │ MAX_EVENTS: 50   │             │    │
-│  │  │   - event_id     │               │ MAX_CHARS: 24k   │             │    │
-│  │  └──────────────────┘               └────────┬─────────┘             │    │
-│  │                                               │ Raw JSON              │    │
-│  └───────────────────────────────────────────────┼───────────────────────┘    │
-│                                                   ▼                            │
-│  ┌──────────────────────────────────────────────────────────────────────┐    │
-│  │  PHASE 3: VALIDATE                                                    │    │
-│  │  ┌────────────────────┐          ┌────────────────────┐              │    │
-│  │  │ src/schemas.py     │◄─────────│ src/security.py    │              │    │
-│  │  ├────────────────────┤  Scans   ├────────────────────┤              │    │
-│  │  │ Pydantic Models:   │  Text    │ validate_output()  │              │    │
-│  │  │                    │          │                    │              │    │
-│  │  │ • AnalysisOutput   │          │ 5 PATTERNS:        │              │    │
-│  │  │ • Finding          │          │ 1. I have blocked  │              │    │
-│  │  │ • Evidence         │          │ 2. This is malicious│             │    │
-│  │  │ • Hypothesis       │          │ 3. Action taken    │              │    │
-│  │  │                    │          │ 4. System modified │              │    │
-│  │  │ ENFORCES:          │          │ 5. Confirmed that  │              │    │
-│  │  │ • Status enum      │          │                    │              │    │
-│  │  │ • Severity enum    │          │ Returns: True/False│              │    │
-│  │  │ • Confidence 0-1   │          │ + error message    │              │    │
-│  │  │ • Required fields  │          │                    │              │    │
-│  │  │ • event_id coercion│          │                    │              │    │
-│  │  └────────┬───────────┘          └────────────────────┘              │    │
-│  │           │ Valid AnalysisOutput                                      │    │
-│  └───────────┼───────────────────────────────────────────────────────────┘    │
-│              ▼                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────┐    │
-│  │  PHASE 4: REPORT                                                      │    │
-│  │  ┌────────────────────┐                                               │    │
-│  │  │ src/report.py      │                                               │    │
-│  │  ├────────────────────┤                                               │    │
-│  │  │ generate_report()  │                                               │    │
-│  │  │                    │                                               │    │
-│  │  │ • Check status     │                                               │    │
-│  │  │ • Build banner     │                                               │    │
-│  │  │ • Sort findings by │                                               │    │
-│  │  │   severity         │                                               │    │
-│  │  │ • Format sections  │                                               │    │
-│  │  │                    │                                               │    │
-│  │  │ NO LLM CALLS       │                                               │    │
-│  │  │ 100% Deterministic │                                               │    │
-│  │  └────────┬───────────┘                                               │    │
-│  │           │ Formatted Text                                            │    │
-│  └───────────┼───────────────────────────────────────────────────────────┘    │
-│              ▼                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────┐    │
-│  │  PHASE 5: PERSIST                                                     │    │
-│  │  ┌────────────────────┐                                               │    │
-│  │  │ src/storage.py     │                                               │    │
-│  │  ├────────────────────┤                                               │    │
-│  │  │ initialize_db()    │                                               │    │
-│  │  │ save_analysis()    │                                               │    │
-│  │  │                    │                                               │    │
-│  │  │ 5 TABLES:          │                                               │    │
-│  │  │ 1. analysis_runs   │ ──┐                                           │    │
-│  │  │    (run_id PK)     │   │ Foreign Key                               │    │
-│  │  │                    │   │ Relationships                             │    │
-│  │  │ 2. findings        │ ──┤                                           │    │
-│  │  │    (run_id FK)     │   │                                           │    │
-│  │  │                    │   │                                           │    │
-│  │  │ 3. hypotheses      │ ──┤                                           │    │
-│  │  │    (run_id FK)     │   │                                           │    │
-│  │  │                    │   │                                           │    │
-│  │  │ 4. iocs            │ ──┤                                           │    │
-│  │  │    (run_id FK)     │   │                                           │    │
-│  │  │                    │   │                                           │    │
-│  │  │ 5. reports         │ ──┘                                           │    │
-│  │  │    (run_id FK)     │                                               │    │
-│  │  │                    │                                               │    │
-│  │  │ • Parameterized    │                                               │    │
-│  │  │   queries (no SQL  │                                               │    │
-│  │  │   injection)       │                                               │    │
-│  │  │ • UTC timestamps   │                                               │    │
-│  │  │ • Foreign keys ON  │                                               │    │
-│  │  └────────────────────┘                                               │    │
-│  └──────────────────────────────────────────────────────────────────────┘    │
+│  ┌──────────────┐   ┌─────────────────────┐   ┌──────────────────────────┐    │
+│  │ EVTX (.evtx) │   │ AWS CloudTrail JSON  │   │ GCP Audit Logs (JSON/JSONL)│   │
+│  │  (Windows)   │   │  (data/aws_demo.jsonl)│   │  (data/gcp_log_pack/*.json)│   │
+│  └──────┬───────┘   └──────────┬──────────┘   └──────────┬───────────────┘    │
+│         │                    │                         │                    │
+│         │ scripts/prep_evtx  │                         │ scripts/append_exposure
+│         │ -> .jsonl          │ ingestion adapter        │ -> dedupe/write      │
+│         ▼                    ▼                         ▼                    │
+│  ┌───────────────────────────────────────────────────────────────────────┐   │
+│  │                 Normalized JSONL events (text-based, provenance)       │   │
+│  │  - Fields: source_file, record_index, insertId/event_id, protoPayload   │   │
+│  │  - Enrichment: actor_kind, automation_tool, cross_project, workload_id  │   │
+│  └───────────────────────────────────────────────────────────────────────┘   │
 │                                                                                │
-└────────────────────────────────────────────────────────────────────────────────┘
-                                   │
-                                   ▼
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                              OUTPUT LAYER                                      │
-├───────────────────────────────────────────────────────────────────────────────┤
-│                                                                                │
-│  ┌──────────────────┐         ┌──────────────────┐                           │
-│  │ Console Output   │         │ File Output      │                           │
-│  │ (--output console│         │ (--output file)  │                           │
-│  │  or default)     │         │                  │                           │
-│  │                  │         │ reports/         │                           │
-│  │ Markdown-formatted│        │ analysis_<UUID>  │                           │
-│  │ report to stdout │         │ .txt             │                           │
-│  └──────────────────┘         └──────────────────┘                           │
-│                                                                                │
-│  ┌──────────────────────────────────────────────────────────────────┐        │
-│  │ Database Persistence                                              │        │
-│  │ db/analysis.db (SQLite3)                                          │        │
-│  │                                                                    │        │
-│  │ Query examples:                                                   │        │
-│  │ • List all runs:                                                  │        │
-│  │   SELECT * FROM analysis_runs ORDER BY timestamp DESC;            │        │
-│  │                                                                    │        │
-│  │ • Get findings for specific run:                                  │        │
-│  │   SELECT * FROM findings WHERE run_id = '<uuid>';                 │        │
-│  │                                                                    │        │
-│  │ • Count HIGH severity findings across all runs:                   │        │
-│  │   SELECT COUNT(*) FROM findings WHERE severity = 'high';          │        │
-│  └──────────────────────────────────────────────────────────────────┘        │
-│                                                                                │
-└────────────────────────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────────────────────────────┘
 
 ┌───────────────────────────────────────────────────────────────────────────────┐
-│                         EXTERNAL DEPENDENCIES                                  │
+│                        APPLICATION LAYER (Python 3.13.x)                       │
 ├───────────────────────────────────────────────────────────────────────────────┤
 │                                                                                │
-│  ┌────────────────────┐    ┌────────────────────┐    ┌──────────────────┐   │
-│  │ OpenAI API         │    │ Pydantic v2        │    │ python-dotenv    │   │
-│  ├────────────────────┤    ├────────────────────┤    ├──────────────────┤   │
-│  │ • gpt-4o-mini      │    │ • Schema validation│    │ • .env loading   │   │
-│  │ • gpt-4 (optional) │    │ • Type coercion    │    │ • API key mgmt   │   │
-│  │ • JSON mode        │    │ • Error messages   │    │                  │   │
-│  │ • Retry logic      │    │                    │    │                  │   │
-│  │   (3 attempts)     │    │                    │    │                  │   │
-│  └────────────────────┘    └────────────────────┘    └──────────────────┘   │
+│  CLI entrypoint: `src/main.py`                                                 │
+│  - Options: `--input`, `--source (gcp|aws|windows)`, `--debug`, `--dry-run`    │
 │                                                                                │
-└────────────────────────────────────────────────────────────────────────────────┘
+│  Pipeline phases:                                                              │
+│                                                                                │
+│  PHASE 1: INGEST / Enrichment                                                  │
+│  - `src/ingest_gcp.py`, `src/ingest_aws.py`, `src/ingest_evtx.py`              │
+│  - Normalize per-source fields into canonical schema                          │
+│  - Deterministic enrichment: detect `actor_kind`, `automation_tool`, `ioc`     │
+│  - Cross-project detection and IAM evidence tagging                            │
+│                                                                                │
+│  PHASE 2: ANALYZE (LLM + Deterministic Post-processing)                       │
+│  - `src/llm_analyze.py`                                                         │
+│  - Batch events, build source-aware prompts, and call LLM (JSON schema enforced)
+│  - Deterministic IOC extraction (IPs, UAs, principals, project IDs, resources)
+│  - Merge LLM output with deterministic IOCs into `AnalysisOutput`              │
+│                                                                                │
+│  PHASE 3: VALIDATE                                                            │
+│  - `src/schemas.py` (Pydantic models)                                          │
+│  - `src/security.py` enforces policy patterns and blocks prohibited wording     │
+│  - Ensures required evidence (source_file, record_index, event_id) present     │
+│                                                                                │
+│  PHASE 4: REPORT                                                              │
+│  - `src/report.py` (deterministic, no LLM calls)                               │
+│  - Consistent top-level Executive Summary for all runs (success + errors)      │
+│  - Findings sorted/prioritized by severity (Critical → High → Medium → Low → Info)
+│  - Deduplication & normalization of finding titles (e.g., CryptoKeyVersion)    │
+│                                                                                │
+│  PHASE 5: PERSIST / OUTPUT                                                     │
+│  - `src/storage.py` writes report text and structured objects to DB/files     │
+│  - Console and file outputs: `reports/analysis_<UUID>.txt`                     │
+│                                                                                │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                              REPORTING / OUTPUT LAYER                          │
+├───────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│  - All successful reports include:                                             │
+│    - Executive Summary (risk level, counts, top recommendation)                │
+│    - Prioritized Findings (severity-sorted with evidence pointers)            │
+│    - Hypotheses, IOCs, Recommended Next Steps                                 │
+│                                                                                │
+│  - Error / Incomplete reports now include a minimal Executive Summary to keep  │
+│    top-level structure consistent and easier programmatic consumption.        │
+│                                                                                │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                              STORAGE / DEPENDENCIES                            │
+├───────────────────────────────────────────────────────────────────────────────┤
+│  - SQLite DB: `db/analysis.db` (analysis_runs, findings, iocs, hypotheses)     │
+│  - Reports folder: `reports/analysis_<UUID>.txt`                               │
+│  - External: OpenAI API (LLM), Pydantic v2, python-dotenv                      │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+Notes:
+- The architecture intentionally separates source adapters (ingest_*) from normalization/enrichment so
+   new sources (other clouds, SaaS logs) can be added with minimal changes to analysis and reporting.
+- Deterministic post-processing ensures reproducible IOC extraction and consistent report structure across
+   Windows (EVTX), AWS, and GCP analyses.
+
 ```
 
 ---

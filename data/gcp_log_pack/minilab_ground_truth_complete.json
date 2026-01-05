@@ -1,0 +1,2056 @@
+[
+  {
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+      },
+      "requestMetadata": {
+        "callerIp": "192.0.2.1",
+        "callerSuppliedUserAgent": "Terraform/1.5.7 (+https://www.terraform.io) google-api-go-client/0.123.0"
+      },
+      "serviceName": "iam.googleapis.com",
+      "methodName": "google.iam.admin.v1.CreateServiceAccountKey",
+      "resourceName": "projects/purplelens-lab-core/serviceAccounts/victim-app@purplelens-lab-core.iam.gserviceaccount.com/keys/new"
+    },
+    "insertId": "synthetic-persistence-001",
+    "resource": {
+      "type": "service_account",
+      "labels": {
+        "project_id": "purplelens-lab-core",
+        "email_id": "victim-app@purplelens-lab-core.iam.gserviceaccount.com"
+      }
+    },
+    "timestamp": "2026-01-03T10:00:00Z",
+    "severity": "NOTICE",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "receiveTimestamp": "2026-01-03T10:00:01Z"
+  },
+  {
+    "insertId": "973y0le8gvlg",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        }
+      ],
+      "methodName": "SetIamPolicy",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.v1.SetIamPolicyRequest",
+        "policy": {
+          "auditConfigs": [
+            {
+              "auditLogConfigs": [
+                {
+                  "logType": "ADMIN_READ"
+                },
+                {
+                  "logType": "DATA_READ"
+                },
+                {
+                  "logType": "DATA_WRITE"
+                }
+              ],
+              "service": "storage.googleapis.com"
+            }
+          ]
+        },
+        "resource": "purplelens-lab-core",
+        "updateMask": "auditConfigs,bindings,etag"
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.projects.set-iam-policy invocation-id/ce776e895e174f63837c55b99d5910aa environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {}
+      },
+      "resourceName": "projects/purplelens-lab-core",
+      "serviceName": "cloudresourcemanager.googleapis.com",
+      "status": {
+        "code": 3,
+        "message": "<eye3 title='INVALID_ARGUMENT'/> generic::INVALID_ARGUMENT: At least one remaining owner must have accepted the cloud ToS."
+      }
+    },
+    "receiveTimestamp": "2026-01-04T15:43:42.585254988Z",
+    "resource": {
+      "labels": {
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "project"
+    },
+    "severity": "ERROR",
+    "timestamp": "2026-01-04T15:43:42.188784Z"
+  },
+  {
+    "insertId": "-qwgg9gf1iqdk2",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "principalEmail": "service-agent-manager@system.gserviceaccount.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        },
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        }
+      ],
+      "methodName": "SetIamPolicy",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.v1.SetIamPolicyRequest",
+        "policy": {
+          "bindings": [
+            {
+              "members": [
+                "serviceAccount:service-16356170548@gcp-sa-cloudaicompanion.iam.gserviceaccount.com"
+              ],
+              "role": "roles/cloudaicompanion.serviceAgent"
+            },
+            {
+              "members": [
+                "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+              ],
+              "role": "roles/iam.serviceAccountAdmin"
+            },
+            {
+              "members": [
+                "user:mwill.itmission@gmail.com"
+              ],
+              "role": "roles/owner"
+            },
+            {
+              "members": [
+                "serviceAccountId:113348400726338942980"
+              ],
+              "role": "roles/logging.serviceAgent"
+            }
+          ],
+          "etag": "BwZHkR9IRUo="
+        },
+        "resource": "16356170548"
+      },
+      "requestMetadata": {
+        "callerIp": "private",
+        "destinationAttributes": {},
+        "requestAttributes": {}
+      },
+      "resourceName": "projects/purplelens-lab-core",
+      "response": {
+        "@type": "type.googleapis.com/google.iam.v1.Policy",
+        "bindings": [
+          {
+            "members": [
+              "serviceAccount:service-16356170548@gcp-sa-cloudaicompanion.iam.gserviceaccount.com"
+            ],
+            "role": "roles/cloudaicompanion.serviceAgent"
+          },
+          {
+            "members": [
+              "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+            ],
+            "role": "roles/iam.serviceAccountAdmin"
+          },
+          {
+            "members": [
+              "serviceAccount:service-16356170548@gcp-sa-logging.iam.gserviceaccount.com"
+            ],
+            "role": "roles/logging.serviceAgent"
+          },
+          {
+            "members": [
+              "user:mwill.itmission@gmail.com"
+            ],
+            "role": "roles/owner"
+          }
+        ],
+        "etag": "BwZHkccaIW0="
+      },
+      "serviceData": {
+        "@type": "type.googleapis.com/google.iam.v1.logging.AuditData",
+        "policyDelta": {
+          "bindingDeltas": [
+            {
+              "action": "ADD",
+              "member": "serviceAccount:service-16356170548@gcp-sa-logging.iam.gserviceaccount.com",
+              "role": "roles/logging.serviceAgent"
+            }
+          ]
+        }
+      },
+      "serviceName": "cloudresourcemanager.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T15:41:37.338505129Z",
+    "resource": {
+      "labels": {
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "project"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T15:41:36.140493Z"
+  },
+  {
+    "insertId": "lz09ptf1pgk92",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "loggableShortLivedCredential": {
+          "@type": "type.googleapis.com/identity_cloudgaia.AuditLoggableShortLivedCredential",
+          "oauthToken": {
+            "tokenPrefix": "ya29.c.c0AYnqXlhOYqJvexSlnfpBozo5_5"
+          }
+        },
+        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "iam.serviceAccounts.getAccessToken",
+          "permissionType": "DATA_READ",
+          "resource": "projects/-/serviceAccounts/114193339470602582752"
+        }
+      ],
+      "methodName": "GenerateAccessToken",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
+        "lifetime": "3600s",
+        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "scope": [
+          "openid",
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/cloud-platform",
+          "https://www.googleapis.com/auth/appengine.admin",
+          "https://www.googleapis.com/auth/sqlservice.login",
+          "https://www.googleapis.com/auth/compute"
+        ]
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.auth.print-access-token invocation-id/c751d08be9f14db39bf5b1e9acb06c92 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)"
+      },
+      "resourceName": "projects/-/serviceAccounts/114193339470602582752",
+      "serviceName": "iamcredentials.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T15:19:44.018211315Z",
+    "resource": {
+      "labels": {
+        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "project_id": "purplelens-lab-core",
+        "unique_id": "114193339470602582752"
+      },
+      "type": "service_account"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T15:19:43.277625689Z"
+  },
+  {
+    "insertId": "ujw19ne6l8o5",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "cloudkms.cryptoKeyVersions.destroy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+            "service": "google.cloud.kms",
+            "type": "cloudkms.googleapis.com/CryptoKeyVersion"
+          }
+        }
+      ],
+      "metadata": {},
+      "methodName": "DestroyCryptoKeyVersion",
+      "request": {
+        "@type": "type.googleapis.com/google.cloud.kms.v1.DestroyCryptoKeyVersionRequest",
+        "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1"
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.kms.keys.versions.destroy invocation-id/0701bf042e7843cb96693d4731be450a environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T15:18:39.304863188Z"
+        }
+      },
+      "resourceLocation": {
+        "currentLocations": [
+          "global"
+        ]
+      },
+      "resourceName": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+      "serviceName": "cloudkms.googleapis.com",
+      "status": {
+        "code": 9,
+        "message": "The request cannot be fulfilled. Resource projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1 has value DESTROY_SCHEDULED in field crypto_key_version.state."
+      }
+    },
+    "receiveTimestamp": "2026-01-04T15:18:40.808027703Z",
+    "resource": {
+      "labels": {
+        "crypto_key_id": "top-secret-key",
+        "crypto_key_version_id": "1",
+        "key_ring_id": "lab-keyring",
+        "location": "global",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "cloudkms_cryptokeyversion"
+    },
+    "severity": "ERROR",
+    "timestamp": "2026-01-04T15:18:39.297791371Z"
+  },
+  {
+    "insertId": "6ez1kpe58fcs",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "cloudkms.cryptoKeys.create",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
+            "service": "google.cloud.kms",
+            "type": "cloudkms.googleapis.com/CryptoKey"
+          }
+        }
+      ],
+      "metadata": {},
+      "methodName": "CreateCryptoKey",
+      "request": {
+        "@type": "type.googleapis.com/google.cloud.kms.v1.CreateCryptoKeyRequest",
+        "cryptoKey": {
+          "purpose": "ENCRYPT_DECRYPT",
+          "versionTemplate": {
+            "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+            "protectionLevel": "SOFTWARE"
+          }
+        },
+        "cryptoKeyId": "top-secret-key",
+        "parent": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring"
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.kms.keys.create invocation-id/16330e0da07846fe9c661ab2ea85bd42 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T15:18:23.278106122Z"
+        }
+      },
+      "resourceLocation": {
+        "currentLocations": [
+          "global"
+        ]
+      },
+      "resourceName": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
+      "serviceName": "cloudkms.googleapis.com",
+      "status": {
+        "code": 6,
+        "message": "CryptoKey projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key already exists."
+      }
+    },
+    "receiveTimestamp": "2026-01-04T15:18:25.047444253Z",
+    "resource": {
+      "labels": {
+        "crypto_key_id": "top-secret-key",
+        "key_ring_id": "lab-keyring",
+        "location": "global",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "cloudkms_cryptokey"
+    },
+    "severity": "ERROR",
+    "timestamp": "2026-01-04T15:18:23.263966058Z"
+  },
+  {
+    "insertId": "erqyg2f113yud",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "loggableShortLivedCredential": {
+          "@type": "type.googleapis.com/identity_cloudgaia.AuditLoggableShortLivedCredential",
+          "oauthToken": {
+            "tokenPrefix": "ya29.c.c0AYnqXlgGpy0v5gf7kuwd7KYGRC"
+          }
+        },
+        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "iam.serviceAccounts.getAccessToken",
+          "permissionType": "DATA_READ",
+          "resource": "projects/-/serviceAccounts/114193339470602582752"
+        }
+      ],
+      "methodName": "GenerateAccessToken",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
+        "lifetime": "3600s",
+        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "scope": [
+          "openid",
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/cloud-platform",
+          "https://www.googleapis.com/auth/appengine.admin",
+          "https://www.googleapis.com/auth/sqlservice.login",
+          "https://www.googleapis.com/auth/compute"
+        ]
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.auth.print-access-token invocation-id/ccb5959c44a748bf860c18b9692f8461 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)"
+      },
+      "resourceName": "projects/-/serviceAccounts/114193339470602582752",
+      "serviceName": "iamcredentials.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T15:15:20.178515239Z",
+    "resource": {
+      "labels": {
+        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "project_id": "purplelens-lab-core",
+        "unique_id": "114193339470602582752"
+      },
+      "type": "service_account"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T15:15:19.127798653Z"
+  },
+  {
+    "insertId": "ujw19ne6l6ld",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "cloudkms.cryptoKeyVersions.destroy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+            "service": "google.cloud.kms",
+            "type": "cloudkms.googleapis.com/CryptoKeyVersion"
+          }
+        }
+      ],
+      "metadata": {},
+      "methodName": "DestroyCryptoKeyVersion",
+      "request": {
+        "@type": "type.googleapis.com/google.cloud.kms.v1.DestroyCryptoKeyVersionRequest",
+        "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1"
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.kms.keys.versions.destroy invocation-id/becc52312c614a70be4ae5291ef7a68a environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T15:14:48.233819485Z"
+        }
+      },
+      "resourceLocation": {
+        "currentLocations": [
+          "global"
+        ]
+      },
+      "resourceName": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+      "serviceName": "cloudkms.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T15:14:49.263360689Z",
+    "resource": {
+      "labels": {
+        "crypto_key_id": "top-secret-key",
+        "crypto_key_version_id": "1",
+        "key_ring_id": "lab-keyring",
+        "location": "global",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "cloudkms_cryptokeyversion"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T15:14:48.226034419Z"
+  },
+  {
+    "insertId": "8m5eg8e6xo1g",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "cloudkms.cryptoKeys.create",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
+            "service": "google.cloud.kms",
+            "type": "cloudkms.googleapis.com/CryptoKey"
+          }
+        }
+      ],
+      "metadata": {},
+      "methodName": "CreateCryptoKey",
+      "request": {
+        "@type": "type.googleapis.com/google.cloud.kms.v1.CreateCryptoKeyRequest",
+        "cryptoKey": {
+          "purpose": "ENCRYPT_DECRYPT",
+          "versionTemplate": {
+            "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+            "protectionLevel": "SOFTWARE"
+          }
+        },
+        "cryptoKeyId": "top-secret-key",
+        "parent": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring"
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.kms.keys.create invocation-id/9ee10f309d3149c091ca659cc17522ec environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T15:14:34.227502828Z"
+        }
+      },
+      "resourceLocation": {
+        "currentLocations": [
+          "global"
+        ]
+      },
+      "resourceName": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
+      "serviceName": "cloudkms.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T15:14:35.959693082Z",
+    "resource": {
+      "labels": {
+        "crypto_key_id": "top-secret-key",
+        "key_ring_id": "lab-keyring",
+        "location": "global",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "cloudkms_cryptokey"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T15:14:34.214748400Z"
+  },
+  {
+    "insertId": "1px1bx8e804pk",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "loggableShortLivedCredential": {
+          "@type": "type.googleapis.com/identity_cloudgaia.AuditLoggableShortLivedCredential",
+          "oauthToken": {
+            "tokenPrefix": "ya29.c.c0AYnqXlgJUHndTNeeouyXkHsXOw"
+          }
+        },
+        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+      },
+      "userAgent": "Terraform/1.5.7 (+https://www.terraform.io) google-api-go-client/0.123.0",
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "iam.serviceAccounts.getAccessToken",
+          "permissionType": "DATA_READ",
+          "resource": "projects/-/serviceAccounts/114193339470602582752"
+        }
+      ],
+      "methodName": "GenerateAccessToken",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
+        "lifetime": "3600s",
+        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "scope": [
+          "openid",
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/cloud-platform",
+          "https://www.googleapis.com/auth/appengine.admin",
+          "https://www.googleapis.com/auth/sqlservice.login",
+          "https://www.googleapis.com/auth/compute"
+        ]
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.iam.service-accounts.keys.create invocation-id/1e37e66ae5ad48e9b1db60d5ef279240 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)"
+      },
+      "resourceName": "projects/-/serviceAccounts/114193339470602582752",
+      "serviceName": "iamcredentials.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T15:12:28.998182761Z",
+    "resource": {
+      "labels": {
+        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "project_id": "purplelens-lab-core",
+        "unique_id": "114193339470602582752"
+      },
+      "type": "service_account"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T15:12:28.584094333Z"
+  },
+  {
+    "insertId": "erqyg2f110dpy",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "loggableShortLivedCredential": {
+          "@type": "type.googleapis.com/identity_cloudgaia.AuditLoggableShortLivedCredential",
+          "oauthToken": {
+            "tokenPrefix": "ya29.c.c0AYnqXlgBbW6hlWcKRYLGGKlZ_v"
+          }
+        },
+        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "iam.serviceAccounts.getAccessToken",
+          "permissionType": "DATA_READ",
+          "resource": "projects/-/serviceAccounts/114193339470602582752"
+        }
+      ],
+      "methodName": "GenerateAccessToken",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
+        "lifetime": "3600s",
+        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "scope": [
+          "openid",
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/cloud-platform",
+          "https://www.googleapis.com/auth/appengine.admin",
+          "https://www.googleapis.com/auth/sqlservice.login",
+          "https://www.googleapis.com/auth/compute"
+        ]
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.iam.service-accounts.keys.create invocation-id/1a6a486ff0f04410b2bf7e64b4a49d1c environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)"
+      },
+      "resourceName": "projects/-/serviceAccounts/114193339470602582752",
+      "serviceName": "iamcredentials.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T14:57:07.613991795Z",
+    "resource": {
+      "labels": {
+        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "project_id": "purplelens-lab-core",
+        "unique_id": "114193339470602582752"
+      },
+      "type": "service_account"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T14:57:07.356675786Z"
+  },
+  {
+    "insertId": "-llyqsvf1iiddq",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "principalEmail": "service-agent-manager@system.gserviceaccount.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        },
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        }
+      ],
+      "methodName": "SetIamPolicy",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.v1.SetIamPolicyRequest",
+        "policy": {
+          "bindings": [
+            {
+              "members": [
+                "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+              ],
+              "role": "roles/iam.serviceAccountAdmin"
+            },
+            {
+              "members": [
+                "user:mwill.itmission@gmail.com"
+              ],
+              "role": "roles/owner"
+            },
+            {
+              "members": [
+                "serviceAccountId:110652719641551439608"
+              ],
+              "role": "roles/cloudaicompanion.serviceAgent"
+            }
+          ],
+          "etag": "BwZHkN2Z/jM="
+        },
+        "resource": "16356170548"
+      },
+      "requestMetadata": {
+        "callerIp": "private",
+        "destinationAttributes": {},
+        "requestAttributes": {}
+      },
+      "resourceName": "projects/purplelens-lab-core",
+      "response": {
+        "@type": "type.googleapis.com/google.iam.v1.Policy",
+        "bindings": [
+          {
+            "members": [
+              "serviceAccount:service-16356170548@gcp-sa-cloudaicompanion.iam.gserviceaccount.com"
+            ],
+            "role": "roles/cloudaicompanion.serviceAgent"
+          },
+          {
+            "members": [
+              "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+            ],
+            "role": "roles/iam.serviceAccountAdmin"
+          },
+          {
+            "members": [
+              "user:mwill.itmission@gmail.com"
+            ],
+            "role": "roles/owner"
+          }
+        ],
+        "etag": "BwZHkR9IRUo="
+      },
+      "serviceData": {
+        "@type": "type.googleapis.com/google.iam.v1.logging.AuditData",
+        "policyDelta": {
+          "bindingDeltas": [
+            {
+              "action": "ADD",
+              "member": "serviceAccount:service-16356170548@gcp-sa-cloudaicompanion.iam.gserviceaccount.com",
+              "role": "roles/cloudaicompanion.serviceAgent"
+            }
+          ]
+        }
+      },
+      "serviceName": "cloudresourcemanager.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T14:54:41.418586858Z",
+    "resource": {
+      "labels": {
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "project"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T14:54:40.534073Z"
+  },
+  {
+    "insertId": "1wb529nf1tbqxx",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "loggableShortLivedCredential": {
+          "@type": "type.googleapis.com/identity_cloudgaia.AuditLoggableShortLivedCredential",
+          "oauthToken": {
+            "tokenPrefix": "ya29.c.c0AYnqXlj3d6d2PGatk4w-T1e3Cd"
+          }
+        },
+        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "iam.serviceAccounts.getAccessToken",
+          "permissionType": "DATA_READ",
+          "resource": "projects/-/serviceAccounts/114193339470602582752"
+        }
+      ],
+      "methodName": "GenerateAccessToken",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
+        "lifetime": "3600s",
+        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "scope": [
+          "openid",
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/cloud-platform",
+          "https://www.googleapis.com/auth/appengine.admin",
+          "https://www.googleapis.com/auth/sqlservice.login",
+          "https://www.googleapis.com/auth/compute"
+        ]
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.iam.service-accounts.keys.create invocation-id/5bd084e6aa4a40f3a078e00356b135c3 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)"
+      },
+      "resourceName": "projects/-/serviceAccounts/114193339470602582752",
+      "serviceName": "iamcredentials.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T14:53:12.515301116Z",
+    "resource": {
+      "labels": {
+        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "project_id": "purplelens-lab-core",
+        "unique_id": "114193339470602582752"
+      },
+      "type": "service_account"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T14:53:11.637053876Z"
+  },
+  {
+    "insertId": "c9hyhif2ja1wt",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "loggableShortLivedCredential": {
+          "@type": "type.googleapis.com/identity_cloudgaia.AuditLoggableShortLivedCredential",
+          "oauthToken": {
+            "tokenPrefix": "ya29.c.c0AYnqXliT_oKyc9n86irXc5mFZv"
+          }
+        },
+        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "iam.serviceAccounts.getAccessToken",
+          "permissionType": "DATA_READ",
+          "resource": "projects/-/serviceAccounts/114193339470602582752"
+        }
+      ],
+      "methodName": "GenerateAccessToken",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
+        "lifetime": "3600s",
+        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "scope": [
+          "openid",
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/cloud-platform",
+          "https://www.googleapis.com/auth/appengine.admin",
+          "https://www.googleapis.com/auth/sqlservice.login",
+          "https://www.googleapis.com/auth/compute"
+        ]
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.iam.service-accounts.keys.create invocation-id/6b0c9c9223434f638f7f47cb1eb469e9 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)"
+      },
+      "resourceName": "projects/-/serviceAccounts/114193339470602582752",
+      "serviceName": "iamcredentials.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T14:50:53.235768073Z",
+    "resource": {
+      "labels": {
+        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "project_id": "purplelens-lab-core",
+        "unique_id": "114193339470602582752"
+      },
+      "type": "service_account"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T14:50:52.254525911Z"
+  },
+  {
+    "insertId": "aia2sf1lmdtv",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "loggableShortLivedCredential": {
+          "@type": "type.googleapis.com/identity_cloudgaia.AuditLoggableShortLivedCredential",
+          "oauthToken": {
+            "tokenPrefix": "ya29.c.c0AYnqXlgISCzz68a-KdCsaCJE-z"
+          }
+        },
+        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "iam.serviceAccounts.getAccessToken",
+          "permissionType": "DATA_READ",
+          "resource": "projects/-/serviceAccounts/114193339470602582752"
+        }
+      ],
+      "methodName": "GenerateAccessToken",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
+        "lifetime": "3600s",
+        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "scope": [
+          "openid",
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/cloud-platform",
+          "https://www.googleapis.com/auth/appengine.admin",
+          "https://www.googleapis.com/auth/sqlservice.login",
+          "https://www.googleapis.com/auth/compute"
+        ]
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.iam.service-accounts.keys.create invocation-id/0f4c14f5ff524ccfade4c2dba9f784db environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)"
+      },
+      "resourceName": "projects/-/serviceAccounts/114193339470602582752",
+      "serviceName": "iamcredentials.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T14:40:53.084662495Z",
+    "resource": {
+      "labels": {
+        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "project_id": "purplelens-lab-core",
+        "unique_id": "114193339470602582752"
+      },
+      "type": "service_account"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T14:40:52.504676069Z"
+  },
+  {
+    "insertId": "13gg1xmez6g89",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "loggableShortLivedCredential": {
+          "@type": "type.googleapis.com/identity_cloudgaia.AuditLoggableShortLivedCredential",
+          "oauthToken": {
+            "tokenPrefix": "ya29.c.c0AYnqXljIN1MP0B3nlzCQcb67cJ"
+          }
+        },
+        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "iam.serviceAccounts.getAccessToken",
+          "permissionType": "DATA_READ",
+          "resource": "projects/-/serviceAccounts/114193339470602582752"
+        }
+      ],
+      "methodName": "GenerateAccessToken",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
+        "lifetime": "3600s",
+        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "scope": [
+          "openid",
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/cloud-platform",
+          "https://www.googleapis.com/auth/appengine.admin",
+          "https://www.googleapis.com/auth/sqlservice.login",
+          "https://www.googleapis.com/auth/compute"
+        ]
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.iam.service-accounts.keys.create invocation-id/57b5f22a721342218c59117061bc20f7 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)"
+      },
+      "resourceName": "projects/-/serviceAccounts/114193339470602582752",
+      "serviceName": "iamcredentials.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T14:39:42.582408519Z",
+    "resource": {
+      "labels": {
+        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "project_id": "purplelens-lab-core",
+        "unique_id": "114193339470602582752"
+      },
+      "type": "service_account"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T14:39:42.396542230Z"
+  },
+  {
+    "insertId": "bfwv3je2htxe",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        },
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        }
+      ],
+      "methodName": "SetIamPolicy",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.v1.SetIamPolicyRequest",
+        "policy": {
+          "bindings": [
+            {
+              "members": [
+                "user:mwill.itmission@gmail.com"
+              ],
+              "role": "roles/owner"
+            },
+            {
+              "members": [
+                "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+              ],
+              "role": "roles/iam.serviceAccountAdmin"
+            }
+          ],
+          "etag": "BwZHiiZhNaI="
+        },
+        "resource": "purplelens-lab-core"
+      },
+      "requestMetadata": {
+        "callerIp": "34.19.14.43",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.projects.add-iam-policy-binding invocation-id/fbb79aca431e4b1185bde418ab5ce583 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {}
+      },
+      "resourceName": "projects/purplelens-lab-core",
+      "response": {
+        "@type": "type.googleapis.com/google.iam.v1.Policy",
+        "bindings": [
+          {
+            "members": [
+              "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+            ],
+            "role": "roles/iam.serviceAccountAdmin"
+          },
+          {
+            "members": [
+              "user:mwill.itmission@gmail.com"
+            ],
+            "role": "roles/owner"
+          }
+        ],
+        "etag": "BwZHkN2Z/jM="
+      },
+      "serviceData": {
+        "@type": "type.googleapis.com/google.iam.v1.logging.AuditData",
+        "policyDelta": {
+          "bindingDeltas": [
+            {
+              "action": "ADD",
+              "member": "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+              "role": "roles/iam.serviceAccountAdmin"
+            }
+          ]
+        }
+      },
+      "serviceName": "cloudresourcemanager.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T14:36:19.418937629Z",
+    "resource": {
+      "labels": {
+        "project_id": "purplelens-production-database"
+      },
+      "type": "project"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T14:36:18.296315Z"
+  },
+  {
+    "insertId": "29q4fgev8avi",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "iam.serviceAccountKeys.delete",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/-/serviceAccounts/104837142829871986884",
+          "resourceAttributes": {
+            "name": "projects/-/serviceAccounts/104837142829871986884"
+          }
+        }
+      ],
+      "methodName": "google.iam.admin.v1.DeleteServiceAccountKey",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.admin.v1.DeleteServiceAccountKeyRequest",
+        "name": "projects/-/serviceAccounts/victim-app@purplelens-lab-core.iam.gserviceaccount.com/keys/cfe81ea15073a7c6eaea152ec5ae03d67c2af0d0"
+      },
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.iam.service-accounts.keys.delete invocation-id/af536e7a0e0c4daba435180fa2c40084 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T17:44:19.646189839Z"
+        }
+      },
+      "resourceName": "projects/-/serviceAccounts/104837142829871986884/keys/cfe81ea15073a7c6eaea152ec5ae03d67c2af0d0",
+      "serviceName": "iam.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T17:44:20.030463147Z",
+    "resource": {
+      "labels": {
+        "email_id": "victim-app@purplelens-lab-core.iam.gserviceaccount.com",
+        "project_id": "purplelens-lab-core",
+        "unique_id": "104837142829871986884"
+      },
+      "type": "service_account"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T17:44:19.629083863Z"
+  },
+  {
+    "insertId": "-6c6vn9e8pz0g",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        },
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        }
+      ],
+      "methodName": "SetIamPolicy",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.v1.SetIamPolicyRequest",
+        "policy": {
+          "auditConfigs": [
+            {
+              "auditLogConfigs": [
+                {
+                  "logType": "ADMIN_READ"
+                },
+                {
+                  "logType": "DATA_READ"
+                },
+                {
+                  "logType": "DATA_WRITE"
+                }
+              ],
+              "service": "storage.googleapis.com"
+            }
+          ],
+          "bindings": [
+            {
+              "members": [
+                "serviceAccount:service-16356170548@gcp-sa-cloudaicompanion.iam.gserviceaccount.com"
+              ],
+              "role": "roles/cloudaicompanion.serviceAgent"
+            },
+            {
+              "members": [
+                "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+              ],
+              "role": "roles/iam.serviceAccountAdmin"
+            },
+            {
+              "members": [
+                "serviceAccount:service-16356170548@gcp-sa-logging.iam.gserviceaccount.com"
+              ],
+              "role": "roles/logging.serviceAgent"
+            },
+            {
+              "members": [
+                "user:mwill.itmission@gmail.com"
+              ],
+              "role": "roles/owner"
+            }
+          ],
+          "etag": "BwZHkccaIW0="
+        },
+        "resource": "purplelens-lab-core",
+        "updateMask": "auditConfigs,bindings,etag,version"
+      },
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.projects.set-iam-policy invocation-id/86bb516ebbc74c2a94444f441629d1ff environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {}
+      },
+      "resourceName": "projects/purplelens-lab-core",
+      "response": {
+        "@type": "type.googleapis.com/google.iam.v1.Policy",
+        "auditConfigs": [
+          {
+            "auditLogConfigs": [
+              {
+                "logType": "ADMIN_READ"
+              },
+              {
+                "logType": "DATA_READ"
+              },
+              {
+                "logType": "DATA_WRITE"
+              }
+            ],
+            "service": "storage.googleapis.com"
+          }
+        ],
+        "bindings": [
+          {
+            "members": [
+              "serviceAccount:service-16356170548@gcp-sa-cloudaicompanion.iam.gserviceaccount.com"
+            ],
+            "role": "roles/cloudaicompanion.serviceAgent"
+          },
+          {
+            "members": [
+              "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+            ],
+            "role": "roles/iam.serviceAccountAdmin"
+          },
+          {
+            "members": [
+              "serviceAccount:service-16356170548@gcp-sa-logging.iam.gserviceaccount.com"
+            ],
+            "role": "roles/logging.serviceAgent"
+          },
+          {
+            "members": [
+              "user:mwill.itmission@gmail.com"
+            ],
+            "role": "roles/owner"
+          }
+        ],
+        "etag": "BwZHk3ogUyc="
+      },
+      "serviceData": {
+        "@type": "type.googleapis.com/google.iam.v1.logging.AuditData",
+        "policyDelta": {}
+      },
+      "serviceName": "cloudresourcemanager.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T17:43:15.427036003Z",
+    "resource": {
+      "labels": {
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "project"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T17:43:14.258388Z"
+  },
+  {
+    "insertId": "-76l24xe8zxo4",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        }
+      ],
+      "methodName": "SetIamPolicy",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.v1.SetIamPolicyRequest",
+        "policy": {
+          "auditConfigs": [
+            {
+              "auditLogConfigs": [
+                {
+                  "logType": "ADMIN_READ"
+                },
+                {
+                  "logType": "DATA_READ"
+                },
+                {
+                  "logType": "DATA_WRITE"
+                }
+              ],
+              "service": "storage.googleapis.com"
+            }
+          ]
+        },
+        "resource": "purplelens-lab-core",
+        "updateMask": "auditConfigs,bindings,etag"
+      },
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.projects.set-iam-policy invocation-id/42cbfbe3144543f29ef7e186eb413a02 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {}
+      },
+      "resourceName": "projects/purplelens-lab-core",
+      "serviceName": "cloudresourcemanager.googleapis.com",
+      "status": {
+        "code": 3,
+        "message": "<eye3 title='INVALID_ARGUMENT'/> generic::INVALID_ARGUMENT: At least one remaining owner must have accepted the cloud ToS."
+      }
+    },
+    "receiveTimestamp": "2026-01-04T17:41:53.153760868Z",
+    "resource": {
+      "labels": {
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "project"
+    },
+    "severity": "ERROR",
+    "timestamp": "2026-01-04T17:41:51.864291Z"
+  },
+  {
+    "insertId": "u91o19e3lox0",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "resourcemanager.projects.setIamPolicy",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core",
+            "service": "cloudresourcemanager.googleapis.com",
+            "type": "cloudresourcemanager.googleapis.com/Project"
+          }
+        }
+      ],
+      "methodName": "SetIamPolicy",
+      "request": {
+        "@type": "type.googleapis.com/google.iam.v1.SetIamPolicyRequest",
+        "policy": {
+          "auditConfigs": [
+            {
+              "auditLogConfigs": [
+                {
+                  "logType": "ADMIN_READ"
+                },
+                {
+                  "logType": "DATA_READ"
+                },
+                {
+                  "logType": "DATA_WRITE"
+                }
+              ],
+              "service": "storage.googleapis.com"
+            }
+          ]
+        },
+        "resource": "purplelens-lab-core",
+        "updateMask": "auditConfigs,bindings,etag"
+      },
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.projects.set-iam-policy invocation-id/919db92c0824468897f8b8a310485bf1 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {}
+      },
+      "resourceName": "projects/purplelens-lab-core",
+      "serviceName": "cloudresourcemanager.googleapis.com",
+      "status": {
+        "code": 3,
+        "message": "<eye3 title='INVALID_ARGUMENT'/> generic::INVALID_ARGUMENT: At least one remaining owner must have accepted the cloud ToS."
+      }
+    },
+    "receiveTimestamp": "2026-01-04T17:41:17.668894287Z",
+    "resource": {
+      "labels": {
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "project"
+    },
+    "severity": "ERROR",
+    "timestamp": "2026-01-04T17:41:16.729952Z"
+  },
+  {
+    "insertId": "vcuw4ydl3fz",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "logging.sinks.update",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+            "service": "logging.googleapis.com",
+            "type": "logging.googleapis.com/LogSink"
+          }
+        }
+      ],
+      "methodName": "google.logging.v2.ConfigServiceV2.UpdateSink",
+      "request": {
+        "@type": "type.googleapis.com/google.logging.v2.UpdateSinkRequest",
+        "sink": {
+          "filter": "resource.type=\"gce_instance\" AND NOT protoPayload.methodName=\"DeleteServiceAccountKey\"",
+          "name": "gap-fill-sink"
+        },
+        "sinkName": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+        "uniqueWriterIdentity": true,
+        "updateMask": "filter"
+      },
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.logging.sinks.update invocation-id/33c4deded04d4072aff3b80a0c5fd927 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T17:40:35.747097386Z"
+        }
+      },
+      "resourceName": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+      "serviceName": "logging.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T17:40:36.799373893Z",
+    "resource": {
+      "labels": {
+        "destination": "",
+        "name": "gap-fill-sink",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "logging_sink"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T17:40:35.736166046Z"
+  },
+  {
+    "insertId": "15wg4lfdb8q8",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "logging.sinks.create",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+            "service": "logging.googleapis.com",
+            "type": "logging.googleapis.com/LogSink"
+          }
+        }
+      ],
+      "methodName": "google.logging.v2.ConfigServiceV2.CreateSink",
+      "request": {
+        "@type": "type.googleapis.com/google.logging.v2.CreateSinkRequest",
+        "parent": "projects/purplelens-lab-core",
+        "sink": {
+          "destination": "storage.googleapis.com/purplelens-sink-24502",
+          "filter": "resource.type=\"gce_instance\"",
+          "name": "gap-fill-sink"
+        },
+        "uniqueWriterIdentity": true
+      },
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.logging.sinks.create invocation-id/7d0d49788c54480aaf31cf6db1e561a1 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T17:39:46.935560002Z"
+        }
+      },
+      "resourceName": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+      "serviceName": "logging.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T17:39:48.965809854Z",
+    "resource": {
+      "labels": {
+        "destination": "",
+        "name": "gap-fill-sink",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "logging_sink"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T17:39:46.923549734Z"
+  },
+  {
+    "insertId": "1dq1e1vdgb8i",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "logging.logMetrics.delete",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+            "service": "logging.googleapis.com",
+            "type": "logging.googleapis.com/LogMetric"
+          }
+        }
+      ],
+      "methodName": "google.logging.v2.MetricsServiceV2.DeleteLogMetric",
+      "request": {
+        "@type": "type.googleapis.com/google.logging.v2.DeleteLogMetricRequest",
+        "metricName": "projects/purplelens-lab-core/metrics/gap-fill-metric"
+      },
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.logging.metrics.delete invocation-id/c1ddc5dc9b294ba39eccaf11a2761511 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T17:39:23.419327640Z"
+        }
+      },
+      "resourceName": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+      "serviceName": "logging.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T17:39:25.484475485Z",
+    "resource": {
+      "labels": {
+        "name": "logging.googleapis.com/user/gap-fill-metric",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "metric"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T17:39:23.410006471Z"
+  },
+  {
+    "insertId": "1nftsssdhxga",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com",
+        "principalSubject": "user:mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "logging.logMetrics.create",
+          "permissionType": "ADMIN_WRITE",
+          "resource": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+          "resourceAttributes": {
+            "name": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+            "service": "logging.googleapis.com",
+            "type": "logging.googleapis.com/LogMetric"
+          }
+        }
+      ],
+      "methodName": "google.logging.v2.MetricsServiceV2.CreateLogMetric",
+      "request": {
+        "@type": "type.googleapis.com/google.logging.v2.CreateLogMetricRequest",
+        "metric": {
+          "description": "Test",
+          "filter": "resource.type=\"gce_instance\"",
+          "name": "gap-fill-metric"
+        },
+        "parent": "projects/purplelens-lab-core"
+      },
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.logging.metrics.create invocation-id/027f8bc527f44ab4bdfdbf1981ce1dbd environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T17:39:21.317022750Z"
+        }
+      },
+      "resourceName": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+      "serviceName": "logging.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T17:39:23.118479101Z",
+    "resource": {
+      "labels": {
+        "name": "logging.googleapis.com/user/gap-fill-metric",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "metric"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T17:39:21.305725939Z"
+  },
+  {
+    "insertId": "qp46ctf5kw7ih",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "storage.objects.get",
+          "resource": "projects/_/buckets/purplelens-final-25664/objects/secret.txt",
+          "resourceAttributes": {}
+        }
+      ],
+      "metadata": {
+        "requested_bytes": 13
+      },
+      "methodName": "storage.objects.get",
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.storage.cp invocation-id/74c4f4ab9beb40ffb6974239cc6e7c5f environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/False from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T18:05:08.873036973Z"
+        }
+      },
+      "resourceLocation": {
+        "currentLocations": [
+          "us-central1"
+        ]
+      },
+      "resourceName": "projects/_/buckets/purplelens-final-25664/objects/secret.txt",
+      "serviceName": "storage.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T18:05:09.799373316Z",
+    "resource": {
+      "labels": {
+        "bucket_name": "purplelens-final-25664",
+        "location": "us-central1",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "gcs_bucket"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T18:05:08.866333924Z"
+  },
+  {
+    "insertId": "qz3l9yday69",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "storage.buckets.setIamPolicy",
+          "resource": "projects/_/buckets/purplelens-leak-32350",
+          "resourceAttributes": {}
+        }
+      ],
+      "methodName": "storage.setIamPermissions",
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.storage.buckets.add-iam-policy-binding invocation-id/68fd4b25e67042faad37a8f72b097b62 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T18:36:10.704488768Z"
+        }
+      },
+      "resourceLocation": {
+        "currentLocations": [
+          "us-central1"
+        ]
+      },
+      "resourceName": "projects/_/buckets/purplelens-leak-32350",
+      "serviceData": {
+        "@type": "type.googleapis.com/google.iam.v1.logging.AuditData",
+        "policyDelta": {
+          "bindingDeltas": [
+            {
+              "action": "ADD",
+              "member": "allUsers",
+              "role": "roles/storage.objectViewer"
+            }
+          ]
+        }
+      },
+      "serviceName": "storage.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T18:36:12.551203356Z",
+    "resource": {
+      "labels": {
+        "bucket_name": "purplelens-leak-32350",
+        "location": "us-central1",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "gcs_bucket"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T18:36:10.686492259Z"
+  },
+  {
+    "insertId": "1qzp1ftf2xvdcy",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "storage.buckets.getIamPolicy",
+          "resource": "projects/_/buckets/purplelens-leak-32350",
+          "resourceAttributes": {}
+        }
+      ],
+      "methodName": "storage.getIamPermissions",
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.storage.buckets.add-iam-policy-binding invocation-id/68fd4b25e67042faad37a8f72b097b62 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T18:36:10.505141219Z"
+        }
+      },
+      "resourceLocation": {
+        "currentLocations": [
+          "us-central1"
+        ]
+      },
+      "resourceName": "projects/_/buckets/purplelens-leak-32350",
+      "serviceName": "storage.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T18:36:11.268153730Z",
+    "resource": {
+      "labels": {
+        "bucket_name": "purplelens-leak-32350",
+        "location": "us-central1",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "gcs_bucket"
+    },
+    "severity": "INFO",
+    "timestamp": "2026-01-04T18:36:10.421759481Z"
+  },
+  {
+    "insertId": "1179g2pe9nn56",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "oauthInfo": {
+          "oauthClientId": "618104708054-9r9s1c4alg36erliucho9t52n32n6dgq.apps.googleusercontent.com"
+        },
+        "principalEmail": "mwill.itmission@gmail.com"
+      },
+      "authorizationInfo": [
+        {
+          "granted": true,
+          "permission": "storage.buckets.create",
+          "resource": "projects/_/buckets/purplelens-leak-32350",
+          "resourceAttributes": {}
+        }
+      ],
+      "methodName": "storage.buckets.create",
+      "request": {
+        "defaultObjectAcl": {
+          "@type": "type.googleapis.com/google.iam.v1.Policy",
+          "bindings": [
+            {
+              "members": [
+                "projectViewer:purplelens-lab-core"
+              ],
+              "role": "roles/storage.legacyObjectReader"
+            },
+            {
+              "members": [
+                "projectOwner:purplelens-lab-core",
+                "projectEditor:purplelens-lab-core"
+              ],
+              "role": "roles/storage.legacyObjectOwner"
+            }
+          ]
+        }
+      },
+      "requestMetadata": {
+        "callerIp": "34.127.11.7",
+        "callerSuppliedUserAgent": "google-cloud-sdk gcloud/550.0.0 command/gcloud.storage.buckets.create invocation-id/25d33c3350a841a28460a14cb2df4ad0 environment/devshell environment-version/None client-os/LINUX client-os-ver/6.6.111 client-pltf-arch/x86_64 interactive/True from-script/False python/3.13.10 term/tmux-256color  (Linux 6.6.111+),gzip(gfe)",
+        "destinationAttributes": {},
+        "requestAttributes": {
+          "auth": {},
+          "time": "2026-01-04T18:36:00.579594028Z"
+        }
+      },
+      "resourceLocation": {
+        "currentLocations": [
+          "us-central1"
+        ]
+      },
+      "resourceName": "projects/_/buckets/purplelens-leak-32350",
+      "serviceData": {
+        "@type": "type.googleapis.com/google.iam.v1.logging.AuditData",
+        "policyDelta": {
+          "bindingDeltas": [
+            {
+              "action": "ADD",
+              "member": "projectEditor:purplelens-lab-core",
+              "role": "roles/storage.legacyBucketOwner"
+            },
+            {
+              "action": "ADD",
+              "member": "projectOwner:purplelens-lab-core",
+              "role": "roles/storage.legacyBucketOwner"
+            },
+            {
+              "action": "ADD",
+              "member": "projectViewer:purplelens-lab-core",
+              "role": "roles/storage.legacyBucketReader"
+            }
+          ]
+        }
+      },
+      "serviceName": "storage.googleapis.com",
+      "status": {}
+    },
+    "receiveTimestamp": "2026-01-04T18:36:02.038584379Z",
+    "resource": {
+      "labels": {
+        "bucket_name": "purplelens-leak-32350",
+        "location": "us-central1",
+        "project_id": "purplelens-lab-core"
+      },
+      "type": "gcs_bucket"
+    },
+    "severity": "NOTICE",
+    "timestamp": "2026-01-04T18:36:00.574357621Z"
+  },
+  {
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "status": {},
+      "authenticationInfo": {
+        "principalEmail": "mwill.itmission@gmail.com"
+      },
+      "requestMetadata": {
+        "callerIp": "35.23.1.104",
+        "callerSuppliedUserAgent": "GoogleCloudSDK/455.0.0 (Windows NT 10.0; x64) gcloud/455.0.0"
+      },
+      "serviceName": "storage.googleapis.com",
+      "methodName": "storage.setIamPolicy",
+      "resourceName": "projects/_/buckets/purplelens-marketing-assets-v2",
+      "serviceData": {
+        "@type": "type.googleapis.com/google.iam.v1.PolicyDelta",
+        "bindingDeltas": [
+          {
+            "action": "ADD",
+            "role": "roles/storage.objectViewer",
+            "member": "allUsers"
+          }
+        ]
+      }
+    },
+    "insertId": "aj84ks92ld01",
+    "resource": {
+      "type": "gcs_bucket",
+      "labels": {
+        "bucket_name": "purplelens-marketing-assets-v2",
+        "location": "us-central1",
+        "project_id": "purplelens-lab-core"
+      }
+    },
+    "timestamp": "2026-01-04T12:30:00Z",
+    "severity": "NOTICE",
+    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity"
+  }
+]

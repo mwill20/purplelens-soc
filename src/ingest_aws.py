@@ -15,7 +15,9 @@ logger = logging.getLogger(__name__)
 REQUIRED_CLOUDTRAIL_FIELDS = ["eventTime", "eventSource", "eventName"]
 
 
-def validate_required_fields(record: Dict[str, Any], source_file: str, record_index: int) -> bool:
+def validate_required_fields(
+    record: Dict[str, Any], source_file: str, record_index: int
+) -> bool:
     """Validate required fields are present and not empty."""
     for field in REQUIRED_CLOUDTRAIL_FIELDS:
         if field not in record or not record[field] or str(record[field]).strip() == "":
@@ -27,7 +29,9 @@ def validate_required_fields(record: Dict[str, Any], source_file: str, record_in
     return True
 
 
-def safe_extract(record: Dict[str, Any], field_path: str, default: str = "Unknown") -> str:
+def safe_extract(
+    record: Dict[str, Any], field_path: str, default: str = "Unknown"
+) -> str:
     """Safely extract nested field with fallback to default."""
     try:
         keys = field_path.split(".")
@@ -69,7 +73,9 @@ def ingest_cloudtrail(input_path: Path) -> List[Dict[str, Any]]:
     if base_path.is_file():
         file_paths = [base_path]
     elif base_path.is_dir():
-        file_paths = sorted(base_path.glob("*.jsonl")) + sorted(base_path.glob("*.json"))
+        file_paths = sorted(base_path.glob("*.jsonl")) + sorted(
+            base_path.glob("*.json")
+        )
         if not file_paths:
             raise ValueError(f"No JSON or JSONL files found in {base_path}")
     else:
@@ -80,9 +86,13 @@ def ingest_cloudtrail(input_path: Path) -> List[Dict[str, Any]]:
         events.extend(_load_cloudtrail_file(file_path))
 
     if not events:
-        raise ValueError("No valid CloudTrail events were loaded from the provided input")
+        raise ValueError(
+            "No valid CloudTrail events were loaded from the provided input"
+        )
 
-    logger.info("Loaded %d CloudTrail events from %d file(s)", len(events), len(file_paths))
+    logger.info(
+        "Loaded %d CloudTrail events from %d file(s)", len(events), len(file_paths)
+    )
     return events
 
 
@@ -202,7 +212,9 @@ def _extract_event_id(record: Dict[str, Any]) -> Optional[str]:
 
 
 def _hash_record(record: Dict[str, Any]) -> str:
-    canonical = json.dumps(record, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    canonical = json.dumps(
+        record, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
@@ -223,7 +235,9 @@ def _extract_resources(record: Dict[str, Any]) -> List[str]:
     if isinstance(resources, list):
         for resource in resources:
             if isinstance(resource, dict):
-                extracted.append(resource.get("ARN") or resource.get("arn") or "UNKNOWN")
+                extracted.append(
+                    resource.get("ARN") or resource.get("arn") or "UNKNOWN"
+                )
             else:
                 extracted.append(str(resource))
     else:

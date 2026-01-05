@@ -4,7 +4,9 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 
-def build_aws_batches(events: List[Dict[str, Any]], max_batch_size: int) -> List[Dict[str, Any]]:
+def build_aws_batches(
+    events: List[Dict[str, Any]], max_batch_size: int
+) -> List[Dict[str, Any]]:
     """
     Build deterministic batches of AWS CloudTrail events for LLM processing.
 
@@ -17,7 +19,9 @@ def build_aws_batches(events: List[Dict[str, Any]], max_batch_size: int) -> List
     Returns list of batch objects with batch_id and events[].
     """
     # Filter to AWS events only
-    aws_events = [e for e in events if e.get("raw_event", {}).get("source") == "aws_cloudtrail"]
+    aws_events = [
+        e for e in events if e.get("raw_event", {}).get("source") == "aws_cloudtrail"
+    ]
     if not aws_events:
         return []
 
@@ -71,9 +75,13 @@ def _event_sort_key(event: Dict[str, Any]) -> tuple:
     event_time_str = raw_event.get("event_time", "")
     try:
         if event_time_str.endswith("Z"):
-            event_time = datetime.fromisoformat(event_time_str[:-1]).replace(tzinfo=timezone.utc)
+            event_time = datetime.fromisoformat(event_time_str[:-1]).replace(
+                tzinfo=timezone.utc
+            )
         else:
-            event_time = datetime.fromisoformat(event_time_str).replace(tzinfo=timezone.utc)
+            event_time = datetime.fromisoformat(event_time_str).replace(
+                tzinfo=timezone.utc
+            )
     except Exception:
         event_time = datetime.min.replace(tzinfo=timezone.utc)
 

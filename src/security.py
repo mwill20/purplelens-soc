@@ -7,7 +7,9 @@ from typing import Optional, Tuple
 PROHIBITED_PATTERNS = [
     r"I have (blocked|removed|deleted|remediated)",
     r"This (is|was) (benign|malicious|definitely)",
-    r"Action (taken|executed|completed|performed)",
+    # Prevent first-person claims of taking actions while avoiding false positives
+    # like "no action taken" or attacker-action descriptions.
+    r"\b(I|we)\b.*\b(took|have taken|has taken|executed|completed|performed)\b.*\baction\b",
     r"System (modified|updated|patched|fixed)",
     r"(Confirmed|Certain|Guaranteed) that",
     r"(?i)\b(powershell|pwsh)(\.exe)?\s+(-enc|-encodedcommand|-e|-ec)\s+[A-Za-z0-9+/=]{20,}",

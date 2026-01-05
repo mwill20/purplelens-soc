@@ -18,16 +18,17 @@ class TestSourceDetection:
     def test_cloudtrail_json_detected(self):
         """Test CloudTrail JSON detection"""
         cloudtrail_data = {"Records": [{"eventVersion": "1.05"}]}
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as tmp:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
             json.dump(cloudtrail_data, tmp)
             tmp.flush()
-        
+
         try:
             source, reason = detect_source(Path(tmp.name))
             assert source == "aws"
             assert "CloudTrail schema" in reason
         finally:
             import os
+
             os.unlink(tmp.name)
 
     def test_generic_json_fallback(self):
