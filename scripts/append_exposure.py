@@ -1,3 +1,17 @@
+#!/usr/bin/env python3
+"""
+Usage:
+  python scripts/append_exposure.py
+
+Purpose:
+  Appends a synthetic exposure event to the GCP mini-lab dataset.
+
+Limitations:
+  - Modifies the dataset in place.
+  - Intended for local demo data only.
+  - Re-running appends unless prior synthetic IDs are filtered.
+"""
+
 import json
 from pathlib import Path
 

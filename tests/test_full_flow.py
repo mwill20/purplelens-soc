@@ -1,4 +1,14 @@
-"""Phase 1G integration test for full CLI execution."""
+﻿"""
+Usage:
+  pytest tests/test_full_flow.py
+
+Purpose:
+  End-to-end CLI execution with a mocked LLM response.
+
+Limitations:
+  - Skips if data/evtx_parsed is missing.
+  - Uses a temporary SQLite database.
+"""
 
 import os
 import sqlite3
@@ -7,16 +17,16 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import pytest
 
 from src import main as cli_main
 
 
-def run_full_flow() -> None:
+def test_full_flow() -> None:
     """Execute CLI pipeline end-to-end with a mocked LLM response."""
-
-    dataset_dir = Path("data/evtx_parsed")
-    assert dataset_dir.exists(), "Dataset directory missing; run Phase 1F first."
+    dataset_dir = Path("data/evtx_sample")
+    if not dataset_dir.exists():
+        pytest.skip("data/evtx_sample is missing")
 
     mock_analysis = {
         "status": "success",
@@ -28,7 +38,7 @@ def run_full_flow() -> None:
                 "severity": "medium",
                 "evidence": [
                     {
-                        "source_file": "data/evtx_parsed/Execution_wmic.jsonl",
+                        "source_file": "data/evtx_sample/Execution_wmic.jsonl",
                         "record_index": 0,
                         "event_id": "4688",
                         "excerpt": "powershell.exe -ExecutionPolicy Bypass",
@@ -73,8 +83,6 @@ def run_full_flow() -> None:
     else:
         os.environ["OPENAI_API_KEY"] = previous_key
 
-    print("✓ Phase 1G full-flow integration test passed")
-
 
 def _validate_database(db_path: Path) -> None:
     conn = sqlite3.connect(db_path)
@@ -97,7 +105,3 @@ def _validate_database(db_path: Path) -> None:
     assert report_count == 1, "reports table should contain one record"
 
     conn.close()
-
-
-if __name__ == "__main__":
-    run_full_flow()

@@ -1,3 +1,14 @@
+"""
+Usage:
+  pytest tests/test_source_detect.py
+
+Purpose:
+  Validate source detection logic for Windows, AWS, and GCP inputs.
+
+Limitations:
+  - Uses temporary files; does not validate full dataset content.
+"""
+
 import json
 import tempfile
 from pathlib import Path

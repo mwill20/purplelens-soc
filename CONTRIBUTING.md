@@ -1,10 +1,10 @@
-# Contributing to PurpleLens
+﻿# Contributing to PurpleLens
 
 ## Branch Protection Policy
 
-**CRITICAL: Do not commit directly to `master` branch.**
+**Do not commit directly to `master`.**
 
-All development work must follow the feature branch workflow:
+All development work should follow a feature branch workflow.
 
 ### Workflow
 
@@ -22,9 +22,7 @@ All development work must follow the feature branch workflow:
 
 3. **Verify all tests pass** before merging:
    ```bash
-   python tests/test_phase1a.py
-   python tests/test_phase1b.py
-   python tests/test_full_flow.py
+   pytest tests/
    # Plus any new tests for your feature
    ```
 
@@ -32,7 +30,7 @@ All development work must follow the feature branch workflow:
    ```bash
    # Push to remote
    git push origin feature/your-feature-name
-   
+
    # Create PR via GitHub UI or:
    gh pr create --base master --head feature/your-feature-name
    ```
@@ -48,20 +46,13 @@ Before merging any feature branch:
 
 - [ ] All existing tests pass (zero regression)
 - [ ] New tests added for new functionality
-- [ ] Documentation updated (README, code comments)
+- [ ] Documentation updated (README, docs, code comments)
 - [ ] Architecture invariants preserved:
   - [ ] LLM is extraction-only (no action claims)
   - [ ] Evidence is mandatory (source + provenance)
   - [ ] Python writes reports (deterministic)
   - [ ] Guardrails block prohibited patterns
   - [ ] SQLite persistence works
-
-### Current Active Branches
-
-- **`master`**: Stable, production-ready code
-- **`enhancement/aws-cloudtrail`**: AWS CloudTrail ingestion adapter (Phases 0-4 complete ✅)
-  - See [docs/BRANCH_STRATEGY_AWS_CloudTrail.md](docs/BRANCH_STRATEGY_AWS_CloudTrail.md) for details
-  - Ready for merge after final review
 
 ---
 
@@ -71,13 +62,29 @@ Before merging any feature branch:
 - Follow PEP 8
 - Use type hints where practical
 - Docstrings for all public functions
-- Maximum line length: 100 characters
+- Maximum line length: 120 characters
 
 ### Testing Requirements
 - Unit tests for all new modules
 - End-to-end tests for new workflows
 - Negative tests for error handling
 - Mock LLM calls in tests (no live API usage)
+- Each test file must include a header comment with **Usage**, **Purpose**, and **Limitations**
+
+### How to Run Tests
+Run the full suite:
+```bash
+pytest tests/
+```
+
+Run a single file:
+```bash
+pytest tests/test_phase1b.py
+```
+
+Notes:
+- `tests/test_full_flow.py` is skipped if `data/evtx_sample` is missing.
+- Tests do not call external APIs; LLM calls are mocked.
 
 ### Security Requirements
 - **Never commit secrets** (.env files excluded via .gitignore)
@@ -121,10 +128,10 @@ These rules are non-negotiable across all features:
 
 ## Getting Help
 
-- **Architecture questions:** See `docs/` directory
-- **Phase-specific guidance:** Check NorthStar documents
-- **Overseer approval:** Required before phase completion
-- **Test failures:** Run with `--verbose` flag for debugging
+- **Architecture:** See `docs/ARCHITECTURE.md`
+- **Demo runbook:** See `docs/DEMO_SCRIPT.md`
+- **Troubleshooting:** See `docs/TROUBLESHOOTING.md`
+- **Test failures:** Re-run with `pytest -vv tests/`
 
 ---
 

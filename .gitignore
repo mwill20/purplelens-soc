@@ -57,6 +57,8 @@ Thumbs.db
 # Project-specific
 data/evtx_raw/*.evtx
 data/evtx_parsed/*.jsonl
+# Allow the small, interview-safe Windows sample set.
+!data/evtx_sample/*.jsonl
 EVTX-ATTACK-SAMPLES/
 *.log
 output/

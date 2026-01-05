@@ -22,15 +22,21 @@ SOFTWARE.
 
 ---
 
-## Third-Party Attributions
+## Third-Party Notices
+
+This repository includes or interoperates with third-party data and services
+that are not covered by the MIT license above.
 
 ### EVTX-ATTACK-SAMPLES Dataset
 - **Source:** https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES
 - **Author:** Samir Bousseaden (@sbousseaden)
 - **License:** See source repository
-- **Usage:** Sample EVTX files used for testing and demonstration purposes only
+- **Scope:** Applies when EVTX-ATTACK-SAMPLES data is used or converted
+  (including any derived JSONL). Any such data remains under the dataset's
+  terms.
 
-### OpenAI API
-- **Service:** OpenAI GPT Models (gpt-4, gpt-4o, gpt-4o-mini)
+### OpenAI API (Optional)
+- **Service:** OpenAI API and models
 - **Terms:** https://openai.com/policies/terms-of-use
-- **Note:** Requires valid API key and compliance with OpenAI terms of service
+- **Note:** Requires a user-supplied API key; usage is governed by OpenAI
+  terms.

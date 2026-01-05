@@ -1,4 +1,15 @@
-"""Convert Kaggle CloudTrail CSV to JSONL for PurpleLens ingestion."""
+#!/usr/bin/env python3
+"""
+Usage:
+  python scripts/aws_csv_to_jsonl.py <input_csv> <output_jsonl>
+
+Purpose:
+  Convert CloudTrail CSV (Kaggle Flaws dataset format) to JSONL for ingestion.
+
+Limitations:
+  - Only maps known CSV columns listed in CSV_TO_CLOUDTRAIL_MAPPING.
+  - Rows missing required fields are skipped.
+"""
 
 from __future__ import annotations
 

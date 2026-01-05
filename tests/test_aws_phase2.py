@@ -1,4 +1,13 @@
-"""Phase 2 AWS plane tagging and correlation tests."""
+"""
+Usage:
+  pytest tests/test_aws_phase2.py
+
+Purpose:
+  Validate AWS plane tagging and correlation clustering.
+
+Limitations:
+  - Uses synthetic events; correlation is proximity-based, not causality.
+"""
 
 from src.aws_correlate import correlate_events
 from src.aws_plane_tagging import tag_plane

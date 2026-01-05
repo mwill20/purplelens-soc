@@ -1,7 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-Quick verification script for Phase 3 GCP enrichment.
-Tests enrichment functions against synthetic mini-lab data.
+Usage:
+  python scripts/verify_gcp_enrichment.py
+
+Purpose:
+  Print deterministic GCP enrichment signals for the mini-lab dataset.
+
+Limitations:
+  - Reads data/gcp_log_pack/minilab_ground_truth_complete.json.
+  - Output is for inspection only; no assertions are made.
 """
 
 import json

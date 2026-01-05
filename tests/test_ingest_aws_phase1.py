@@ -1,3 +1,14 @@
+"""
+Usage:
+  pytest tests/test_ingest_aws_phase1.py
+
+Purpose:
+  Validate AWS CloudTrail ingestion and normalization behavior.
+
+Limitations:
+  - Uses synthetic records; does not cover full CloudTrail schema.
+"""
+
 import json
 import logging
 from pathlib import Path

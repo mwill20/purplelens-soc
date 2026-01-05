@@ -1,3 +1,14 @@
+"""
+Usage:
+  pytest tests/test_aws_csv_converter.py
+
+Purpose:
+  Validate CloudTrail CSV-to-JSONL conversion helper.
+
+Limitations:
+  - Uses temporary files only; does not cover full dataset scale.
+"""
+
 import csv
 import json
 from pathlib import Path

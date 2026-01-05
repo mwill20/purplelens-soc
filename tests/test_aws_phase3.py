@@ -1,4 +1,13 @@
-"""Phase 3 AWS batching and LLM integration tests."""
+"""
+Usage:
+  pytest tests/test_aws_phase3.py
+
+Purpose:
+  Validate AWS batching logic and LLM prompt selection behavior.
+
+Limitations:
+  - Uses mocked LLM responses; does not call external APIs.
+"""
 
 from unittest.mock import patch
 

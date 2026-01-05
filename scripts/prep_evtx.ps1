@@ -1,5 +1,12 @@
 # PowerShell script to convert EVTX files to JSONL format.
-# Usage: .\scripts\prep_evtx.ps1 -InputPath ".\data\evtx_raw" -OutputPath ".\data\evtx_parsed"
+#
+# Usage:
+#   .\scripts\prep_evtx.ps1 -InputPath ".\data\evtx_raw" -OutputPath ".\data\evtx_parsed"
+#
+# Limitations:
+#   - Windows-only (uses Get-WinEvent).
+#   - Produces a minimal JSONL envelope, not a full EVTX export.
+#   - Overwrites existing JSONL files with the same base name.
 
 param(
     [Parameter(Mandatory = $true)]
