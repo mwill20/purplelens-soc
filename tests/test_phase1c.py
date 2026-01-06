@@ -328,7 +328,7 @@ def test_retry_logic_mock():
     with patch("src.llm_analyze._get_client") as mock_client:
         mock_client.return_value.chat.completions.create.return_value = mock_response
 
-        result = analyze_events(events, model="gpt-4o")
+        result = analyze_events(events, model="gpt-4o", provider="openai")
 
         assert result["status"] == "success"
         assert mock_client.return_value.chat.completions.create.call_count == 1

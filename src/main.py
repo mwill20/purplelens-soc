@@ -20,9 +20,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
-# Load environment variables from .env file if OPENAI_API_KEY not already set
-# This allows tests to control the environment while still supporting .env for normal use
-if not os.environ.get("OPENAI_API_KEY"):
+# Load environment variables from .env if either provider key is missing.
+# This allows tests to control the environment while still supporting .env for normal use.
+if not os.environ.get("OPENAI_API_KEY") or not os.environ.get("GEMINI_API_KEY"):
     load_dotenv()
 
 from src.llm_analyze import analyze_events
@@ -181,8 +181,14 @@ def parse_args() -> (
     )
     parser.add_argument(
         "--model",
-        default="gpt-4o",
-        help="OpenAI model to use (default: gpt-4o)",
+        default="gemini-flash-latest",
+        help="LLM model to use (default: gemini-flash-latest)",
+    )
+    parser.add_argument(
+        "--provider",
+        choices=["openai", "gemini"],
+        default="gemini",
+        help="LLM provider to use (default: gemini)",
     )
     parser.add_argument(
         "--db",
@@ -219,9 +225,13 @@ def configure_logging(verbose: bool, debug: bool) -> None:
 def ensure_environment(
     args: argparse.Namespace,
 ) -> bool:  # for API key checks and DB path setup
-    if not args.dry_run and not os.environ.get("OPENAI_API_KEY"):
-        LOGGER.error("OPENAI_API_KEY environment variable not set.")
-        return False
+    if not args.dry_run:
+        if args.provider == "openai" and not os.environ.get("OPENAI_API_KEY"):
+            LOGGER.error("OPENAI_API_KEY environment variable not set.")
+            return False
+        if args.provider == "gemini" and not os.environ.get("GEMINI_API_KEY"):
+            LOGGER.error("GEMINI_API_KEY environment variable not set.")
+            return False
     Path(args.db).parent.mkdir(parents=True, exist_ok=True)
     return True
 
@@ -232,9 +242,10 @@ def main() -> int:  # for the one-pass orchestration sequence.
 
     run_id = str(uuid.uuid4())
     LOGGER.info(
-        "Starting analysis run %s | model=%s | input=%s | dry_run=%s",
+        "Starting analysis run %s | model=%s | provider=%s | input=%s | dry_run=%s",
         run_id,
         args.model,
+        args.provider,
         args.input,
         args.dry_run,
     )
@@ -324,7 +335,7 @@ def main() -> int:  # for the one-pass orchestration sequence.
         return 0
 
     initialize_database(args.db)
-    analysis_data = analyze_events(events, model=args.model)
+    analysis_data = analyze_events(events, model=args.model, provider=args.provider)
     analysis = _validate_analysis_output(analysis_data)
 
     policy_valid, policy_error = validate_output(

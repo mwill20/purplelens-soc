@@ -2,6 +2,8 @@
 
 ## System Architecture Overview
 
+Default LLM provider: Gemini (`gemini-flash-latest`). Use `--provider openai` to switch.
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         PURPLELENS AI SOC ASSISTANT                          │
@@ -87,7 +89,7 @@
 ├───────────────────────────────────────────────────────────────────────────────┤
 │  - SQLite DB: `db/analysis.db` (analysis_runs, findings, iocs, hypotheses)     │
 │  - Reports folder: `reports/analysis_<UUID>.txt`                               │
-│  - External: OpenAI API (LLM), Pydantic v2, python-dotenv                      │
+│  - External: Gemini API (default) or OpenAI API, Pydantic v2, python-dotenv    │
 └───────────────────────────────────────────────────────────────────────────────┘
 
 Notes:
@@ -134,11 +136,11 @@ Notes:
       ]
 
 4. LLM ANALYZE (src/llm_analyze.py)
-   ├─ Function: analyze_events(events, "gpt-4o-mini")
+   ├─ Function: analyze_events(events, "gemini-flash-latest")
    ├─ Process:
    │  ├─ Batch events (max 50 or 24k chars)
    │  ├─ Build prompt with system instructions + event JSON
-   │  ├─ Call OpenAI API with response_format="json_object"
+   │  ├─ Call Gemini API (default) or OpenAI API with JSON-only response
    │  ├─ Retry up to 3 times on error
    │  └─ Parse JSON response
    │
@@ -219,7 +221,7 @@ Notes:
 |------|-------------|---------------|--------------|
 | **src/main.py** | CLI orchestrator & entrypoint | `parse_args()`, `ensure_environment()`, `run()` | All other src/* modules |
 | **src/ingest.py** | Load JSONL files, attach provenance | `load_events()` | json, pathlib |
-| **src/llm_analyze.py** | OpenAI API integration & batching | `analyze_events()`, `_parse_llm_response()` | openai, schemas |
+| **src/llm_analyze.py** | Gemini/OpenAI integration & batching | `analyze_events()`, `_parse_llm_response()` | openai, google-generativeai, schemas |
 | **src/schemas.py** | Data models & validation rules | `AnalysisOutput`, `Finding`, `Evidence` | pydantic |
 | **src/security.py** | Policy enforcement (regex patterns) | `validate_output()`, `PROHIBITED_PATTERNS` | re, schemas |
 | **src/report.py** | Deterministic report formatting | `generate_report()`, `_build_banner()` | schemas |
@@ -238,7 +240,7 @@ Notes:
 
 1. MISSING API KEY
    ├─ Detection: ensure_environment() in main.py
-   ├─ Error: "OPENAI_API_KEY environment variable is not set"
+   ├─ Error: "GEMINI_API_KEY environment variable is not set" (or OPENAI_API_KEY when using --provider openai)
    ├─ Exit Code: 1
    └─ User Action: Set API key in .env file
 
@@ -259,7 +261,7 @@ Notes:
    ├─ Retry Logic: 3 attempts with exponential backoff (0s, 1s, 2s)
    ├─ Status: "llm_error"
    ├─ Report: Partial findings + error message
-   └─ User Action: Check API key, network, OpenAI status
+   └─ User Action: Check API key, network, provider status
 
 5. SCHEMA VALIDATION FAILURE
    ├─ Detection: Pydantic model validation in schemas.py

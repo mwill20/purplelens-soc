@@ -19,11 +19,12 @@ This is not a chatbot or an automated responder. It is a guardrail-first analysi
    ```bash
    pip install -r requirements.txt
    ```
-3. Configure your OpenAI API key.
+3. Configure your API key (OpenAI or Gemini).
    ```powershell
    Copy-Item .env.example .env
    # Edit .env and add:
    # OPENAI_API_KEY=sk-...
+   # GEMINI_API_KEY=AIza...
    ```
    ```bash
    cp .env.example .env
@@ -64,7 +65,22 @@ Write report to file (always saved in `reports/` regardless):
 python -m src.main --input data/evtx_sample --output file
 ```
 
-Model compatibility: use an OpenAI model that supports `response_format={"type":"json_object"}` (for example `gpt-4o`).
+Model compatibility:
+- OpenAI: requires `response_format={"type":"json_object"}` support (for example `gpt-4o`).
+- Gemini: use a JSON-capable model (for example `gemini-flash-latest`).
+
+## LLM Providers
+Gemini is the default. To use OpenAI, set `OPENAI_API_KEY` and pass `--provider openai`.
+
+Gemini (default):
+```bash
+python -m src.main --input data/evtx_sample --model gemini-flash-latest
+```
+
+OpenAI:
+```bash
+python -m src.main --input data/evtx_sample --provider openai --model gpt-4o
+```
 
 ## Data Sources and Detection
 PurpleLens supports three source types and processes one type per run:
@@ -219,7 +235,7 @@ data/
 - License: MIT (`LICENSE`)
 - EVTX dataset: https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES
 - AWS dataset: https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud
-- OpenAI API required for LLM extraction
+- OpenAI or Gemini API required for LLM extraction
 
 ## Documentation
 Additional guides and runbooks live in `docs/`:

@@ -123,7 +123,7 @@ def generate_error_report(analysis: AnalysisOutput) -> str:
     """Generate degraded report describing partial results and next actions."""
 
     sections: List[str] = []
-    sections.extend(_header_lines("Analysis Report — INCOMPLETE"))
+    sections.extend(_header_lines("Analysis Report - INCOMPLETE"))
     sections.append(f"STATUS: {analysis.status}")
     explanation = STATUS_EXPLANATIONS.get(
         analysis.status, "Analysis did not complete successfully."
@@ -156,7 +156,7 @@ def generate_error_report(analysis: AnalysisOutput) -> str:
     sections.append("RECOMMENDED ACTION:")
     sections.append("- Review logs for additional details.")
     if analysis.status == "llm_error":
-        sections.append("- Check OpenAI API connectivity and credentials.")
+        sections.append("- Check LLM API connectivity and credentials.")
     if analysis.status == "timeout":
         sections.append("- Re-run analysis with fewer events or during lower load.")
     if analysis.status == "validation_error":

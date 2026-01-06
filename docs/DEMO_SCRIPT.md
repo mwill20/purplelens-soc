@@ -7,7 +7,7 @@ Audience: Security engineers, cloud security leads, hiring managers
 ---
 
 ## Pre-Demo Checklist
-- `.env` exists and contains `OPENAI_API_KEY` (required unless using `--dry-run`).
+- `.env` exists and contains `GEMINI_API_KEY` (default provider) or `OPENAI_API_KEY`.
 - Dependencies installed: `pip install -r requirements.txt`.
 - Datasets present:
   - Windows: `data/evtx_sample/` (JSONL demo set)
@@ -51,22 +51,25 @@ Pick one path depending on the audience.
 
 Option A: Windows EVTX
 ```powershell
-python -m src.main --input data/evtx_sample --model gpt-4o
+python -m src.main --input data/evtx_sample --model gemini-flash-latest
+python -m src.main --input data/evtx_sample --provider openai --model gpt-4o
 ```
 
 Option B: AWS CloudTrail
 ```powershell
 python scripts/aws_csv_to_jsonl.py data/sample_cloudtrail.csv data/sample_aws.jsonl
-python -m src.main --input data/sample_aws.jsonl --source aws --model gpt-4o
+python -m src.main --input data/sample_aws.jsonl --source aws --model gemini-flash-latest
+python -m src.main --input data/sample_aws.jsonl --source aws --provider openai --model gpt-4o
 ```
 
 Option C: GCP Audit Logs
 ```powershell
-python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --model gpt-4o
+python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --model gemini-flash-latest
+python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --provider openai --model gpt-4o
 ```
 
 Callout:
-> "Models must support `response_format={"type":"json_object"}`. The system fails closed if the model cannot return JSON."
+> "OpenAI models must support `response_format={"type":"json_object"}`. Gemini models must support JSON output. The system fails closed if the model cannot return JSON."
 
 ### 4) Show the Report (60 seconds)
 What to say:
@@ -99,12 +102,12 @@ What to say:
 ## Troubleshooting
 
 API key missing:
-- Symptom: `OPENAI_API_KEY environment variable not set`
+- Symptom: `GEMINI_API_KEY environment variable not set` or `OPENAI_API_KEY environment variable not set`
 - Fix: add the key to `.env`
 
 Model incompatibility:
-- Symptom: API error about `response_format`
-- Fix: use `gpt-4o` or another model that supports JSON response format
+- Symptom: API error about unsupported model or response format
+- Fix: use `gemini-flash-latest` or `--provider openai --model gpt-4o`
 
 No events loaded:
 - Symptom: "No JSONL files found" or "No supported files found"
@@ -119,14 +122,17 @@ AWS CSV not ingested:
 ## Quick Reference Commands
 ```powershell
 # Windows EVTX
-python -m src.main --input data/evtx_sample --model gpt-4o
+python -m src.main --input data/evtx_sample --model gemini-flash-latest
+python -m src.main --input data/evtx_sample --provider openai --model gpt-4o
 
 # AWS CloudTrail
 python scripts/aws_csv_to_jsonl.py data/sample_cloudtrail.csv data/sample_aws.jsonl
-python -m src.main --input data/sample_aws.jsonl --source aws --model gpt-4o
+python -m src.main --input data/sample_aws.jsonl --source aws --model gemini-flash-latest
+python -m src.main --input data/sample_aws.jsonl --source aws --provider openai --model gpt-4o
 
 # GCP Audit Logs
-python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --model gpt-4o
+python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --model gemini-flash-latest
+python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --provider openai --model gpt-4o
 
 # Validation only (no LLM)
 python -m src.main --input data/evtx_sample --dry-run

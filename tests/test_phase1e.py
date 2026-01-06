@@ -30,6 +30,7 @@ def test_help_flag():
     assert "--input INPUT" in result.stdout
     assert "--output" in result.stdout
     assert "--model" in result.stdout
+    assert "--provider" in result.stdout
     assert "--db" in result.stdout
     assert "--verbose" in result.stdout
     assert "--dry-run" in result.stdout
@@ -45,7 +46,15 @@ def test_missing_api_key():
         env["OPENAI_API_KEY"] = ""
 
         result = subprocess.run(
-            [sys.executable, "-m", "src.main", "--input", tmpdir],
+            [
+                sys.executable,
+                "-m",
+                "src.main",
+                "--input",
+                tmpdir,
+                "--provider",
+                "openai",
+            ],
             capture_output=True,
             text=True,
             check=False,
@@ -54,6 +63,34 @@ def test_missing_api_key():
 
         assert result.returncode == 1, "Should exit with code 1 on missing API key"
         assert "OPENAI_API_KEY" in result.stderr or "not set" in result.stderr.lower()
+
+
+def test_missing_gemini_api_key():
+    """Test that missing GEMINI_API_KEY produces error."""
+    with TemporaryDirectory() as tmpdir:
+        test_file = Path(tmpdir) / "test.jsonl"
+        test_file.write_text('{"Event":{"System":{"EventID":4688}}}\n')
+
+        env = os.environ.copy()
+        env["GEMINI_API_KEY"] = ""
+        env.setdefault("OPENAI_API_KEY", "test-key")
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "src.main",
+                "--input",
+                tmpdir,
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            env=env,
+        )
+
+        assert result.returncode == 1, "Should exit with code 1 on missing API key"
+        assert "GEMINI_API_KEY" in result.stderr or "not set" in result.stderr.lower()
 
 
 def test_dry_run_no_api_key_required():
@@ -177,7 +214,9 @@ def test_cli_arguments_match_spec():
     assert "--output" in result.stdout
     assert "console" in result.stdout
     assert "--model" in result.stdout
-    assert "gpt-4o" in result.stdout
+    assert "gemini-flash-latest" in result.stdout
+    assert "--provider" in result.stdout
+    assert "gemini" in result.stdout
     assert "--db" in result.stdout
     assert "db/analysis.db" in result.stdout
 

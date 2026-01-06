@@ -6,6 +6,7 @@ import argparse
 import ipaddress
 import json
 import logging
+import os
 import re
 import time
 from typing import Any, Dict, Iterable, List
@@ -23,6 +24,18 @@ try:
 except ImportError:  # pragma: no cover - handled during runtime if package missing
     OpenAI = None  # type: ignore
     APIConnectionError = APIError = APITimeoutError = RateLimitError = Exception  # type: ignore
+
+try:
+    import google.generativeai as genai
+    from google.api_core.exceptions import GoogleAPIError, RetryError
+except ImportError:  # pragma: no cover - handled during runtime if package missing
+    genai = None  # type: ignore
+
+    class GoogleAPIError(Exception):
+        """Fallback when google-generativeai is not installed."""
+
+    class RetryError(Exception):
+        """Fallback when google-generativeai is not installed."""
 
 logger = logging.getLogger(__name__)
 
@@ -116,10 +129,14 @@ STATUS_PRIORITY = {
 }
 
 _client: Any = None
+_gemini_models: dict[str, Any] = {}
+_gemini_configured = False
 
 
 def analyze_events(
-    events: List[Dict[str, Any]], model: str = "gpt-4o"
+    events: List[Dict[str, Any]],
+    model: str = "gemini-flash-latest",
+    provider: str = "gemini",
 ) -> Dict[str, Any]:
     """Send batched events to the LLM and merge structured results."""
 
@@ -154,7 +171,7 @@ def analyze_events(
 
         merged_result = None
         for batch in batches:
-            batch_result = _process_aws_batch(batch["events"], model)
+            batch_result = _process_aws_batch(batch["events"], model, provider)
             if merged_result is None:
                 merged_result = batch_result
             else:
@@ -174,7 +191,7 @@ def analyze_events(
 
         merged_result = None
         for batch in batches:
-            batch_result = _process_gcp_batch(batch, model)
+            batch_result = _process_gcp_batch(batch, model, provider)
             if merged_result is None:
                 merged_result = batch_result
             else:
@@ -198,7 +215,7 @@ def analyze_events(
 
     merged_result = None
     for batch in batches:
-        batch_result = _process_batch(batch, model)
+        batch_result = _process_batch(batch, model, provider)
         if merged_result is None:
             merged_result = batch_result
         else:
@@ -289,32 +306,38 @@ def _extract_gcp_operational_iocs(events: List[Dict[str, Any]]) -> List[str]:
     return iocs
 
 
-def _process_batch(batch: List[Dict[str, Any]], model: str) -> Dict[str, Any]:
+def _process_batch(
+    batch: List[Dict[str, Any]], model: str, provider: str
+) -> Dict[str, Any]:
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": _build_user_prompt(batch)},
     ]
-    return _call_with_retry(messages, model)
+    return _call_with_retry(messages, model, provider)
 
 
-def _process_aws_batch(batch: List[Dict[str, Any]], model: str) -> Dict[str, Any]:
+def _process_aws_batch(
+    batch: List[Dict[str, Any]], model: str, provider: str
+) -> Dict[str, Any]:
     """Process AWS batch with CloudTrail-specific prompt."""
     user_prompt = _build_aws_user_prompt(batch)
     messages = [
         {"role": "system", "content": AWS_SYSTEM_PROMPT},
         {"role": "user", "content": user_prompt},
     ]
-    return _call_with_retry(messages, model)
+    return _call_with_retry(messages, model, provider)
 
 
-def _process_gcp_batch(batch: List[Dict[str, Any]], model: str) -> Dict[str, Any]:
+def _process_gcp_batch(
+    batch: List[Dict[str, Any]], model: str, provider: str
+) -> Dict[str, Any]:
     """Process GCP batch with Cloud Audit Log-specific prompt."""
     user_prompt = _build_gcp_user_prompt(batch)
     messages = [
         {"role": "system", "content": GCP_SYSTEM_PROMPT},
         {"role": "user", "content": user_prompt},
     ]
-    return _call_with_retry(messages, model)
+    return _call_with_retry(messages, model, provider)
 
 
 def _build_user_prompt(events: List[Dict[str, Any]]) -> str:
@@ -456,22 +479,34 @@ def _build_gcp_user_prompt(events: List[Dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
-def _call_with_retry(messages: List[Dict[str, str]], model: str) -> Dict[str, Any]:
+def _call_with_retry(
+    messages: List[Dict[str, str]], model: str, provider: str
+) -> Dict[str, Any]:
+    provider = (provider or "openai").lower().strip()
     last_error: str | None = None
     last_status = "llm_error"
 
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            response = _get_client().chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=0,
-                timeout=60,
-                response_format={"type": "json_object"},
-            )
-            content = response.choices[0].message.content
+            if provider == "openai":
+                response = _get_client().chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    temperature=0,
+                    timeout=60,
+                    response_format={"type": "json_object"},
+                )
+                content = response.choices[0].message.content
+            elif provider == "gemini":
+                content = _call_gemini(messages, model)
+            else:
+                raise ValueError(f"Unsupported LLM provider: {provider}")
             return _parse_llm_content(content)
         except APITimeoutError as exc:
+            last_status = "timeout"
+            last_error = f"LLM request timed out: {exc}"
+            logger.warning("LLM timeout (attempt %d/%d)", attempt, MAX_RETRIES)
+        except RetryError as exc:
             last_status = "timeout"
             last_error = f"LLM request timed out: {exc}"
             logger.warning("LLM timeout (attempt %d/%d)", attempt, MAX_RETRIES)
@@ -479,6 +514,14 @@ def _call_with_retry(messages: List[Dict[str, str]], model: str) -> Dict[str, An
             last_status = "llm_error"
             last_error = f"LLM API error: {exc}"
             logger.warning("LLM API error (attempt %d/%d)", attempt, MAX_RETRIES)
+        except GoogleAPIError as exc:
+            last_status = "llm_error"
+            last_error = f"LLM API error: {exc}"
+            logger.warning("LLM API error (attempt %d/%d)", attempt, MAX_RETRIES)
+        except ValueError as exc:
+            last_status = "llm_error"
+            last_error = str(exc)
+            logger.warning("LLM config error: %s", exc)
         except Exception as exc:  # pragma: no cover - defensive path
             last_status = "llm_error"
             last_error = f"Unexpected LLM error: {exc}"
@@ -681,6 +724,67 @@ def _get_client() -> Any:
             raise RuntimeError("openai package is required but not installed.")
         _client = OpenAI()
     return _client
+
+
+def _call_gemini(messages: List[Dict[str, str]], model: str) -> str:
+    system_prompt, user_prompt = _split_messages(messages)
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY environment variable not set.")
+    gemini_model = _get_gemini_model(model, system_prompt, api_key)
+    response = gemini_model.generate_content(
+        user_prompt,
+        generation_config={
+            "temperature": 0,
+            "response_mime_type": "application/json",
+        },
+        request_options={"timeout": 60},
+    )
+    return response.text or ""
+
+
+def _split_messages(messages: List[Dict[str, str]]) -> tuple[str, str]:
+    system_prompt = ""
+    user_parts: List[str] = []
+
+    for message in messages:
+        role = message.get("role")
+        content = message.get("content", "")
+        if role == "system":
+            system_prompt = content
+        elif role == "user":
+            user_parts.append(content)
+
+    return system_prompt, "\n\n".join(user_parts)
+
+
+def _get_gemini_model(model: str, system_prompt: str, api_key: str) -> Any:
+    global _gemini_configured
+    if genai is None:  # pragma: no cover - dependency missing scenario
+        raise RuntimeError(
+            "google-generativeai package is required but not installed."
+        )
+    if not _gemini_configured:
+        genai.configure(api_key=api_key)
+        _gemini_configured = True
+
+    normalized_model = _normalize_gemini_model_name(model)
+    cache_key = f"{normalized_model}:{hash(system_prompt)}"
+    if cache_key not in _gemini_models:
+        _gemini_models[cache_key] = genai.GenerativeModel(
+            model_name=normalized_model,
+            system_instruction=system_prompt or None,
+        )
+    return _gemini_models[cache_key]
+
+
+def _normalize_gemini_model_name(model: str) -> str:
+    model = (model or "").strip()
+    if not model:
+        return "models/gemini-flash-latest"
+    if model.startswith("models/"):
+        return model
+    return f"models/{model}"
 
 
 def _main() -> None:

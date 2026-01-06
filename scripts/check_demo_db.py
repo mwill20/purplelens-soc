@@ -21,7 +21,8 @@ def check_db() -> None:
     if not db_path.exists():
         print(f"Database not found at {db_path}")
         print("Run an analysis first, for example:")
-        print("  python -m src.main --input data/evtx_parsed --model gpt-4o")
+        print("  python -m src.main --input data/evtx_sample --model gemini-flash-latest")
+        print("  python -m src.main --input data/evtx_sample --provider openai --model gpt-4o")
         return
 
     try:

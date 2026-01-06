@@ -73,11 +73,11 @@ def test_error_report_llm_error():
 
     report = generate_error_report(analysis)
 
-    assert "Analysis Report — INCOMPLETE" in report
+    assert "Analysis Report - INCOMPLETE" in report
     assert "STATUS: llm_error" in report
     assert "API connection failed" in report
     assert "PARTIAL FINDINGS: 0 extracted before failure" in report
-    assert "Check OpenAI API connectivity and credentials" in report
+    assert "Check LLM API connectivity and credentials" in report
     assert "Review logs for additional details" in report
 
 
