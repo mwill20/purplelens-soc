@@ -56,6 +56,10 @@ Thumbs.db
 
 # Project-specific
 data/evtx_raw/*.evtx
+# Allow the small, interview-safe EVTX sample set.
+!data/evtx_raw/Credential_hashdump.evtx
+!data/evtx_raw/Execution_wmic.evtx
+!data/evtx_raw/Lateral_wmic.evtx
 data/evtx_parsed/*.jsonl
 # Allow the small, interview-safe Windows sample set.
 !data/evtx_sample/*.jsonl
