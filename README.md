@@ -10,22 +10,53 @@ PurpleLens is a CLI SOC analysis system that ingests Windows EVTX, AWS CloudTrai
 This is not a chatbot or an automated responder. It is a guardrail-first analysis pipeline designed to make cloud and host security and telemetry review faster while preserving defensibility.
 
 ## Installation
+
 1. Clone the repo and enter it.
+
    ```bash
    git clone https://github.com/mwill20/purplelens-soc.git
    cd purplelens-soc
    ```
-2. Install dependencies.
+
+2. Create the virtual environment:
+
+   ```powershell
+   python -m venv .venv
+   ```
+
+3. Activate it:
+
+   ```powershell
+   .venv\Scripts\Activate.ps1
+   ```
+
+   - If you get an execution policy error, run:
+
+      ```powershell
+      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+      ```
+
+4. Install dependencies.
+
    ```bash
    pip install -r requirements.txt
    ```
-3. Configure your API key (OpenAI or Gemini).
+
+6. Upgrade pip:
+
+   ```powershell
+   .venv\Scripts\python.exe -m pip install --upgrade pip
+   ```
+
+7. Configure your API key (OpenAI or Gemini).
+
    ```powershell
    Copy-Item .env.example .env
    # Edit .env and add:
    # OPENAI_API_KEY=sk-...
    # GEMINI_API_KEY=AIza...
    ```
+
    ```bash
    cp .env.example .env
    ```
@@ -46,24 +77,24 @@ The repo includes a small Windows sample set at `data/evtx_sample/` for demos.
 
 ## Usage
 Minimal run:
-```bash
-python -m src.main --input data/evtx_sample
-```
+   ```bash
+   python -m src.main --input data/evtx_sample
+   ```
 
 Verbose logging:
-```bash
-python -m src.main --input data/evtx_sample --verbose
-```
+   ```bash
+   python -m src.main --input data/evtx_sample --verbose
+   ```
 
-Validation only (no LLM calls):
-```bash
-python -m src.main --input data/evtx_sample --dry-run
-```
+   Validation only (no LLM calls):
+   ```bash
+   python -m src.main --input data/evtx_sample --dry-run
+   ```
 
 Write report to file (always saved in `reports/` regardless):
-```bash
-python -m src.main --input data/evtx_sample --output file
-```
+   ```bash
+   python -m src.main --input data/evtx_sample --output file
+   ```
 
 Model compatibility:
 - OpenAI: requires `response_format={"type":"json_object"}` support (for example `gpt-4o`).

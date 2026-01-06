@@ -123,7 +123,7 @@ def generate_error_report(analysis: AnalysisOutput) -> str:
     """Generate degraded report describing partial results and next actions."""
 
     sections: List[str] = []
-    sections.extend(_header_lines("Analysis Report - INCOMPLETE"))
+    sections.extend(_header_lines("Analysis Report — INCOMPLETE"))
     sections.append(f"STATUS: {analysis.status}")
     explanation = STATUS_EXPLANATIONS.get(
         analysis.status, "Analysis did not complete successfully."
@@ -132,20 +132,11 @@ def generate_error_report(analysis: AnalysisOutput) -> str:
     sections.append("")
     # Provide a minimal Executive Summary for consistency with successful reports
     sections.append("## Executive Summary")
-    partial_event_count = len(analysis.findings) + len(
-        analysis.indicators_of_compromise
-    )
-    sections.append("- **Risk Level**: UNKNOWN")
-    sections.append(f"- **Analysis Scope**: {partial_event_count} events (partial)")
-    sections.append(
-        f"- **Key Findings**: {len(analysis.findings)} security findings identified (partial)"
-    )
-    sections.append(
-        f"- **Hypotheses**: {len(analysis.hypotheses)} investigative theories (partial)"
-    )
-    sections.append(
-        f"- **Indicators of Compromise**: {len(analysis.indicators_of_compromise)} IOCs detected (partial)"
-    )
+    sections.append(f"- **Risk Level**: UNKNOWN")
+    sections.append(f"- **Analysis Scope**: {len(analysis.findings) + len(analysis.indicators_of_compromise)} events (partial)")
+    sections.append(f"- **Key Findings**: {len(analysis.findings)} security findings identified (partial)")
+    sections.append(f"- **Hypotheses**: {len(analysis.hypotheses)} investigative theories (partial)")
+    sections.append(f"- **Indicators of Compromise**: {len(analysis.indicators_of_compromise)} IOCs detected (partial)")
     sections.append("\n---\n")
     sections.append(
         f"PARTIAL FINDINGS: {len(analysis.findings)} extracted before failure"
@@ -156,7 +147,7 @@ def generate_error_report(analysis: AnalysisOutput) -> str:
     sections.append("RECOMMENDED ACTION:")
     sections.append("- Review logs for additional details.")
     if analysis.status == "llm_error":
-        sections.append("- Check LLM API connectivity and credentials.")
+        sections.append("- Check OpenAI API connectivity and credentials.")
     if analysis.status == "timeout":
         sections.append("- Re-run analysis with fewer events or during lower load.")
     if analysis.status == "validation_error":
