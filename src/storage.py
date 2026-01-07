@@ -1,4 +1,10 @@
-"""SQLite persistence layer for analysis runs and related artifacts."""
+"""SQLite persistence layer for analysis runs and related artifacts.
+
+Every run is preserved:
+- save_analysis() stores complete run metadata, findings, hypotheses, IOCs, and reports
+- Status is normalized to success/partial/failed via _derive_run_status()
+- Table definitions enforce schema constraints for data integrity
+"""
 
 from __future__ import annotations
 
@@ -10,6 +16,7 @@ from typing import List
 
 from src.schemas import AnalysisOutput
 
+# Table definitions: enforce schema constraints and foreign key relationships
 _CREATE_TABLE_STATEMENTS = [
     """
     CREATE TABLE IF NOT EXISTS analysis_runs (
@@ -66,6 +73,7 @@ def initialize_database(db_path: str) -> None:
     conn.close()
 
 
+# Every run is preserved: complete metadata, findings, hypotheses, IOCs, and report
 def save_analysis(
     db_path: str,
     run_id: str,
@@ -196,6 +204,7 @@ def _insert_report(
     )
 
 
+# Status is normalized: maps analyzer status to storage tri-state (success/partial/failed)
 def _derive_run_status(analysis: AnalysisOutput) -> str:
     """Map analyzer status into the storage status tri-state."""
 

@@ -9,8 +9,8 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB cap
-# prevent excessive memory usage
+# Provenance is mandatory: every event must trace back to source file + line number
+MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB cap prevents excessive memory usage
 # must split huge logs into chunks
 
 
@@ -71,11 +71,12 @@ def _load_file_events(file_path: Path) -> List[Dict[str, Any]]:
                     )
                     continue
 
+                # Evidence for credibility: source_file, record_index, event_id enable traceability
                 records.append(
                     {
-                        "source_file": str(file_path),
-                        "record_index": record_index,
-                        "event_id": _extract_event_id(raw_event),
+                        "source_file": str(file_path),  # Provenance: origin file
+                        "record_index": record_index,  # Provenance: line number
+                        "event_id": _extract_event_id(raw_event),  # Provenance: Windows EventID
                         "raw_event": raw_event,
                     }
                 )

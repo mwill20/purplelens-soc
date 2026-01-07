@@ -158,9 +158,19 @@ def detect_source(input_path: Path) -> tuple[str, str]:
         raise SystemExit(f"Input path does not exist: {input_path}")
 
 
-def parse_args() -> (
-    argparse.Namespace
-):  # for CLI options (input path, output mode, model, db)
+def parse_args() -> argparse.Namespace:  # CLI options (input path, output mode, model, db)
+    """Parse command-line arguments and return an argparse.Namespace.
+
+    Returns:
+        argparse.Namespace: Parsed CLI arguments including:
+            - input: path to input file or directory
+            - source: data source type (auto/windows/aws/gcp)
+            - output: output mode (console/file)
+            - model: LLM model to use
+            - provider: LLM provider (openai/gemini)
+            - db: path to SQLite database
+            - verbose/debug/dry_run: logging and run controls
+    """
     parser = argparse.ArgumentParser(description="PurpleLens AI SOC Assistant")
     parser.add_argument(
         "--input",

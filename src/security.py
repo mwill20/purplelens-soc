@@ -1,8 +1,15 @@
-"""Security policy enforcement for LLM responses."""
+"""Security policy enforcement for LLM responses.
+
+LLM output is untrusted input:
+- We enforce behavior, not hope for compliance
+- PROHIBITED_PATTERNS blocks false authority claims
+- validate_output() inspects all responses before acceptance
+"""
 
 import re
 from typing import Optional, Tuple
 
+# LLM output is untrusted input - enforce behavior with regex guardrails
 # Guardrail contract: no false authority or claimed actions; we only recommend.
 PROHIBITED_PATTERNS = [
     r"I have (blocked|removed|deleted|remediated)",
@@ -12,10 +19,11 @@ PROHIBITED_PATTERNS = [
     r"\b(I|we)\b.*\b(took|have taken|has taken|executed|completed|performed)\b.*\baction\b",
     r"System (modified|updated|patched|fixed)",
     r"(Confirmed|Certain|Guaranteed) that",
-    r"(?i)\b(powershell|pwsh)(\.exe)?\s+(-enc|-encodedcommand|-e|-ec)\s+[A-Za-z0-9+/=]{20,}",
+    r"(?i)\b(powershell|pwsh)(\.exe)?\s+(-enc|-encodedcommand|-e|-ec)\s+[A-Za-z0-9+/=]{20,}",  # Block base64 PowerShell commands (common attack vector)
 ]
 
 
+# We enforce behavior, not hope: validate_output() inspects every LLM response
 def validate_output(response_text: str) -> Tuple[bool, Optional[str]]:
     """Check the raw LLM response for prohibited language."""
 

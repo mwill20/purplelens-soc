@@ -1,4 +1,11 @@
-"""LLM integration for extracting structured intelligence from events."""
+"""LLM integration for extracting structured intelligence from events.
+
+Prompting & Reliability:
+- Different sources get tuned prompts (Windows/AWS/GCP)
+- JSON only output enforced (no markdown, no commentary)
+- Evidence required for every finding (no claims without proof)
+- Retries included with exponential backoff for transient failures
+"""
 
 from __future__ import annotations
 
@@ -39,6 +46,7 @@ except ImportError:  # pragma: no cover - handled during runtime if package miss
 
 logger = logging.getLogger(__name__)
 
+# Batch limits: prevent token overflow and ensure manageable context windows
 MAX_EVENTS_PER_BATCH = 50
 MAX_PROMPT_CHARS = 24_000  # Roughly ~8K tokens
 MAX_RETRIES = 3
@@ -46,6 +54,7 @@ BACKOFF_SECONDS = [0, 1, 2]  # after attempt 1,2 re-try doubling; final sleep op
 
 SCHEMA_JSON = json.dumps(AnalysisOutput.model_json_schema(), indent=2)
 
+# Windows-specific prompt: JSON only, evidence required, no speculation without data
 SYSTEM_PROMPT = f"""
 You are the PurpleLens AI SOC Assistant. Analyze provided Windows log
 events and extract structured intelligence strictly conforming to the following
@@ -66,6 +75,7 @@ RULES:
     reasoned speculation based on the observed events.
 """.strip()
 
+# AWS CloudTrail-specific prompt: adds plane/cluster context, identity focus
 AWS_SYSTEM_PROMPT = f"""
 You are the PurpleLens AI SOC Assistant. Analyze provided AWS CloudTrail
 security events and extract structured intelligence strictly conforming to the
@@ -90,6 +100,7 @@ RULES:
     reasoned speculation based on the observed events.
 """.strip()
 
+# GCP Audit Log-specific prompt: automation signals, workload identity, crypto ops
 GCP_SYSTEM_PROMPT = f"""
 You are the PurpleLens AI SOC Assistant. Analyze provided Google Cloud Platform
 Audit Logs and extract structured intelligence strictly conforming to the
@@ -479,6 +490,7 @@ def _build_gcp_user_prompt(events: List[Dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+# Retries included: exponential backoff for transient failures (timeout, rate limit)
 def _call_with_retry(
     messages: List[Dict[str, str]], model: str, provider: str
 ) -> Dict[str, Any]:

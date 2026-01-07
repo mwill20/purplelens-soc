@@ -1,8 +1,18 @@
+"""Report generation - pure Python Deterministiclogic, no LLM calls.
+
+No model calls here:
+- Python owns the report format and deduplication logic
+- generate_report() transforms structured data to human-readable text
+- Deduplication helpers prevent redundant findings/IOCs/recommendations
+- Executive summary logic aggregates risk metrics deterministically
+"""
+
 from __future__ import annotations
 
 import re
 
 
+# Executive summary logic: Python aggregates risk metrics, no LLM involved
 def _generate_executive_summary(analysis: AnalysisOutput, event_count: int = 0) -> str:
     """
     Generate an executive summary section for the SOC report.
@@ -78,6 +88,7 @@ STATUS_EXPLANATIONS: Dict[str, str] = {
 }
 
 
+# Python owns the report: deterministic transformation from structured data to text
 def generate_report(analysis: AnalysisOutput, event_count: int = 0) -> str:
     """Generate deterministic SOC report from the structured analysis object."""
 
@@ -203,6 +214,7 @@ def _format_list(items: List[str]) -> List[str]:
     return [f"- {item}" for item in items] + [""]
 
 
+# Deduplication helpers: prevent redundant findings, IOCs, and recommendations
 _ACTION_STOPWORDS = {
     "a",
     "an",

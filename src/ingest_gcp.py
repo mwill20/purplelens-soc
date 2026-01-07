@@ -8,6 +8,11 @@ Supports:
 - Pub/Sub wrappers (base64-encoded message payloads)
 
 Implements data minimization: SHA-256 hash storage only.
+
+GCP Adapter Stack (3-phase pipeline):
+1. Normalize first: normalize_gcp_audit() -> standard envelope
+2. Tag plane: tag_plane() -> control/data/telemetry classification
+3. Enrich deterministically: classify_actor_type() + compute_automation_confidence()
 """
 
 import base64
@@ -101,6 +106,7 @@ def load_gcp_log_file(file_path: Path) -> List[Dict[str, Any]]:
     return unwrapped
 
 
+# Phase 1: Normalize first - convert raw GCP audit log to standard envelope
 def normalize_gcp_audit(
     rec: Dict[str, Any], source_file: str, idx: int
 ) -> Dict[str, Any]:
@@ -126,10 +132,10 @@ def normalize_gcp_audit(
     # insertId is the GCP Unique ID - Critical for audit trails
     insert_id = rec.get("insertId", "UNKNOWN")
 
-    # 3. Determine Security Plane (Control vs Telemetry vs Data)
+    # 3. Phase 2: Tag plane - classify into control/data/telemetry
     service_name = pp.get("serviceName", "unknown")
     method_name = pp.get("methodName", "unknown")
-    plane = tag_plane(service_name, method_name)
+    plane = tag_plane(service_name, method_name)  # Deterministic plane classification
 
     # 4. Extract fields for enrichment analysis
     principal_email = auth.get("principalEmail", "unknown")
@@ -146,13 +152,13 @@ def normalize_gcp_audit(
     if resource_project_id and resource.get("type") == "project":
         resource_name = f"projects/{resource_project_id}"
 
-    # 5. PHASE 3 ENRICHMENT: Deterministic automation & identity classification
-    actor_kind = classify_actor_type(principal_email)
+    # 5. Phase 3: Enrich deterministically - no external API calls, pure logic
+    actor_kind = classify_actor_type(principal_email)  # Human vs service account vs agent
     automation_tool = detect_automation_tool(user_agent)
     workload_identity_detected = detect_workload_identity(principal_subject)
     private_ip_detected = is_private_ip(caller_ip)
     cross_project_detected = is_cross_project(principal_email, resource_name)
-    automation_confidence = compute_automation_confidence(
+    automation_confidence = compute_automation_confidence(  # Multi-signal confidence scoring
         actor_kind, automation_tool, workload_identity_detected, private_ip_detected
     )
 

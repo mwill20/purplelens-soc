@@ -1,6 +1,11 @@
 """
 GCP Enrichment Logic (Phase 3).
 Deterministic classification of Actors and Automation Tools with confidence scoring.
+
+Phase 3 of GCP Adapter Stack:
+- classify_actor_type(): Strong tell for automation (service account email pattern)
+- compute_automation_confidence(): Multi-signal scoring (high/medium/low/none)
+- All functions are deterministic: no API calls, pure classification logic
 """
 
 import re

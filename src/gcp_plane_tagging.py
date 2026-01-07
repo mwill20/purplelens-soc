@@ -2,6 +2,11 @@
 Conservative GCP plane tagging logic.
 Classifies events into Control, Telemetry, or Data planes based on Service and Method.
 Deterministic: No external API calls.
+
+Phase 2 of GCP Adapter Stack:
+- Called by normalize_gcp_audit() after initial field extraction
+- tag_plane() maps service+method to security plane
+- Pure function: same input always produces same output
 """
 
 
