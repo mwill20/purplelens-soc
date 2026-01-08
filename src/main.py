@@ -223,13 +223,38 @@ def parse_args() -> argparse.Namespace:  # CLI options (input path, output mode,
     return parser.parse_args()
 
 
-def configure_logging(verbose: bool, debug: bool) -> None:
-    level = logging.DEBUG if debug else logging.INFO if verbose else logging.WARNING
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
+def configure_logging(verbose: bool, debug: bool, run_id: str) -> Path:
+    # Console level based on flags, file level matches debug/verbose behavior
+    console_level = logging.DEBUG if debug else logging.INFO if verbose else logging.WARNING
+    # File logging: DEBUG only when --debug is set, otherwise INFO for audit trail
+    file_level = logging.DEBUG if debug else logging.INFO
+    
+    log_dir = Path("logs")
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / f"run_{run_id}.log"
+
+    root_logger = logging.getLogger()
+    root_logger.handlers.clear()
+    # Set root to lowest handler level to allow handlers to filter
+    root_logger.setLevel(min(console_level, file_level))
+
+    formatter = logging.Formatter(
+        fmt="%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(console_level)
+    console_handler.setFormatter(formatter)
+
+    file_handler = logging.FileHandler(log_path, mode="w", encoding="utf-8")
+    file_handler.setLevel(file_level)
+    file_handler.setFormatter(formatter)
+
+    root_logger.addHandler(console_handler)
+    root_logger.addHandler(file_handler)
+
+    return log_path
 
 
 def ensure_environment(
@@ -248,22 +273,22 @@ def ensure_environment(
 
 def main() -> int:  # for the one-pass orchestration sequence.
     args = parse_args()
-    configure_logging(args.verbose, args.debug)
-
     run_id = str(uuid.uuid4())
-    LOGGER.info(
-        "Starting analysis run %s | model=%s | provider=%s | input=%s | dry_run=%s",
-        run_id,
-        args.model,
-        args.provider,
-        args.input,
-        args.dry_run,
-    )
-
-    if not ensure_environment(args):
-        return 1
+    log_path = configure_logging(args.verbose, args.debug, run_id)
 
     try:
+        LOGGER.info(
+            "Starting analysis run %s | model=%s | provider=%s | input=%s | dry_run=%s",
+            run_id,
+            args.model,
+            args.provider,
+            args.input,
+            args.dry_run,
+        )
+
+        if not ensure_environment(args):
+            return 1
+
         # Source detection and routing
         if args.source == "auto":
             decision, reason = detect_source(args.input)
@@ -376,8 +401,10 @@ def main() -> int:  # for the one-pass orchestration sequence.
         LOGGER.error("Failed to persist analysis: %s", exc)
         return 1
 
-    LOGGER.info("Analysis complete with status=%s", analysis.status)
-    return 0 if analysis.status == "success" else 1
+        LOGGER.info("Analysis complete with status=%s", analysis.status)
+        return 0 if analysis.status == "success" else 1
+    finally:
+        print(f"Debug log written to {log_path}", file=sys.stdout)
 
 
 def _validate_analysis_output(data: dict) -> AnalysisOutput:
@@ -403,7 +430,14 @@ def _build_error_analysis(status: str, message: str | None) -> AnalysisOutput:
 def _output_report(report_text: str, destination: str, run_id: str) -> None:
     reports_dir = Path("reports")
     reports_dir.mkdir(parents=True, exist_ok=True)
-    output_path = reports_dir / f"analysis_{run_id}.txt"
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    output_path = reports_dir / f"analysis_{timestamp}.txt"
+    if output_path.exists():
+        for counter in range(1, 1000):
+            candidate = reports_dir / f"analysis_{timestamp}-{counter}.txt"
+            if not candidate.exists():
+                output_path = candidate
+                break
     output_path.write_text(report_text, encoding="utf-8")
     if destination == "console":
         print(report_text)

@@ -9,12 +9,15 @@ Every run is preserved:
 from __future__ import annotations
 
 import json
+import logging
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List
 
 from src.schemas import AnalysisOutput
+
+logger = logging.getLogger(__name__)
 
 # Table definitions: enforce schema constraints and foreign key relationships
 _CREATE_TABLE_STATEMENTS = [
@@ -69,8 +72,12 @@ _CREATE_TABLE_STATEMENTS = [
 def initialize_database(db_path: str) -> None:
     """Ensure the SQLite database and schema exist."""
 
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Initializing database at: %s", db_path)
     conn = _get_connection(db_path)
     conn.close()
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Database initialized successfully")
 
 
 # Every run is preserved: complete metadata, findings, hypotheses, IOCs, and report
@@ -86,6 +93,15 @@ def save_analysis(
 ) -> None:
     """Persist analysis outputs according to the architect-defined schema."""
 
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(
+            "Storage: Saving analysis run_id=%s | findings=%d | hypotheses=%d | iocs=%d",
+            run_id,
+            len(analysis.findings),
+            len(analysis.hypotheses),
+            len(analysis.indicators_of_compromise),
+        )
+
     # Audit trail contract: every run is stored with metadata to reproduce outcomes.
     conn = _get_connection(db_path)
     try:
@@ -97,6 +113,8 @@ def save_analysis(
             _insert_hypotheses(conn, run_id, analysis)
             _insert_iocs(conn, run_id, analysis)
             _insert_report(conn, run_id, report_text, report_generated_at)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Storage: Successfully committed all data for run_id=%s", run_id)
     finally:
         conn.close()
 
@@ -107,11 +125,18 @@ def _get_connection(db_path: str) -> sqlite3.Connection:
     db_file = Path(db_path)
     db_file.parent.mkdir(parents=True, exist_ok=True)
 
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Storage: Opening database connection to %s", db_path)
+
     conn = sqlite3.connect(db_path)
     conn.execute("PRAGMA foreign_keys = ON;")
     for statement in _CREATE_TABLE_STATEMENTS:
         conn.execute(statement)
     conn.commit()
+    
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Storage: Schema verified, connection ready")
+    
     return conn
 
 
@@ -142,6 +167,9 @@ def _insert_findings(
 ) -> None:
     """Persist findings and their evidence arrays."""
 
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Storage: Inserting %d findings", len(analysis.findings))
+
     for finding in analysis.findings:
         evidence_json = json.dumps([ev.model_dump() for ev in finding.evidence])
         conn.execute(
@@ -158,6 +186,9 @@ def _insert_hypotheses(
 ) -> None:
     """Persist hypotheses collected from the analysis."""
 
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Storage: Inserting %d hypotheses", len(analysis.hypotheses))
+
     for hypothesis in analysis.hypotheses:
         conn.execute(
             """
@@ -172,6 +203,9 @@ def _insert_iocs(
     conn: sqlite3.Connection, run_id: str, analysis: AnalysisOutput
 ) -> None:
     """Persist indicators of compromise."""
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Storage: Inserting %d IOCs", len(analysis.indicators_of_compromise))
 
     for indicator in analysis.indicators_of_compromise:
         conn.execute(

@@ -9,7 +9,11 @@ No model calls here:
 
 from __future__ import annotations
 
+import logging
 import re
+from datetime import datetime, timezone
+
+logger = logging.getLogger(__name__)
 
 
 # Executive summary logic: Python aggregates risk metrics, no LLM involved
@@ -25,6 +29,16 @@ def _generate_executive_summary(analysis: AnalysisOutput, event_count: int = 0) 
         if sev in severity_counts:
             severity_counts[sev] += 1
 
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(
+            "Report: Executive summary severity counts: critical=%d high=%d medium=%d low=%d info=%d",
+            severity_counts["critical"],
+            severity_counts["high"],
+            severity_counts["medium"],
+            severity_counts["low"],
+            severity_counts["info"],
+        )
+
     # Determine risk level
     if severity_counts["critical"] > 0 or severity_counts["high"] > 0:
         risk_level = "**HIGH**"
@@ -38,6 +52,9 @@ def _generate_executive_summary(analysis: AnalysisOutput, event_count: int = 0) 
     else:
         risk_level = "**MINIMAL**"
         risk_detail = _build_severity_breakdown(severity_counts)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Report: Risk level determined as %s", risk_level)
 
     # Key statistics
     finding_count = len(analysis.findings)
@@ -94,12 +111,36 @@ def generate_report(analysis: AnalysisOutput, event_count: int = 0) -> str:
 
     # Determinism contract: same structured input yields the same report text.
     if analysis.status != "success":
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Report: Generating error report for status=%s", analysis.status)
         return generate_error_report(analysis)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(
+            "Report: Starting generation | findings=%d | hypotheses=%d | iocs=%d | next_steps=%d",
+            len(analysis.findings),
+            len(analysis.hypotheses),
+            len(analysis.indicators_of_compromise),
+            len(analysis.recommended_next_steps),
+        )
 
     deduped_findings = _merge_findings(analysis.findings)
     deduped_hypotheses = _dedupe_hypotheses(analysis.hypotheses)
     deduped_iocs = _dedupe_iocs(analysis.indicators_of_compromise)
     deduped_next_steps = _dedupe_actions(analysis.recommended_next_steps)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(
+            "Report: Deduplication complete | findings=%d→%d | hypotheses=%d→%d | iocs=%d→%d | next_steps=%d→%d",
+            len(analysis.findings),
+            len(deduped_findings),
+            len(analysis.hypotheses),
+            len(deduped_hypotheses),
+            len(analysis.indicators_of_compromise),
+            len(deduped_iocs),
+            len(analysis.recommended_next_steps),
+            len(deduped_next_steps),
+        )
 
     analysis_for_report = analysis.model_copy(
         update={
@@ -127,6 +168,11 @@ def generate_report(analysis: AnalysisOutput, event_count: int = 0) -> str:
     sections.append("=" * 80)
     sections.append(f"Overall Confidence: {analysis.confidence:.2f}")
     sections.append("=" * 80)
+    
+    if logger.isEnabledFor(logging.DEBUG):
+        report_length = sum(len(s) for s in sections)
+        logger.debug("Report: Generated %d sections, %d total characters", len(sections), report_length)
+    
     return "\n".join(sections)
 
 
@@ -170,10 +216,12 @@ def generate_error_report(analysis: AnalysisOutput) -> str:
 
 
 def _header_lines(subtitle: str) -> List[str]:
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     return [
         "=" * 80,
         "PURPLELENS AI SOC ASSISTANT",
         subtitle,
+        f"Report Timestamp (UTC): {timestamp}",
         "=" * 80,
         "",
     ]

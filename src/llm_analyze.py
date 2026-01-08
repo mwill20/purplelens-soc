@@ -10,6 +10,7 @@ Prompting & Reliability:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import ipaddress
 import json
 import logging
@@ -180,8 +181,23 @@ def analyze_events(
             len(aws_events),
         )
 
+        if logger.isEnabledFor(logging.DEBUG):
+            avg_events = len(aws_events) / len(batches) if batches else 0
+            logger.debug(
+                "AWS batch details: %d batches, avg events per batch: %.1f",
+                len(batches),
+                avg_events,
+            )
+
         merged_result = None
-        for batch in batches:
+        for idx, batch in enumerate(batches, 1):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(
+                    "AWS: Processing batch %d/%d with %d events",
+                    idx,
+                    len(batches),
+                    len(batch["events"]),
+                )
             batch_result = _process_aws_batch(batch["events"], model, provider)
             if merged_result is None:
                 merged_result = batch_result
@@ -200,8 +216,23 @@ def analyze_events(
             len(gcp_events),
         )
 
+        if logger.isEnabledFor(logging.DEBUG):
+            avg_events = len(gcp_events) / len(batches) if batches else 0
+            logger.debug(
+                "GCP batch details: %d batches, avg events per batch: %.1f",
+                len(batches),
+                avg_events,
+            )
+
         merged_result = None
-        for batch in batches:
+        for idx, batch in enumerate(batches, 1):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(
+                    "GCP: Processing batch %d/%d with %d events",
+                    idx,
+                    len(batches),
+                    len(batch),
+                )
             batch_result = _process_gcp_batch(batch, model, provider)
             if merged_result is None:
                 merged_result = batch_result
@@ -223,6 +254,13 @@ def analyze_events(
     logger.info(
         "Processing %d Windows batches with %d events", len(batches), len(events)
     )
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(
+            "Batch details: %d batches, avg events per batch: %.1f",
+            len(batches),
+            len(events) / len(batches) if batches else 0,
+        )
 
     merged_result = None
     for batch in batches:
@@ -498,9 +536,24 @@ def _call_with_retry(
     last_error: str | None = None
     last_status = "llm_error"
 
+    if logger.isEnabledFor(logging.DEBUG):
+        prompt_size = sum(len(m.get("content", "")) for m in messages)
+        logger.debug(
+            "LLM: Starting request | model=%s | provider=%s | prompt_size=%d chars | max_retries=%d",
+            model,
+            provider,
+            prompt_size,
+            MAX_RETRIES,
+        )
+
     for attempt in range(1, MAX_RETRIES + 1):
+        if logger.isEnabledFor(logging.DEBUG) and attempt > 1:
+            logger.debug("LLM: Retry attempt %d/%d", attempt, MAX_RETRIES)
+
         try:
             if provider == "openai":
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug("LLM: Calling OpenAI API")
                 response = _get_client().chat.completions.create(
                     model=model,
                     messages=messages,
@@ -509,11 +562,33 @@ def _call_with_retry(
                     response_format={"type": "json_object"},
                 )
                 content = response.choices[0].message.content
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(
+                        "LLM: Received OpenAI response | length=%d chars",
+                        len(content) if content else 0,
+                    )
             elif provider == "gemini":
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug("LLM: Calling Gemini API")
                 content = _call_gemini(messages, model)
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(
+                        "LLM: Received Gemini response | length=%d chars",
+                        len(content) if content else 0,
+                    )
             else:
                 raise ValueError(f"Unsupported LLM provider: {provider}")
-            return _parse_llm_content(content)
+            
+            parsed_result = _parse_llm_content(content)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(
+                    "LLM: Parse successful | status=%s | findings=%d | hypotheses=%d | iocs=%d",
+                    parsed_result.get("status", "unknown"),
+                    len(parsed_result.get("findings", [])),
+                    len(parsed_result.get("hypotheses", [])),
+                    len(parsed_result.get("indicators_of_compromise", [])),
+                )
+            return parsed_result
         except APITimeoutError as exc:
             last_status = "timeout"
             last_error = f"LLM request timed out: {exc}"
@@ -549,13 +624,27 @@ def _call_with_retry(
 
 def _parse_llm_content(content: str | None) -> Dict[str, Any]:
     if not content:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("LLM: Parse failed - empty response")
         return _build_empty_analysis(
             status="llm_error", error_message="LLM returned empty response."
         )
 
+    if logger.isEnabledFor(logging.DEBUG):
+        content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+        logger.debug(
+            "LLM: Parsing JSON response | length=%d chars | hash=sha256:%s",
+            len(content),
+            content_hash,
+        )
+
     try:
         data = json.loads(content)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("LLM: JSON parse successful")
     except json.JSONDecodeError:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("LLM: JSON parse failed, attempting salvage")
         data = _attempt_salvage_json(content)
         if data is None:
             return _build_empty_analysis(
@@ -612,6 +701,16 @@ def _merge_batch_results(
     result1: Dict[str, Any], result2: Dict[str, Any]
 ) -> Dict[str, Any]:
     """Deterministically merge results from multiple batches."""
+    
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(
+            "LLM: Merging batches | Batch1: findings=%d hypotheses=%d | Batch2: findings=%d hypotheses=%d",
+            len(result1.get("findings", [])),
+            len(result1.get("hypotheses", [])),
+            len(result2.get("findings", [])),
+            len(result2.get("hypotheses", [])),
+        )
+    
     status1_priority = STATUS_PRIORITY.get(result1.get("status"), 999)
     status2_priority = STATUS_PRIORITY.get(result2.get("status"), 999)
     merged_status = (
@@ -629,6 +728,14 @@ def _merge_batch_results(
 
     merged_findings = _deduplicate_findings(merged_findings)
     merged_iocs = list(dict.fromkeys(merged_iocs))
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(
+            "LLM: Merge complete | Total findings=%d hypotheses=%d iocs=%d",
+            len(merged_findings),
+            len(merged_hypotheses),
+            len(merged_iocs),
+        )
 
     conf1 = result1.get("confidence", 0.0)
     conf2 = result2.get("confidence", 0.0)

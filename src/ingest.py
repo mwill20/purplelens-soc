@@ -52,6 +52,7 @@ def load_events(input_path: str) -> List[Dict[str, Any]]:
 def _load_file_events(file_path: Path) -> List[Dict[str, Any]]:
     """Load events from a single JSONL file."""
 
+    logger.debug("Processing file: %s", file_path)
     records: List[Dict[str, Any]] = []
     try:
         with file_path.open("r", encoding="utf-8-sig") as handle:
@@ -72,14 +73,25 @@ def _load_file_events(file_path: Path) -> List[Dict[str, Any]]:
                     continue
 
                 # Evidence for credibility: source_file, record_index, event_id enable traceability
+                event_id = _extract_event_id(raw_event)
                 records.append(
                     {
                         "source_file": str(file_path),  # Provenance: origin file
                         "record_index": record_index,  # Provenance: line number
-                        "event_id": _extract_event_id(raw_event),  # Provenance: Windows EventID
+                        "event_id": event_id,  # Provenance: Windows EventID
                         "raw_event": raw_event,
                     }
                 )
+                
+                # DEBUG: Show per-event ingestion details
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(
+                        "Ingested event [%s:%d] | EventID=%s | Size=%d bytes",
+                        file_path.name,
+                        record_index,
+                        event_id or "unknown",
+                        len(stripped),
+                    )
     except OSError as exc:
         logger.error("Failed to read %s: %s", file_path, exc)
 
