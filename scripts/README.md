@@ -10,6 +10,7 @@ Small utilities that support dataset preparation, validation, and demos.
 - `append_exposure.py`: Append a synthetic exposure event to the GCP mini-lab dataset (modifies data in place).
 - `export_gcp_logs.ps1`: Export targeted GCP audit logs using gcloud to JSON (Windows/PowerShell).
 - `export_gcp_logs.sh`: Export targeted GCP audit logs using gcloud to JSON (Linux/macOS).
+- `gcp_job_wrapper.py`: Cloud Run Jobs wrapper that downloads GCS input, runs the CLI, and uploads outputs.
 
 ## Notes
 - Scripts assume repository-relative paths and should be run from the repo root.

@@ -1,316 +1,110 @@
-# PurpleLens AI SOC Assistant - Architecture Guide
+# Architecture
 
-## System Architecture Overview
+PurpleLens is a CLI-first security analysis pipeline that ingests log files
+from Windows, AWS CloudTrail, and GCP Cloud Logging, runs LLM-driven analysis,
+validates the result, and writes a deterministic report plus a SQLite record of
+the run. The goal is demo-grade realism with clear, explainable phases.
 
-Default LLM provider: Gemini (`gemini-flash-latest`). Use `--provider openai` to switch.
+## Goals
+- Batch processing: file in, report out
+- Multi-source: Windows, AWS, GCP
+- Deterministic reporting and storage
+- Simple CLI entrypoint for local or job execution
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         PURPLELENS AI SOC ASSISTANT                          │
-│                     Multi-Source Cloud & Host Analysis                        │
-└─────────────────────────────────────────────────────────────────────────────┘
+## Pipeline phases
+1. Ingest and normalize
+2. LLM analysis
+3. Validate output
+4. Generate report
+5. Persist to SQLite
 
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                           INPUT LAYER (Data Preparation)                       │
-├───────────────────────────────────────────────────────────────────────────────┤
-│                                                                                │
-│  Sources supported (examples):                                                 │
-│                                                                                │
-│  ┌──────────────┐   ┌─────────────────────┐   ┌──────────────────────────┐    │
-│  │ EVTX (.evtx) │   │ AWS CloudTrail JSON  │   │ GCP Audit Logs (JSON/JSONL)│   │
-│  │  (Windows)   │   │  (data/aws_demo.jsonl)│   │  (data/gcp_log_pack/*.json)│   │
-│  └──────┬───────┘   └──────────┬──────────┘   └──────────┬───────────────┘    │
-│         │                    │                         │                    │
-│         │ scripts/prep_evtx  │                         │ scripts/append_exposure
-│         │ -> .jsonl          │ ingestion adapter        │ -> dedupe/write      │
-│         ▼                    ▼                         ▼                    │
-│  ┌───────────────────────────────────────────────────────────────────────┐   │
-│  │                 Normalized JSONL events (text-based, provenance)       │   │
-│  │  - Fields: source_file, record_index, insertId/event_id, protoPayload   │   │
-│  │  - Enrichment: actor_kind, automation_tool, cross_project, workload_id  │   │
-│  └───────────────────────────────────────────────────────────────────────┘   │
-│                                                                                │
-└───────────────────────────────────────────────────────────────────────────────┘
+## Input and normalization
+- Source auto-detection via `--source` (auto/windows/aws/gcp)
+- Formats: JSONL per line, JSON arrays, AWS CloudTrail JSON, GCP Pub/Sub wrapper
 
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                        APPLICATION LAYER (Python 3.13.x)                       │
-├───────────────────────────────────────────────────────────────────────────────┤
-│                                                                                │
-│  CLI entrypoint: `src/main.py`                                                 │
-│  - Options: `--input`, `--source (gcp|aws|windows)`, `--debug`, `--dry-run`    │
-│                                                                                │
-│  Pipeline phases:                                                              │
-│                                                                                │
-│  PHASE 1: INGEST / Enrichment                                                  │
-│  - `src/ingest_gcp.py`, `src/ingest_aws.py`, `src/ingest_evtx.py`              │
-│  - Normalize per-source fields into canonical schema                          │
-│  - Deterministic enrichment: detect `actor_kind`, `automation_tool`, `ioc`     │
-│  - Cross-project detection and IAM evidence tagging                            │
-│                                                                                │
-│  PHASE 2: ANALYZE (LLM + Deterministic Post-processing)                       │
-│  - `src/llm_analyze.py`                                                         │
-│  - Batch events, build source-aware prompts, and call LLM (JSON schema enforced)
-│  - Deterministic IOC extraction (IPs, UAs, principals, project IDs, resources)
-│  - Merge LLM output with deterministic IOCs into `AnalysisOutput`              │
-│                                                                                │
-│  PHASE 3: VALIDATE                                                            │
-│  - `src/schemas.py` (Pydantic models)                                          │
-│  - `src/security.py` enforces policy patterns and blocks prohibited wording     │
-│  - Ensures required evidence (source_file, record_index, event_id) present     │
-│                                                                                │
-│  PHASE 4: REPORT                                                              │
-│  - `src/report.py` (deterministic, no LLM calls)                               │
-│  - Consistent top-level Executive Summary for all runs (success + errors)      │
-│  - Findings sorted/prioritized by severity (Critical → High → Medium → Low → Info)
-│  - Deduplication & normalization of finding titles (e.g., CryptoKeyVersion)    │
-│                                                                                │
-│  PHASE 5: PERSIST / OUTPUT                                                     │
-│  - `src/storage.py` writes report text and structured objects to DB/files     │
-│  - Console and file outputs: `reports/analysis_<UUID>.txt`                     │
-│                                                                                │
-└───────────────────────────────────────────────────────────────────────────────┘
+Normalized event envelope:
 
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                              REPORTING / OUTPUT LAYER                          │
-├───────────────────────────────────────────────────────────────────────────────┤
-│                                                                                │
-│  - All successful reports include:                                             │
-│    - Executive Summary (risk level, counts, top recommendation)                │
-│    - Prioritized Findings (severity-sorted with evidence pointers)            │
-│    - Hypotheses, IOCs, Recommended Next Steps                                 │
-│                                                                                │
-│  - Error / Incomplete reports now include a minimal Executive Summary to keep  │
-│    top-level structure consistent and easier programmatic consumption.        │
-│                                                                                │
-└───────────────────────────────────────────────────────────────────────────────┘
-
-┌───────────────────────────────────────────────────────────────────────────────┐
-│                              STORAGE / DEPENDENCIES                            │
-├───────────────────────────────────────────────────────────────────────────────┤
-│  - SQLite DB: `db/analysis.db` (analysis_runs, findings, iocs, hypotheses)     │
-│  - Reports folder: `reports/analysis_<UUID>.txt`                               │
-│  - External: Gemini API (default) or OpenAI API, Pydantic v2, python-dotenv    │
-└───────────────────────────────────────────────────────────────────────────────┘
-
-Notes:
-- The architecture intentionally separates source adapters (ingest_*) from normalization/enrichment so
-   new sources (other clouds, SaaS logs) can be added with minimal changes to analysis and reporting.
-- Deterministic post-processing ensures reproducible IOC extraction and consistent report structure across
-   Windows (EVTX), AWS, and GCP analyses.
-
+```json
+{
+  "source_file": "Logs/windows_sample.jsonl",
+  "record_index": 12,
+  "event_id": "optional",
+  "raw_event": {
+    "EventID": 4688,
+    "CommandLine": "powershell -enc ...",
+    "User": "LAB\\alice"
+  }
+}
 ```
 
----
+## LLM analysis
+- Providers: Gemini and OpenAI
+- CLI flags: `--provider` and `--model` (default model is Gemini)
+- Source-specific prompts for Windows, AWS, and GCP
+- Batching to control prompt size and token cost
+  - Windows: up to 50 events or ~24k characters per batch
+  - AWS: 25 events per batch (config driven)
+  - GCP: chunked processing for large log sets
+- Up to three attempts per batch for reliability
+- GCP adds deterministic IOC extraction on top of LLM output
 
-## Data Flow Trace: One Event's Journey
+## Validation and safety
+- `src/schemas.py` defines the `AnalysisOutput` schema
+- Evidence schema links findings back to original events
+- `src/security.py` blocks unsafe patterns from appearing in outputs
 
-```
-1. RAW EVTX FILE
-   ├─ Location: data/evtx_raw/Execution_wmic.evtx
-   └─ Format: Binary Windows Event Log
+Core output shape:
 
-2. POWERSHELL CONVERSION (scripts/prep_evtx.ps1)
-   ├─ Command: Get-WinEvent -Path $evtxFile
-   ├─ Transform: | ConvertTo-Json -Depth 10
-   └─ Output: data/evtx_parsed/Execution_wmic.jsonl
-      │
-      └─ Example line:
-         {"Event": {"System": {"EventID": 1}, "EventData": {...}}}
-
-3. PYTHON INGEST (src/ingest.py)
-   ├─ Function: load_events("data/evtx_parsed")
-   ├─ Process:
-   │  ├─ Scan directory for *.jsonl
-   │  ├─ Parse each line as JSON
-   │  └─ Attach provenance metadata
-   │
-   └─ Output: List[Dict]
-      [
+```json
+{
+  "status": "success",
+  "findings": [
+    {
+      "title": "Suspicious PowerShell Execution",
+      "summary": "Encoded command lines indicate possible staging.",
+      "severity": "high",
+      "evidence": [
         {
-          "_source_file": "Execution_wmic.jsonl",
-          "_record_index": 0,
-          "_event_id": "1",
-          "Event": {"System": {"EventID": 1}, ...}
-        },
-        ...
+          "source_file": "Logs/windows_sample.jsonl",
+          "record_index": 12,
+          "event_id": "optional",
+          "excerpt": "powershell -enc ..."
+        }
       ]
-
-4. LLM ANALYZE (src/llm_analyze.py)
-   ├─ Function: analyze_events(events, "gemini-flash-latest")
-   ├─ Process:
-   │  ├─ Batch events (max 50 or 24k chars)
-   │  ├─ Build prompt with system instructions + event JSON
-   │  ├─ Call Gemini API (default) or OpenAI API with JSON-only response
-   │  ├─ Retry up to 3 times on error
-   │  └─ Parse JSON response
-   │
-   └─ Output: Raw JSON string
-      {
-        "status": "success",
-        "findings": [
-          {
-            "title": "Suspicious WMIC Execution",
-            "severity": "high",
-            "evidence": [
-              {
-                "source_file": "Execution_wmic.jsonl",
-                "record_index": 0,
-                "event_id": "1",
-                "excerpt": "wmic process list /format:https://..."
-              }
-            ]
-          }
-        ],
-        "confidence": 0.8
-      }
-
-5. SCHEMA VALIDATION (src/schemas.py)
-   ├─ Class: AnalysisOutput.model_validate(json_data)
-   ├─ Process:
-   │  ├─ Parse JSON into Pydantic model
-   │  ├─ Validate status enum (success/error/timeout/validation_error)
-   │  ├─ Validate severity enum (info/low/medium/high/critical)
-   │  ├─ Validate confidence is 0.0-1.0
-   │  ├─ Coerce event_id integers to strings
-   │  └─ Ensure all required fields present
-   │
-   └─ Output: AnalysisOutput object (typed, validated)
-
-6. SECURITY VALIDATION (src/security.py)
-   ├─ Function: validate_output(response_text)
-   ├─ Process:
-   │  ├─ Check raw LLM response text (before JSON parsing)
-   │  ├─ Scan against 5 prohibited language patterns (regex)
-   │  ├─ Patterns block false authority claims (action/certainty/modification)
-   │  └─ Return (True, None) or (False, error_message)
-   │
-   └─ Output: Tuple[bool, Optional[str]] - validation result
-
-7. REPORT GENERATION (src/report.py)
-   ├─ Function: generate_report(analysis_output)
-   ├─ Process:
-   │  ├─ Check status (success vs error)
-   │  ├─ Sort findings by severity (CRITICAL > HIGH > MEDIUM > LOW > INFO)
-   │  ├─ Build ASCII banner
-   │  ├─ Format sections (Findings, Hypotheses, IOCs, Recommendations)
-   │  └─ Append confidence score
-   │
-   └─ Output: String (Markdown-formatted report)
-
-8. PERSISTENCE (src/storage.py)
-   ├─ Function: save_analysis(db_path, analysis_output, metadata)
-   ├─ Process:
-   │  ├─ INSERT INTO analysis_runs (run_id, status, model_used, ...)
-   │  ├─ INSERT INTO findings (run_id, title, severity, evidence_json, ...)
-   │  ├─ INSERT INTO hypotheses (run_id, description, confidence)
-   │  ├─ INSERT INTO indicators_of_compromise (run_id, indicator)
-   │  └─ INSERT INTO reports (run_id, report_text)
-   │
-   └─ Output: Data persisted to db/analysis.db
-
-9. OUTPUT
-   ├─ Console: Print report to stdout
-   └─ File: Write to reports/analysis_<run_id>.txt
+    }
+  ],
+  "hypotheses": [
+    {
+      "description": "Initial staging via PowerShell.",
+      "confidence": 0.62
+    }
+  ],
+  "indicators_of_compromise": [
+    "powershell -enc"
+  ],
+  "recommended_next_steps": [
+    "Isolate the host and review parent process tree."
+  ],
+  "confidence": 0.58
+}
 ```
 
----
+## Report generation
+- `src/report.py` builds a deterministic text report
+- Output path: `reports/analysis_<UTC timestamp>.txt`
+- Sections: Executive Summary, Findings, Hypotheses, IOCs, Recommended Next Steps
+- Errors are recorded when analysis or validation fails
 
-## File Responsibilities Matrix
+## Storage
+- SQLite at `db/analysis.db`
+- Tables:
+  - `analysis_runs`: run_id, timestamp, input_files, status, model_used
+  - `findings`: run_id, title, summary, severity, evidence JSON
+  - `hypotheses`: run_id, description, confidence
+  - `indicators_of_compromise`: run_id, indicator
+  - `reports`: run_id, report_text, generated_at
+- Run status is derived from output presence (success, partial, failed)
 
-| File | Primary Role | Key Functions | Dependencies |
-|------|-------------|---------------|--------------|
-| **src/main.py** | CLI orchestrator & entrypoint | `parse_args()`, `ensure_environment()`, `run()` | All other src/* modules |
-| **src/ingest.py** | Load JSONL files, attach provenance | `load_events()` | json, pathlib |
-| **src/llm_analyze.py** | Gemini/OpenAI integration & batching | `analyze_events()`, `_parse_llm_response()` | openai, google-generativeai, schemas |
-| **src/schemas.py** | Data models & validation rules | `AnalysisOutput`, `Finding`, `Evidence` | pydantic |
-| **src/security.py** | Policy enforcement (regex patterns) | `validate_output()`, `PROHIBITED_PATTERNS` | re, schemas |
-| **src/report.py** | Deterministic report formatting | `generate_report()`, `_build_banner()` | schemas |
-| **src/storage.py** | SQLite persistence layer | `initialize_database()`, `save_analysis()` | sqlite3 |
-| **scripts/prep_evtx.ps1** | Convert .evtx to .jsonl | PowerShell script | Get-WinEvent |
-| **tests/test_phase1*.py** | Unit & integration tests | Pytest & script-based tests | All src/* modules |
-
----
-
-## Error Handling Paths
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    ERROR HANDLING FLOW                           │
-└─────────────────────────────────────────────────────────────────┘
-
-1. MISSING API KEY
-   ├─ Detection: ensure_environment() in main.py
-   ├─ Error: "GEMINI_API_KEY environment variable is not set" (or OPENAI_API_KEY when using --provider openai)
-   ├─ Exit Code: 1
-   └─ User Action: Set API key in .env file
-
-2. EMPTY DIRECTORY
-   ├─ Detection: load_events() in ingest.py
-   ├─ Error: "No JSONL files found in {directory}"
-   ├─ Exit Code: 1
-   └─ User Action: Check input path, ensure .jsonl files exist
-
-3. MALFORMED JSON
-   ├─ Detection: load_events() in ingest.py
-   ├─ Handling: Log warning, skip line, continue processing
-   ├─ Exit Code: 0 (graceful degradation)
-   └─ User Action: Review logs, fix source data if needed
-
-4. LLM API ERROR
-   ├─ Detection: analyze_events() in llm_analyze.py
-   ├─ Retry Logic: 3 attempts with exponential backoff (0s, 1s, 2s)
-   ├─ Status: "llm_error"
-   ├─ Report: Partial findings + error message
-   └─ User Action: Check API key, network, provider status
-
-5. SCHEMA VALIDATION FAILURE
-   ├─ Detection: Pydantic model validation in schemas.py
-   ├─ Status: "validation_error"
-   ├─ Report: Error details in logs
-   └─ User Action: Review LLM output logs, adjust prompt if needed
-
-6. SECURITY POLICY VIOLATION
-   ├─ Detection: validate_output() in security.py
-   ├─ Status: "validation_error"
-   ├─ Report: Pattern that triggered violation
-   └─ User Action: Review LLM output, adjust system prompt
-
-7. DATABASE ERROR
-   ├─ Detection: save_analysis() in storage.py
-   ├─ Handling: Log error, continue with report output
-   ├─ Exit Code: 0 (report still generated)
-   └─ User Action: Check db/ directory permissions, disk space
-```
-
----
-
-## Architecture Decisions & Rationale
-
-### 1. **Why JSONL instead of direct .evtx parsing in Python?**
-   - **Reason**: Python .evtx parsing libraries are complex and platform-dependent
-   - **Benefit**: PowerShell's Get-WinEvent is native, robust, well-documented
-   - **Trade-off**: Extra preprocessing step, but cleaner separation of concerns
-
-### 2. **Why separate schemas.py and security.py?**
-   - **Reason**: Single Responsibility Principle
-   - **schemas.py**: Structural validation (types, required fields, ranges)
-   - **security.py**: Business logic validation (policy enforcement)
-   - **Benefit**: Easy to modify policies without touching core data models
-
-### 3. **Why deterministic report.py (no LLM)?**
-   - **Reason**: Avoid double API costs and latency
-   - **Benefit**: Fast, predictable, testable report generation
-   - **Trade-off**: Less "natural" language, but more reliable
-
-### 4. **Why SQLite instead of JSON files for persistence?**
-   - **Reason**: Structured queries, relationships, indexing
-   - **Benefit**: Can query across runs, aggregate statistics, join tables
-   - **Example**: "Find all HIGH severity findings from last 30 days"
-
-### 5. **Why batch events instead of one-by-one LLM calls?**
-   - **Reason**: Reduce API calls, provide cross-event context
-   - **Benefit**: Lower cost, better correlation of related events
-   - **Limit**: 50 events or 24k chars to stay within token limits
-
----
-
+## Observability
+- Run logs: `logs/run_<run_id>.log`
+- The run_id ties together logs, report, and database records
