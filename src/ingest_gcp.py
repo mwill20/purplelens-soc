@@ -31,6 +31,7 @@ from src.gcp_enrichment import (
     is_private_ip,
 )
 from src.gcp_plane_tagging import tag_plane
+from src.security import prompt_firewall_event
 
 logger = logging.getLogger(__name__)
 
@@ -183,6 +184,7 @@ def normalize_gcp_audit(
         "cross_project": cross_project_detected,
         "raw": rec,
     }
+    raw_event = prompt_firewall_event(raw_event, skip_keys={"raw"})
 
     # [DEBUG VISIBILITY] Log enrichment details if in debug mode
     # This allows verification without cluttering the final report evidence

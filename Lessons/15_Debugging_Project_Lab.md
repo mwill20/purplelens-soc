@@ -158,7 +158,7 @@ Why this matters:
 
 ## Demo 3: Report Timestamp (Standalone Evidence)
 
-Goal: verify report headers include a UTC timestamp and filenames are UTC-based.
+Goal: verify report headers include a UTC timestamp and filenames include run_id.
 
 ```powershell
 python -m src.main --input data\evtx_sample --provider gemini --model gemini-flash-latest --output file --verbose
@@ -173,11 +173,11 @@ Get-ChildItem reports | Sort-Object LastWriteTime -Descending | Select-Object -F
 Open the report header:
 
 ```powershell
-Get-Content reports\analysis_YYYYMMDDTHHMMSSZ.txt -TotalCount 6
+Get-Content reports\analysis_<run_id>.txt -TotalCount 6
 ```
 
 Expected:
-- Filename includes UTC timestamp.
+- Filename includes run_id.
 - Header includes `Report Timestamp (UTC): ...`.
 
 Why this matters:

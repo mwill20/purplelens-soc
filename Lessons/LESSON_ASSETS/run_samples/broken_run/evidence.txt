@@ -1,0 +1,9 @@
+EVIDENCE ARTIFACT
+run_dir: runs/d4e80d33-1599-42bc-b9ea-2fccd14102ab
+
+LOG SNIPPETS:
+{"level": "INFO", "run_id": "d4e80d33-1599-42bc-b9ea-2fccd14102ab", "source_type": "unknown", "llm_tokens_in": 0, "llm_tokens_out": 0, "llm_cost_usd": 0.0, "source_file": null, "records_in": null, "records_out": null, "duration_ms": 7, "error_type": null, "error_msg": null, "stage": "parse", "event": "stage_end", "ok": true, "ts": "2026-01-11T17:19:06Z"}
+{"level": "ERROR", "run_id": "d4e80d33-1599-42bc-b9ea-2fccd14102ab", "source_type": "unknown", "llm_tokens_in": 0, "llm_tokens_out": 0, "llm_cost_usd": 0.0, "source_file": null, "records_in": null, "records_out": null, "duration_ms": 2, "error_type": "SystemExit", "error_msg": "Input path does not exist: data\\does_not_exist", "stage": "source_detect", "event": "exception", "ok": false, "ts": "2026-01-11T17:19:06Z"}
+
+METRICS SUMMARY:
+{"run_id": "d4e80d33-1599-42bc-b9ea-2fccd14102ab", "total_duration_ms": 23, "error_count": 1, "llm_calls": 0, "llm_cost_usd_total": 0.0}

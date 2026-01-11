@@ -1,0 +1,6 @@
+OBSERVE -> DETECT -> DIAGNOSE -> RESPOND (safely)
+
+OBSERVE: logs, metrics, artifacts
+DETECT: error spikes, latency spikes, missing outputs
+DIAGNOSE: stage + error_type + evidence pointers
+RESPOND: fix input, rerun, harden guardrails

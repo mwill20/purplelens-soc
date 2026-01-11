@@ -7,6 +7,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from src.security import prompt_firewall_event
+
 logger = logging.getLogger(__name__)
 
 # Provenance is mandatory: every event must trace back to source file + line number
@@ -74,6 +76,7 @@ def _load_file_events(file_path: Path) -> List[Dict[str, Any]]:
 
                 # Evidence for credibility: source_file, record_index, event_id enable traceability
                 event_id = _extract_event_id(raw_event)
+                raw_event = prompt_firewall_event(raw_event)
                 records.append(
                     {
                         "source_file": str(file_path),  # Provenance: origin file

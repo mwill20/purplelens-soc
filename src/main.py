@@ -1,7 +1,7 @@
 """
 CLI entrypoint for the PurpleLens AI SOC Assistant.
 - "This is the entrypoint and control plane: parse args, configure logging, then run the pipeline."
-- "The pipeline is a straight line: ingest -> analyze -> validate -> report -> persist."
+- "The pipeline is a straight line: ingest -> normalize -> sanitize -> enrich -> llm_analyze -> validate_output -> report -> persist."
 - "Report output is saved to `reports/` and the path is printed, so the demo can always show the file."
 """
 
@@ -25,10 +25,11 @@ from pydantic import ValidationError
 if not os.environ.get("OPENAI_API_KEY") or not os.environ.get("GEMINI_API_KEY"):
     load_dotenv()
 
-from src.llm_analyze import analyze_events
+from src.llm_analyze import analyze_events, run_semantic_judge
+from src.ops.ops_context import create_ops_context
 from src.report import generate_report
 from src.schemas import AnalysisOutput
-from src.security import validate_output
+from src.security import validate_output, validate_semantic_output
 from src.storage import initialize_database, save_analysis
 
 LOGGER = logging.getLogger(__name__)
@@ -158,6 +159,14 @@ def detect_source(input_path: Path) -> tuple[str, str]:
         raise SystemExit(f"Input path does not exist: {input_path}")
 
 
+def _event_ref(event: dict) -> dict:
+    return {
+        "source_file": event.get("source_file"),
+        "record_index": event.get("record_index"),
+        "event_id": event.get("event_id"),
+    }
+
+
 def parse_args() -> argparse.Namespace:  # CLI options (input path, output mode, model, db)
     """Parse command-line arguments and return an argparse.Namespace.
 
@@ -220,6 +229,11 @@ def parse_args() -> argparse.Namespace:  # CLI options (input path, output mode,
         action="store_true",
         help="Validate inputs only, do not call LLM",
     )
+    parser.add_argument(
+        "--semantic-judge",
+        action="store_true",
+        help="Enable optional LLM semantic judge validation",
+    )
     return parser.parse_args()
 
 
@@ -272,9 +286,28 @@ def ensure_environment(
 
 
 def main() -> int:  # for the one-pass orchestration sequence.
-    args = parse_args()
     run_id = str(uuid.uuid4())
+    args = parse_args()
     log_path = configure_logging(args.verbose, args.debug, run_id)
+    ops = create_ops_context(run_id)
+    ops.log_run_start(
+        {
+            "input": str(args.input),
+            "model": args.model,
+            "provider": args.provider,
+            "dry_run": args.dry_run,
+            "semantic_judge": args.semantic_judge,
+        }
+    )
+    ops.stage_start("parse")
+    ops.stage_end("parse", ok=True)
+
+    events: list[dict] = []
+    ok = False
+    current_stage = "init"
+    policy_valid = True
+    semantic_valid = True
+    judge_valid = True
 
     try:
         LOGGER.info(
@@ -286,15 +319,26 @@ def main() -> int:  # for the one-pass orchestration sequence.
             args.dry_run,
         )
 
+        current_stage = "environment"
+        ops.stage_start(current_stage)
         if not ensure_environment(args):
+            ops.exception(
+                current_stage,
+                "MissingApiKey",
+                f"Missing API key for provider={args.provider}",
+            )
             return 1
+        ops.stage_end(current_stage, ok=True)
 
-        # Source detection and routing
+        current_stage = "source_detect"
+        ops.stage_start(current_stage, source_file=str(args.input))
         if args.source == "auto":
             decision, reason = detect_source(args.input)
         else:
             decision = args.source
             reason = f"User specified --source {args.source}"
+        ops.set_source_type(decision)
+        ops.stage_end(current_stage, ok=True, source_file=str(args.input))
 
         LOGGER.info(
             "source_detect",
@@ -306,11 +350,12 @@ def main() -> int:  # for the one-pass orchestration sequence.
         )
         LOGGER.info("Detected source type: %s | Reason: %s", decision, reason)
 
-        # Route to appropriate ingestion
+        current_stage = "ingest"
+        ops.stage_start(current_stage, source_file=str(args.input))
         if decision == "aws":
             from src.ingest_aws import ingest_cloudtrail
 
-            events = ingest_cloudtrail(args.input)  # Will raise NotImplementedError
+            events = ingest_cloudtrail(args.input)
         elif decision == "gcp":
             from src.ingest_gcp import load_gcp_log_file, normalize_gcp_audit
 
@@ -343,50 +388,200 @@ def main() -> int:  # for the one-pass orchestration sequence.
             events = load_events(args.input)
         else:
             raise SystemExit(f"Unknown source type: {decision}")
-    except Exception as exc:  # noqa: BLE001
-        LOGGER.error("Failed to load events: %s", exc)
-        return 1
 
-    if (
-        len(
-            [
-                e
-                for e in events
-                if e.get("raw_event", {}).get("source") == "aws_cloudtrail"
+        ops.stage_end(
+            current_stage,
+            ok=True,
+            source_file=str(args.input),
+            records_out=len(events),
+        )
+
+        records_before = len(events)
+        if (
+            len(
+                [
+                    e
+                    for e in events
+                    if e.get("raw_event", {}).get("source") == "aws_cloudtrail"
+                ]
+            )
+            > 1
+        ):
+            from src.aws_correlate import correlate_events
+            from src.config_aws import CORRELATION_CONFIG
+
+            current_stage = "normalize"
+            ops.stage_start(current_stage, records_in=records_before)
+            events = correlate_events(events, CORRELATION_CONFIG)
+            ops.stage_end(
+                current_stage,
+                ok=True,
+                records_in=records_before,
+                records_out=len(events),
+            )
+        else:
+            current_stage = "normalize"
+            ops.stage_start(current_stage, records_in=records_before)
+            ops.stage_end(
+                current_stage,
+                ok=True,
+                records_in=records_before,
+                records_out=len(events),
+            )
+
+        current_stage = "sanitize"
+        ops.stage_start(current_stage, records_in=len(events))
+        prompt_injection_hits = 0
+        sanitized_refs: list[dict] = []
+        quarantined_refs: list[dict] = []
+        affected_event_ids: list[str] = []
+        retained_events: list[dict] = []
+
+        for event in events:
+            raw_event = event.get("raw_event", {})
+            flags = raw_event.get("injection_flags") or []
+            if flags:
+                prompt_injection_hits += len(flags)
+                sanitized_refs.append(_event_ref(event))
+            if raw_event.get("quarantined"):
+                quarantined_refs.append(_event_ref(event))
+            if raw_event.get("sanitized") or raw_event.get("quarantined"):
+                event_id = event.get("event_id")
+                if event_id:
+                    affected_event_ids.append(str(event_id))
+                else:
+                    source_file = event.get("source_file") or "unknown"
+                    record_index = event.get("record_index")
+                    affected_event_ids.append(f"{Path(source_file).name}:{record_index}")
+            if not raw_event.get("quarantined"):
+                retained_events.append(event)
+
+        ops.metrics.record_prompt_injection(
+            prompt_injection_hits,
+            len(sanitized_refs),
+            len(quarantined_refs),
+        )
+        ops.stage_end(
+            current_stage,
+            ok=True,
+            records_in=len(events),
+            records_out=len(retained_events),
+            extra_fields={
+                "prompt_injection_hits": prompt_injection_hits,
+                "events_sanitized": len(sanitized_refs),
+                "events_quarantined": len(quarantined_refs),
+                "affected_event_ids": affected_event_ids,
+                "sanitized_event_refs": sanitized_refs,
+                "quarantined_event_refs": quarantined_refs,
+            },
+        )
+        events = retained_events
+
+        if decision == "gcp":
+            current_stage = "enrich"
+            ops.stage_start(current_stage, records_in=len(events))
+            ops.stage_end(
+                current_stage,
+                ok=True,
+                records_in=len(events),
+                records_out=len(events),
+            )
+
+        unique_files = sorted({event["source_file"] for event in events})
+        ops.metrics.set_counts(len(unique_files), len(events))
+
+        if args.dry_run:
+            print(
+                f"Validation successful. Loaded {len(events)} events from {args.input}.",
+                file=sys.stdout,
+            )
+            ok = True
+            return 0
+
+        initialize_database(args.db)
+        current_stage = "llm_analyze"
+        ops.stage_start(current_stage, records_in=len(events))
+        analysis_data = analyze_events(
+            events, model=args.model, provider=args.provider, ops=ops
+        )
+        ops.stage_end(
+            current_stage,
+            ok=True,
+            records_in=len(events),
+            records_out=len(events),
+        )
+
+        current_stage = "validate_output"
+        ops.stage_start(current_stage, records_in=len(events))
+        analysis = _validate_analysis_output(analysis_data)
+        validation_errors: list[str] = []
+
+        policy_valid, policy_error = validate_output(
+            json.dumps(analysis_data, ensure_ascii=False)
+        )
+        if not policy_valid:
+            LOGGER.error("Security policy violation: %s", policy_error)
+            ops.metrics.record_error("SecurityPolicyViolation")
+            if policy_error:
+                validation_errors.append(f"Security policy violation: {policy_error}")
+
+        semantic_valid, semantic_issues = validate_semantic_output(analysis, events)
+        if not semantic_valid:
+            ops.metrics.record_error("SemanticValidationFailed")
+            sample_issues = "; ".join(semantic_issues[:3])
+            LOGGER.error("Semantic validation failed: %s", sample_issues)
+            if semantic_issues:
+                validation_errors.append(f"Semantic validation failed: {sample_issues}")
+
+        judge_issues: list[str] = []
+        if args.semantic_judge and analysis.status == "success":
+            judge_result = run_semantic_judge(
+                analysis.model_dump(),
+                events,
+                model=args.model,
+                provider=args.provider,
+                ops=ops,
+            )
+            judge_valid = bool(judge_result.get("ok"))
+            judge_issues = [
+                str(issue) for issue in (judge_result.get("issues") or []) if issue
             ]
+            if not judge_valid:
+                ops.metrics.record_error("SemanticJudgeFailed")
+                sample_issues = "; ".join(judge_issues[:3])
+                LOGGER.error("Semantic judge failed: %s", sample_issues)
+                if judge_issues:
+                    validation_errors.append(f"Semantic judge failed: {sample_issues}")
+        else:
+            judge_valid = True
+
+        if validation_errors:
+            analysis = _build_error_analysis(
+                "validation_error", "; ".join(validation_errors)
+            )
+
+        output_valid = policy_valid and semantic_valid and judge_valid
+        ops.stage_end(
+            current_stage,
+            ok=output_valid,
+            records_in=len(events),
+            records_out=len(events),
         )
-        > 1
-    ):
-        from src.aws_correlate import correlate_events
-        from src.config_aws import CORRELATION_CONFIG
 
-        events = correlate_events(events, CORRELATION_CONFIG)
-
-    if args.dry_run:
-        print(
-            f"Validation successful. Loaded {len(events)} events from {args.input}.",
-            file=sys.stdout,
+        current_stage = "report"
+        ops.stage_start(current_stage, records_in=len(events))
+        report_text = generate_report(analysis, event_count=len(events))
+        _output_report(report_text, args.output, run_id)
+        ops.stage_end(
+            current_stage,
+            ok=True,
+            records_in=len(events),
+            records_out=len(events),
         )
-        return 0
 
-    initialize_database(args.db)
-    analysis_data = analyze_events(events, model=args.model, provider=args.provider)
-    analysis = _validate_analysis_output(analysis_data)
-
-    policy_valid, policy_error = validate_output(
-        json.dumps(analysis_data, ensure_ascii=False)
-    )
-    if not policy_valid:
-        LOGGER.error("Security policy violation: %s", policy_error)
-        analysis = _build_error_analysis("validation_error", policy_error)
-
-    report_text = generate_report(analysis, event_count=len(events))
-    _output_report(report_text, args.output, run_id)
-
-    run_timestamp = datetime.now(timezone.utc)
-    unique_files = sorted({event["source_file"] for event in events})
-
-    try:
+        current_stage = "persist"
+        ops.stage_start(current_stage, records_in=len(events))
+        run_timestamp = datetime.now(timezone.utc)
         save_analysis(
             db_path=args.db,
             run_id=run_id,
@@ -397,13 +592,27 @@ def main() -> int:  # for the one-pass orchestration sequence.
             report_generated_at=datetime.now(timezone.utc),
             run_timestamp=run_timestamp,
         )
-    except Exception as exc:  # noqa: BLE001
-        LOGGER.error("Failed to persist analysis: %s", exc)
-        return 1
+        ops.stage_end(
+            current_stage,
+            ok=True,
+            records_in=len(events),
+            records_out=len(events),
+        )
 
+        ok = analysis.status == "success" and output_valid
         LOGGER.info("Analysis complete with status=%s", analysis.status)
-        return 0 if analysis.status == "success" else 1
+        return 0 if ok else 1
+    except SystemExit as exc:
+        ops.exception(current_stage, "SystemExit", str(exc))
+        LOGGER.error("Failed to complete run: %s", exc)
+        return 1
+    except Exception as exc:  # noqa: BLE001
+        ops.exception(current_stage, exc.__class__.__name__, str(exc))
+        LOGGER.error("Failed to complete run: %s", exc)
+        return 1
     finally:
+        ops.finalize(ok)
+        print(f"Ops artifacts written to {ops.run_dir}", file=sys.stdout)
         print(f"Debug log written to {log_path}", file=sys.stdout)
 
 
@@ -430,11 +639,10 @@ def _build_error_analysis(status: str, message: str | None) -> AnalysisOutput:
 def _output_report(report_text: str, destination: str, run_id: str) -> None:
     reports_dir = Path("reports")
     reports_dir.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    output_path = reports_dir / f"analysis_{timestamp}.txt"
+    output_path = reports_dir / f"analysis_{run_id}.txt"
     if output_path.exists():
         for counter in range(1, 1000):
-            candidate = reports_dir / f"analysis_{timestamp}-{counter}.txt"
+            candidate = reports_dir / f"analysis_{run_id}-{counter}.txt"
             if not candidate.exists():
                 output_path = candidate
                 break

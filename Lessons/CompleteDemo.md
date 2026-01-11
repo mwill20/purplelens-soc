@@ -92,6 +92,8 @@ Expected counts:
 
 ### GCP sample
 `data/gcp_synthetic_minilab.jsonl` should exist.
+Optional prompt injection lab dataset:
+`data/redteam/prompt_injection_windows.jsonl`.
 
 ---
 
@@ -129,7 +131,7 @@ python -m src.main --input data/evtx_sample --provider openai --model gpt-4o
 What to look for in output:
 - `Detected source type: windows`
 - A report printed to console
-- `Report written to reports/analysis_<UUID>.txt`
+- `Report written to reports/analysis_<run_id>.txt`
 
 Open the latest report:
 ```powershell
@@ -209,7 +211,7 @@ What to point out:
 Open each file and say one line:
 
 1) `src/main.py`
-- Orchestrator: detect source, ingest, analyze, validate, report, persist.
+- Orchestrator: detect source, ingest, normalize, sanitize, enrich, llm_analyze, validate_output, report, persist.
 
 2) `src/ingest.py`
 - Provenance envelope: `source_file`, `record_index`, `event_id`.
@@ -227,7 +229,7 @@ Open each file and say one line:
 - Strict prompt + batching + retries.
 
 7) `src/security.py`
-- Policy guardrails against action claims and unsafe patterns.
+- Policy guardrails + prompt firewall + semantic validation.
 
 8) `src/report.py`
 - Deterministic reporting (no LLM narrative).
@@ -261,7 +263,7 @@ In PurpleLens:
 
 ## 7) Guardrails (One-Sentence Summary)
 
-The LLM is extraction-only: it must output JSON that matches the schema, evidence is required for every claim, policy rules block action or certainty language, and Python renders the report deterministically.
+The LLM is extraction-only: inputs are sanitized, outputs must match the schema, evidence is required for every claim, policy rules block action or certainty language, and Python renders the report deterministically (optional semantic judge adds a second-pass check).
 
 ---
 
@@ -273,13 +275,14 @@ The LLM is extraction-only: it must output JSON that matches the schema, evidenc
 - **No report file**: look for `Report written to ...` in output.
 - **Activation blocked**: run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 - **Wrong input type**: add `--source aws` or `--source gcp`.
+- **Semantic judge failed**: re-run without `--semantic-judge` or inspect the judge issues.
 
 ---
 
 ## 9) Final Close (30 seconds)
 
 "PurpleLens is a constrained, evidence-first SOC analysis pipeline.  
-It normalizes logs, applies guardrails, uses AI only for structured extraction,  
+It normalizes and sanitizes logs, applies guardrails, uses AI only for structured extraction,  
 then produces a deterministic report with provenance and an audit trail."
 
 ---
@@ -302,6 +305,9 @@ python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --provi
 
 # Dry run (no API)
 python -m src.main --input data/evtx_sample --dry-run
+
+# Prompt injection lab (dry run)
+python -m src.main --input data/redteam/prompt_injection_windows.jsonl --source windows --debug --dry-run
 
 # DB check
 python scripts/check_demo_db.py

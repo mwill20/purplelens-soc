@@ -216,7 +216,7 @@ def generate_error_report(analysis: AnalysisOutput) -> str:
 
 
 def _header_lines(subtitle: str) -> List[str]:
-    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     return [
         "=" * 80,
         "PURPLELENS AI SOC ASSISTANT",

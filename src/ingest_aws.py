@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 from src.aws_plane_tagging import tag_plane
+from src.security import prompt_firewall_event
 
 logger = logging.getLogger(__name__)
 
@@ -195,6 +196,8 @@ def _normalize_record(
             "Failed to process record %d in %s: %s", record_index, source_file, exc
         )
         return None
+
+    normalized_event = prompt_firewall_event(normalized_event)
 
     return {
         "source_file": str(source_file),

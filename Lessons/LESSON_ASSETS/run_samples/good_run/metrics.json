@@ -1,0 +1,18 @@
+{
+  "run_id": "54af2eea-4539-4236-a31d-135552b31c65",
+  "started_at_utc": "2026-01-11T18:40:53Z",
+  "ended_at_utc": "2026-01-11T18:41:14Z",
+  "total_duration_ms": 21099,
+  "ok": true,
+  "error_count": 0,
+  "source_type_counts": {
+    "windows": 1
+  },
+  "files_processed": 3,
+  "records_processed_total": 15,
+  "llm_calls": 1,
+  "llm_tokens_in_total": 5368,
+  "llm_tokens_out_total": 1939,
+  "llm_cost_usd_total": 0.0,
+  "top_errors": []
+}

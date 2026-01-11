@@ -12,11 +12,14 @@ the run. The goal is demo-grade realism with clear, explainable phases.
 - Simple CLI entrypoint for local or job execution
 
 ## Pipeline phases
-1. Ingest and normalize
-2. LLM analysis
-3. Validate output
-4. Generate report
-5. Persist to SQLite
+1. Ingest
+2. Normalize (envelope + provenance)
+3. Sanitize (prompt firewall, redact/quarantine)
+4. Enrich (GCP deterministic signals)
+5. LLM analysis
+6. Validate output (schema + policy + semantic, optional LLM judge)
+7. Generate report
+8. Persist to SQLite
 
 ## Input and normalization
 - Source auto-detection via `--source` (auto/windows/aws/gcp)
@@ -52,6 +55,8 @@ Normalized event envelope:
 - `src/schemas.py` defines the `AnalysisOutput` schema
 - Evidence schema links findings back to original events
 - `src/security.py` blocks unsafe patterns from appearing in outputs
+- Prompt firewall redacts or quarantines instruction-like strings before LLM analysis
+- Optional semantic judge (CLI: `--semantic-judge`) adds a second-pass validation
 
 Core output shape:
 
@@ -91,7 +96,7 @@ Core output shape:
 
 ## Report generation
 - `src/report.py` builds a deterministic text report
-- Output path: `reports/analysis_<UTC timestamp>.txt`
+- Output path: `reports/analysis_<run_id>.txt`
 - Sections: Executive Summary, Findings, Hypotheses, IOCs, Recommended Next Steps
 - Errors are recorded when analysis or validation fails
 
@@ -107,4 +112,5 @@ Core output shape:
 
 ## Observability
 - Run logs: `logs/run_<run_id>.log`
-- The run_id ties together logs, report, and database records
+- Ops artifacts: `runs/<run_id>/run_log.jsonl`, `runs/<run_id>/metrics.json`
+- The run_id ties together logs, reports, ops artifacts, and database records

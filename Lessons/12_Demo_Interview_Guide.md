@@ -43,6 +43,7 @@ Before the demo, verify:
   - Optional: `data/evtx_parsed` if you want to show local conversion output
 - Optional: `db/analysis.db` has prior runs.
 - Architecture diagram ready: `docs/PurpleLens_SOC_Architecture.png`.
+- Diagram reflects current pipeline: sanitize (prompt firewall), optional semantic judge, AIOps artifacts, and red-team dataset.
 - AWS sample path ready:
   - `data/sample_cloudtrail.csv` (in repo)
   - `data/sample_aws.jsonl` (after conversion)
@@ -144,7 +145,7 @@ Get-Content data\evtx_sample\Execution_wmic.jsonl -TotalCount 1 |
 ### Show the architecture diagram
 
 - Open `docs/PurpleLens_SOC_Architecture.png`
-- Point to the 5-phase pipeline
+- Point to sanitize (prompt firewall), validate_output (schema + policy + semantic), and AIOps artifacts
 
 Conversion:
 > "The EVTX-to-JSON conversion is handled with PowerShell using `scripts/prep_evtx.ps1` and Get-WinEvent, then the Python pipeline takes over."
@@ -242,7 +243,7 @@ Open the file and point to the `main()` flow.
 Talking points:
 
 - "This is the entrypoint and control plane: parse args, configure logging, then run the pipeline."
-- "The pipeline is a straight line: ingest -> analyze -> validate -> report -> persist."
+- "The pipeline is a straight line: ingest -> normalize -> sanitize -> enrich -> llm_analyze -> validate_output -> report -> persist."
 - "Report output is saved to `reports/` and the path is printed, so the demo can always show the file."
 
 What to point at:

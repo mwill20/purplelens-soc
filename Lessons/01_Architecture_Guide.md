@@ -63,7 +63,7 @@ python src/main.py --input Logs/sample.jsonl --source auto --provider gemini
 ```
 
 Outputs:
-- Report: `reports/analysis_<UTC timestamp>.txt`
+- Report: `reports/analysis_<run_id>.txt`
 - SQLite DB: `db/analysis.db`
 - Run log: `logs/run_<run_id>.log`
 

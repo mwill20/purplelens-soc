@@ -1,0 +1,21 @@
+{
+  "run_id": "d4e80d33-1599-42bc-b9ea-2fccd14102ab",
+  "started_at_utc": "2026-01-11T17:19:06Z",
+  "ended_at_utc": "2026-01-11T17:19:06Z",
+  "total_duration_ms": 23,
+  "ok": false,
+  "error_count": 1,
+  "source_type_counts": {},
+  "files_processed": 0,
+  "records_processed_total": 0,
+  "llm_calls": 0,
+  "llm_tokens_in_total": 0,
+  "llm_tokens_out_total": 0,
+  "llm_cost_usd_total": 0.0,
+  "top_errors": [
+    {
+      "error_type": "SystemExit",
+      "count": 1
+    }
+  ]
+}

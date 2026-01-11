@@ -52,6 +52,14 @@ MAX_EVENTS_PER_BATCH = 50
 MAX_PROMPT_CHARS = 24_000  # Roughly ~8K tokens
 MAX_RETRIES = 3
 BACKOFF_SECONDS = [0, 1, 2]  # after attempt 1,2 re-try doubling; final sleep optional
+TOKEN_ESTIMATE_CHARS_PER_TOKEN = 4
+
+OPENAI_PRICING_PER_1K = {
+    "gpt-4o": (0.005, 0.015),
+    "gpt-4o-mini": (0.00015, 0.0006),
+    "gpt-4-1106-preview": (0.01, 0.03),
+    "gpt-3.5-turbo-1106": (0.001, 0.002),
+}
 
 SCHEMA_JSON = json.dumps(AnalysisOutput.model_json_schema(), indent=2)
 
@@ -133,6 +141,20 @@ RULES:
     emails/service accounts, project IDs, and high-value resource identifiers).
 """.strip()
 
+SEMANTIC_JUDGE_SYSTEM_PROMPT = """
+You are a validation judge for PurpleLens analysis output. Validate that each
+finding's evidence references exist in the provided events and that the
+excerpt is plausibly grounded in the event summary.
+
+Return JSON only:
+{"ok": true|false, "issues": ["issue 1", "issue 2", ...]}
+
+Rules:
+1. Output valid JSON only. No markdown, no commentary.
+2. If any evidence is missing or mismatched, set ok=false and list issues.
+3. If you cannot confirm, err on the side of ok=false with a clear issue.
+""".strip()
+
 STATUS_PRIORITY = {
     "success": 0,
     "validation_error": 1,
@@ -149,6 +171,7 @@ def analyze_events(
     events: List[Dict[str, Any]],
     model: str = "gemini-flash-latest",
     provider: str = "gemini",
+    ops: Any | None = None,
 ) -> Dict[str, Any]:
     """Send batched events to the LLM and merge structured results."""
 
@@ -188,6 +211,8 @@ def analyze_events(
                 len(batches),
                 avg_events,
             )
+        if ops is not None:
+            ops.record_llm_calls(len(batches))
 
         merged_result = None
         for idx, batch in enumerate(batches, 1):
@@ -198,7 +223,7 @@ def analyze_events(
                     len(batches),
                     len(batch["events"]),
                 )
-            batch_result = _process_aws_batch(batch["events"], model, provider)
+            batch_result = _process_aws_batch(batch["events"], model, provider, ops)
             if merged_result is None:
                 merged_result = batch_result
             else:
@@ -223,6 +248,8 @@ def analyze_events(
                 len(batches),
                 avg_events,
             )
+        if ops is not None:
+            ops.record_llm_calls(len(batches))
 
         merged_result = None
         for idx, batch in enumerate(batches, 1):
@@ -233,7 +260,7 @@ def analyze_events(
                     len(batches),
                     len(batch),
                 )
-            batch_result = _process_gcp_batch(batch, model, provider)
+            batch_result = _process_gcp_batch(batch, model, provider, ops)
             if merged_result is None:
                 merged_result = batch_result
             else:
@@ -261,10 +288,12 @@ def analyze_events(
             len(batches),
             len(events) / len(batches) if batches else 0,
         )
+    if ops is not None:
+        ops.record_llm_calls(len(batches))
 
     merged_result = None
     for batch in batches:
-        batch_result = _process_batch(batch, model, provider)
+        batch_result = _process_batch(batch, model, provider, ops)
         if merged_result is None:
             merged_result = batch_result
         else:
@@ -356,17 +385,23 @@ def _extract_gcp_operational_iocs(events: List[Dict[str, Any]]) -> List[str]:
 
 
 def _process_batch(
-    batch: List[Dict[str, Any]], model: str, provider: str
+    batch: List[Dict[str, Any]],
+    model: str,
+    provider: str,
+    ops: Any | None = None,
 ) -> Dict[str, Any]:
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": _build_user_prompt(batch)},
     ]
-    return _call_with_retry(messages, model, provider)
+    return _call_with_retry(messages, model, provider, ops)
 
 
 def _process_aws_batch(
-    batch: List[Dict[str, Any]], model: str, provider: str
+    batch: List[Dict[str, Any]],
+    model: str,
+    provider: str,
+    ops: Any | None = None,
 ) -> Dict[str, Any]:
     """Process AWS batch with CloudTrail-specific prompt."""
     user_prompt = _build_aws_user_prompt(batch)
@@ -374,11 +409,14 @@ def _process_aws_batch(
         {"role": "system", "content": AWS_SYSTEM_PROMPT},
         {"role": "user", "content": user_prompt},
     ]
-    return _call_with_retry(messages, model, provider)
+    return _call_with_retry(messages, model, provider, ops)
 
 
 def _process_gcp_batch(
-    batch: List[Dict[str, Any]], model: str, provider: str
+    batch: List[Dict[str, Any]],
+    model: str,
+    provider: str,
+    ops: Any | None = None,
 ) -> Dict[str, Any]:
     """Process GCP batch with Cloud Audit Log-specific prompt."""
     user_prompt = _build_gcp_user_prompt(batch)
@@ -386,7 +424,7 @@ def _process_gcp_batch(
         {"role": "system", "content": GCP_SYSTEM_PROMPT},
         {"role": "user", "content": user_prompt},
     ]
-    return _call_with_retry(messages, model, provider)
+    return _call_with_retry(messages, model, provider, ops)
 
 
 def _build_user_prompt(events: List[Dict[str, Any]]) -> str:
@@ -528,16 +566,139 @@ def _build_gcp_user_prompt(events: List[Dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+def run_semantic_judge(
+    analysis: Dict[str, Any],
+    events: List[Dict[str, Any]],
+    model: str,
+    provider: str,
+    ops: Any | None = None,
+) -> Dict[str, Any]:
+    """Optional LLM judge for semantic validation of evidence grounding."""
+    user_prompt = _build_semantic_judge_prompt(analysis, events)
+    messages = [
+        {"role": "system", "content": SEMANTIC_JUDGE_SYSTEM_PROMPT},
+        {"role": "user", "content": user_prompt},
+    ]
+    if ops is not None:
+        ops.record_llm_calls(1)
+    return _call_judge_with_retry(messages, model, provider, ops)
+
+
+def _build_semantic_judge_prompt(
+    analysis: Dict[str, Any], events: List[Dict[str, Any]]
+) -> str:
+    """Build a compact prompt for semantic validation."""
+    findings_payload: List[Dict[str, Any]] = []
+    evidence_refs: set[tuple[str, int]] = set()
+
+    for finding in analysis.get("findings", []):
+        evidence_items = []
+        for evidence in finding.get("evidence", []) or []:
+            source_file = evidence.get("source_file")
+            record_index = evidence.get("record_index")
+            if source_file is not None and record_index is not None:
+                evidence_refs.add((source_file, record_index))
+            evidence_items.append(
+                {
+                    "source_file": source_file,
+                    "record_index": record_index,
+                    "event_id": evidence.get("event_id"),
+                    "excerpt": evidence.get("excerpt"),
+                }
+            )
+        findings_payload.append(
+            {
+                "title": finding.get("title"),
+                "summary": finding.get("summary"),
+                "severity": finding.get("severity"),
+                "evidence": evidence_items,
+            }
+        )
+
+    event_payload: List[Dict[str, Any]] = []
+    for event in events:
+        source_file = event.get("source_file")
+        record_index = event.get("record_index")
+        if evidence_refs and (source_file, record_index) not in evidence_refs:
+            continue
+        event_payload.append(_summarize_event_for_judge(event))
+
+    payload = {
+        "events": event_payload,
+        "findings": findings_payload,
+    }
+
+    return (
+        "Validate the findings against the referenced events. "
+        "If an evidence reference is missing or mismatched, flag it.\n\n"
+        + json.dumps(payload, ensure_ascii=False, indent=2)
+    )
+
+
+def _summarize_event_for_judge(event: Dict[str, Any]) -> Dict[str, Any]:
+    raw_event = event.get("raw_event", {}) or {}
+    source = raw_event.get("source")
+
+    if source == "aws_cloudtrail":
+        summary = {
+            "event_time": raw_event.get("event_time"),
+            "service": raw_event.get("service"),
+            "action": raw_event.get("action"),
+            "actor": raw_event.get("actor"),
+            "actor_type": raw_event.get("actor_type"),
+            "src_ip": raw_event.get("src_ip"),
+            "resources": raw_event.get("resources", [])[:3],
+            "account_id": raw_event.get("account_id"),
+            "aws_region": raw_event.get("aws_region"),
+            "plane": raw_event.get("plane"),
+            "cluster_id": raw_event.get("cluster_id"),
+            "cluster_strategy": raw_event.get("cluster_strategy"),
+            "error": raw_event.get("error"),
+        }
+        summary = {key: value for key, value in summary.items() if value is not None}
+    elif source == "gcp":
+        summary = {
+            "event_time": raw_event.get("event_time"),
+            "actor": raw_event.get("actor"),
+            "action": raw_event.get("action"),
+            "resource": raw_event.get("resource"),
+            "plane": raw_event.get("plane"),
+            "severity": raw_event.get("severity"),
+            "src_ip": raw_event.get("src_ip"),
+            "user_agent": raw_event.get("user_agent"),
+            "insertId": raw_event.get("insertId"),
+            "actor_kind": raw_event.get("actor_kind"),
+            "automation_tool": raw_event.get("automation_tool"),
+            "automation_confidence": raw_event.get("automation_confidence"),
+            "workload_identity": raw_event.get("workload_identity"),
+            "cross_project": raw_event.get("cross_project"),
+        }
+        summary = {key: value for key, value in summary.items() if value is not None}
+    else:
+        summary = raw_event
+
+    return {
+        "source_file": event.get("source_file"),
+        "record_index": event.get("record_index"),
+        "event_id": event.get("event_id"),
+        "event": summary,
+    }
+
+
 # Retries included: exponential backoff for transient failures (timeout, rate limit)
 def _call_with_retry(
-    messages: List[Dict[str, str]], model: str, provider: str
+    messages: List[Dict[str, str]],
+    model: str,
+    provider: str,
+    ops: Any | None = None,
 ) -> Dict[str, Any]:
     provider = (provider or "openai").lower().strip()
     last_error: str | None = None
     last_status = "llm_error"
+    prompt_size = sum(len(m.get("content", "")) for m in messages)
+    tokens_in_est = _estimate_tokens_from_chars(prompt_size)
 
     if logger.isEnabledFor(logging.DEBUG):
-        prompt_size = sum(len(m.get("content", "")) for m in messages)
         logger.debug(
             "LLM: Starting request | model=%s | provider=%s | prompt_size=%d chars | max_retries=%d",
             model,
@@ -578,7 +739,18 @@ def _call_with_retry(
                     )
             else:
                 raise ValueError(f"Unsupported LLM provider: {provider}")
-            
+
+            if ops is not None:
+                tokens_out_est = _estimate_tokens_from_chars(len(content or ""))
+                cost_est = _estimate_cost_usd(
+                    provider, model, tokens_in_est, tokens_out_est
+                )
+                ops.metrics.record_llm_tokens(
+                    tokens_in=tokens_in_est,
+                    tokens_out=tokens_out_est,
+                    cost_usd=cost_est,
+                )
+
             parsed_result = _parse_llm_content(content)
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(
@@ -620,6 +792,116 @@ def _call_with_retry(
             time.sleep(BACKOFF_SECONDS[attempt - 1])
 
     return _build_empty_analysis(status=last_status, error_message=last_error)
+
+
+def _call_judge_with_retry(
+    messages: List[Dict[str, str]],
+    model: str,
+    provider: str,
+    ops: Any | None = None,
+) -> Dict[str, Any]:
+    provider = (provider or "openai").lower().strip()
+    last_error: str | None = None
+    prompt_size = sum(len(m.get("content", "")) for m in messages)
+    tokens_in_est = _estimate_tokens_from_chars(prompt_size)
+
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            if provider == "openai":
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug("Judge: Calling OpenAI API")
+                response = _get_client().chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    temperature=0,
+                    timeout=60,
+                    response_format={"type": "json_object"},
+                )
+                content = response.choices[0].message.content
+            elif provider == "gemini":
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug("Judge: Calling Gemini API")
+                content = _call_gemini(messages, model)
+            else:
+                raise ValueError(f"Unsupported LLM provider: {provider}")
+
+            if ops is not None:
+                tokens_out_est = _estimate_tokens_from_chars(len(content or ""))
+                cost_est = _estimate_cost_usd(
+                    provider, model, tokens_in_est, tokens_out_est
+                )
+                ops.metrics.record_llm_tokens(
+                    tokens_in=tokens_in_est,
+                    tokens_out=tokens_out_est,
+                    cost_usd=cost_est,
+                )
+
+            return _parse_judge_content(content)
+        except APITimeoutError as exc:
+            last_error = f"LLM request timed out: {exc}"
+            logger.warning("Judge timeout (attempt %d/%d)", attempt, MAX_RETRIES)
+        except RetryError as exc:
+            last_error = f"LLM request timed out: {exc}"
+            logger.warning("Judge timeout (attempt %d/%d)", attempt, MAX_RETRIES)
+        except (APIError, RateLimitError, APIConnectionError) as exc:
+            last_error = f"LLM API error: {exc}"
+            logger.warning("Judge API error (attempt %d/%d)", attempt, MAX_RETRIES)
+        except GoogleAPIError as exc:
+            last_error = f"LLM API error: {exc}"
+            logger.warning("Judge API error (attempt %d/%d)", attempt, MAX_RETRIES)
+        except ValueError as exc:
+            last_error = str(exc)
+            logger.warning("Judge config error: %s", exc)
+        except Exception as exc:  # pragma: no cover - defensive path
+            last_error = f"Unexpected LLM error: {exc}"
+            logger.exception("Unexpected judge failure (attempt %d/%d)", attempt, MAX_RETRIES)
+
+        if attempt < MAX_RETRIES:
+            time.sleep(BACKOFF_SECONDS[attempt - 1])
+
+    return {"ok": False, "issues": [last_error or "Semantic judge failed."]}
+
+
+def _parse_judge_content(content: str | None) -> Dict[str, Any]:
+    if not content:
+        return {"ok": False, "issues": ["Semantic judge returned empty response."]}
+
+    try:
+        data = json.loads(content)
+    except json.JSONDecodeError:
+        data = _attempt_salvage_json(content)
+        if data is None:
+            return {"ok": False, "issues": ["Semantic judge returned malformed JSON."]}
+
+    ok_value = bool(data.get("ok", False))
+    issues = data.get("issues") or []
+    if isinstance(issues, str):
+        issues = [issues]
+    if not isinstance(issues, list):
+        issues = [str(issues)]
+    issues = [str(item) for item in issues if item]
+    return {"ok": ok_value, "issues": issues}
+
+
+def _estimate_tokens_from_chars(chars: int) -> int:
+    if chars <= 0:
+        return 0
+    return max(
+        1, (chars + TOKEN_ESTIMATE_CHARS_PER_TOKEN - 1) // TOKEN_ESTIMATE_CHARS_PER_TOKEN
+    )
+
+
+def _estimate_cost_usd(
+    provider: str, model: str, tokens_in: int, tokens_out: int
+) -> float:
+    provider = (provider or "").lower()
+    if provider != "openai":
+        return 0.0
+    rates = OPENAI_PRICING_PER_1K.get(model, None)
+    if not rates:
+        return 0.0
+    input_rate, output_rate = rates
+    return (tokens_in / 1000.0) * input_rate + (tokens_out / 1000.0) * output_rate
 
 
 def _parse_llm_content(content: str | None) -> Dict[str, Any]:

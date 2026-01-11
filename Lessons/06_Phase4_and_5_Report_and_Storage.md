@@ -10,7 +10,7 @@ results to SQLite for later review.
 
 ## Report generation
 Report output is deterministic and text-based for easy sharing:
-- File path: `reports/analysis_<UTC timestamp>.txt`
+- File path: `reports/analysis_<run_id>.txt`
 - Module: `src/report.py`
 
 The report includes:
