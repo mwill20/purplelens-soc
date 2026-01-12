@@ -114,3 +114,4 @@ Core output shape:
 - Run logs: `logs/run_<run_id>.log`
 - Ops artifacts: `runs/<run_id>/run_log.jsonl`, `runs/<run_id>/metrics.json`
 - The run_id ties together logs, reports, ops artifacts, and database records
+- Jailbreak replay (optional): `scripts/jailbreak_harness.py` writes `runs/<run_id>/jailbreak_results.json` plus metrics (`jailbreak_attempts`, `jailbreak_successes`)

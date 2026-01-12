@@ -233,6 +233,14 @@ pytest tests/test_full_flow.py
 
 AWS and GCP-specific tests are under `tests/`.
 
+### Jailbreak harness (optional)
+Replay a corpus of jailbreak prompts against the current prompts/policies:
+```bash
+python scripts/jailbreak_harness.py --prompts data/redteam/jailbreak_prompts.jsonl --provider gemini --model gemini-flash-latest
+# or: --provider openai --model gpt-4o
+```
+Outputs: `runs/<run_id>/jailbreak_results.json`, `runs/<run_id>/run_log.jsonl`, `runs/<run_id>/metrics.json` (with `jailbreak_attempts` and `jailbreak_successes`).
+
 ## Project Structure
 ```
 src/

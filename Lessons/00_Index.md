@@ -34,6 +34,7 @@ nothing feels unclear during your interview.
 - [ ] Lesson 17: Deployment Guide - [17_Deployment_Guide.md](17_Deployment_Guide.md)
 - [ ] Lesson 18: AIOps With PurpleLens - [LESSON_AIOPS_WITH_PURPLELENS.md](LESSON_AIOPS_WITH_PURPLELENS.md)
 - [ ] Lesson 19: Prompt Injection Defense Lab - [19_Prompt_Injection_Defense_Lab.md](19_Prompt_Injection_Defense_Lab.md)
+- [ ] Lesson 20: Jailbreak Hardening Lab - [20_Jailbreak_Hardening_Lab.md](20_Jailbreak_Hardening_Lab.md)
 
 ## Extras and references
 - [CompleteDemo.md](CompleteDemo.md)

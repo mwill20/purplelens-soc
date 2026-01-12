@@ -12,14 +12,17 @@ cleanly separated for future API or job execution.
 ## Pipeline overview
 
 ```
-Inputs -> Ingest + Normalize -> LLM Analysis -> Validate -> Report -> Store
+Inputs -> Ingest -> Normalize -> Sanitize -> Enrich (GCP) -> LLM Analyze -> Validate Output -> Report -> Persist
 ```
 
 - Inputs are log files (Windows, AWS, or GCP)
 - Ingest normalizes each event into a consistent envelope
+- Sanitize applies the prompt firewall (redact/quarantine flags) before any LLM calls
+- Enrich adds deterministic signals for GCP
 - LLM analysis produces structured findings
-- Validation enforces the schema and safety checks
-- Reports and SQLite records are written deterministically
+- Validation enforces schema + policy + semantic checks (optional judge)
+- Reports/SQLite are written deterministically
+- Ops harness records run logs/metrics per `run_id`
 
 ## Code map
 - CLI entry: `src/main.py`
@@ -32,6 +35,8 @@ Inputs -> Ingest + Normalize -> LLM Analysis -> Validate -> Report -> Store
 - Safety checks: `src/security.py`
 - Reporting: `src/report.py`
 - Storage: `src/storage.py`
+- Ops harness: `src/ops/*` (run logs, metrics, artifacts)
+- Jailbreak harness: `scripts/jailbreak_harness.py` (optional replay)
 
 ## Normalized event envelope
 All sources produce the same envelope for downstream stages:
@@ -40,11 +45,15 @@ All sources produce the same envelope for downstream stages:
 {
   "source_file": "Logs/windows_sample.jsonl",
   "record_index": 12,
-  "event_id": "optional",
+  "event_id": "insertId-or-eventID",
   "raw_event": {
-    "EventID": 4688,
-    "CommandLine": "powershell -enc ...",
-    "User": "LAB\\alice"
+    "source": "gcp|aws_cloudtrail|windows",
+    "event_time": "...",
+    "action": "...",
+    "actor": "...",
+    "resource": "...",
+    "plane": "control|data|telemetry|unknown",
+    "...": "source-specific fields"
   }
 }
 ```
@@ -66,11 +75,15 @@ Outputs:
 - Report: `reports/analysis_<run_id>.txt`
 - SQLite DB: `db/analysis.db`
 - Run log: `logs/run_<run_id>.log`
+- Ops artifacts: `runs/<run_id>/run_log.jsonl`, `runs/<run_id>/metrics.json`
 
 ## Design notes
 - Batch-first: logs are analyzed in batches, not as a streaming system.
 - Source-specific prompts: Windows, AWS, and GCP have dedicated prompts.
+- Prompt firewall: sanitize stage flags/quarantines injection-like input.
+- Optional semantic judge: can be enabled with `--semantic-judge`.
 - Deterministic output: reports and storage do not depend on UI or API layers.
+- Ops-first: every run has run_id, logs, and metrics for auditability.
 
 ## When to change what
 - Add new log format: modify the ingest phase.
