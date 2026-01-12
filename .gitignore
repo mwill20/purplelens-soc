@@ -81,3 +81,6 @@ data/dec12_18features.csv
 data/*_features.csv
 # Allow sample files
 !data/sample_*.csv
+
+# Assignment PDFs
+docs/Cloud AI  Security Engineer - Python Assignment  - 1121 (2).pdf
