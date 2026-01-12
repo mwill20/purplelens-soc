@@ -28,6 +28,8 @@ class MetricsCollector:
     prompt_injection_hits: int = 0
     events_sanitized: int = 0
     events_quarantined: int = 0
+    jailbreak_attempts: int = 0
+    jailbreak_successes: int = 0
     top_errors: Dict[str, int] = field(default_factory=dict)
     _stage_starts: Dict[str, float] = field(default_factory=dict, init=False)
     _run_start: float = field(default_factory=time.perf_counter, init=False)
@@ -65,6 +67,10 @@ class MetricsCollector:
         self.events_sanitized += max(0, events_sanitized)
         self.events_quarantined += max(0, events_quarantined)
 
+    def record_jailbreak_results(self, attempts: int, successes: int) -> None:
+        self.jailbreak_attempts += max(0, attempts)
+        self.jailbreak_successes += max(0, successes)
+
     def set_source_type(self, source_type: str) -> None:
         if not source_type:
             return
@@ -99,6 +105,8 @@ class MetricsCollector:
             "prompt_injection_hits": self.prompt_injection_hits,
             "events_sanitized": self.events_sanitized,
             "events_quarantined": self.events_quarantined,
+            "jailbreak_attempts": self.jailbreak_attempts,
+            "jailbreak_successes": self.jailbreak_successes,
             "top_errors": [
                 {"error_type": error_type, "count": count}
                 for error_type, count in sorted(self.top_errors.items(), key=lambda item: item[0])
