@@ -191,6 +191,76 @@ Example: `analyze_events`
 4. Explain what it expects as input and what it returns
 
 ---
+## Answer to 4. 
+
+I'll explain this code in simple terms! This file is essentially a translator between security logs and AI assistants.
+
+### What This Code Does (Big Picture)
+Think of this as a security guard assistant that reads through security camera footage (logs) and summarizes what happened. Instead of a human reading thousands of log entries, an AI (like ChatGPT or Google Gemini) does it.
+
+### The Main Function: analyze_events
+This is the "boss" function starting at line 170. Here's what it does step-by-step:
+
+1. Takes In Security Events
+
+events: List[Dict[str, Any]]
+Gets a list of security log entries (like login attempts, file access, API calls)
+Each event is a dictionary (think: a box of information with labels)
+
+2. Figures Out What Type of Logs
+
+aws_events = [e for e in events if ...]gcp_events = [e for e in events if ...]
+Checks if these are Windows logs, Amazon AWS logs, or Google Cloud logs
+Each type needs different instructions for the AI (like different languages)
+
+3. Splits Into Batches
+
+batches = build_aws_batches(events, MAX_EVENTS_PER_BATCH)
+Why? AIs can't read unlimited text at once (like how you can't memorize a whole book in one go)
+Splits events into smaller chunks (batches) of 50 or fewer events
+Like feeding a giant meal in bite-sized portions
+
+4. Sends Each Batch to the AI
+
+batch_result = _process_aws_batch(batch["events"], model, provider, ops)
+For each batch, it sends the logs to the AI with specific instructions
+The instructions are in those SYSTEM_PROMPT variables at the top
+AI responds with structured findings (threats found, suspicious activities, etc.)
+
+5. Combines All Results
+
+merged_result = _merge_batch_results(merged_result, batch_result)
+Takes all the AI's responses from different batches
+Merges them into one comprehensive report
+Returns the final analysis
+The Different "Instruction Manuals" (Prompts)
+The code has 3 different sets of instructions for the AI:
+
+SYSTEM_PROMPT - For Windows security logs (focuses on user behavior, file access)
+AWS_SYSTEM_PROMPT - For Amazon cloud logs (focuses on permissions, identity theft)
+GCP_SYSTEM_PROMPT - For Google cloud logs (focuses on service accounts, automation)
+
+Each tells the AI:
+
+- What format to respond in (JSON only - structured data)
+- What to look for (suspicious patterns)
+- How to cite evidence (which log entry it found something in)
+- Not to make things up or speculate without evidence
+
+### Why This Matters
+Imagine you're a security analyst drowning in 10,000 log entries.
+This code:
+
+✅ Automatically reads all logs
+✅ Identifies potential security threats
+✅ Provides evidence for each finding
+✅ Suggests what to investigate next
+✅ Does it in minutes instead of days
+
+### In one sentence
+
+This code feeds security logs to an AI, gets back a structured report of potential threats, and handles all the complexity of talking to different AI services and log formats.
+---
 
 ## Interview Talking Points (updated)
 
