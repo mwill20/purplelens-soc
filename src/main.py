@@ -501,7 +501,7 @@ def main() -> int:  # for the one-pass orchestration sequence.
         initialize_database(args.db)
         current_stage = "llm_analyze"
         ops.stage_start(current_stage, records_in=len(events))
-        analysis_data = analyze_events(
+        analysis_data = analyze_events(                         # call analyze_events from llm_analyze.py
             events, model=args.model, provider=args.provider, ops=ops
         )
         ops.stage_end(
