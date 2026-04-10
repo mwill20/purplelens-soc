@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PurpleLens · Safe Enterprise AI Production</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #161b27;
+  --surface2: #1c2438;
+  --border: #252f45;
+  --border2: #2e3d58;
+  --amber: #e8a020;
+  --amber-dim: #a06a10;
+  --amber-glow: rgba(232,160,32,0.12);
+  --amber-glow2: rgba(232,160,32,0.06);
+  --slate: #7a90b0;
+  --slate-dim: #4a5f7a;
+  --text: #c4d4e8;
+  --text-dim: #6a7f9a;
+  --text-bright: #eaf2ff;
+  --green: #3dba7a;
+  --green-glow: rgba(61,186,122,0.1);
+  --red: #d05050;
+  --mono: 'JetBrains Mono', monospace;
+  --serif: 'Crimson Pro', Georgia, serif;
+  --display: 'Bebas Neue', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--serif); font-size: 17px; line-height: 1.65; min-height: 100vh; }
+.header { border-bottom: 1px solid var(--border); padding: 28px 48px 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.header-left { flex: 1; }
+.eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--amber); }
+.header h1 { font-family: var(--display); font-size: clamp(28px, 4vw, 48px); letter-spacing: 0.04em; color: var(--text-bright); line-height: 1.05; }
+.header h1 span { color: var(--amber); }
+.the-question { margin-top: 18px; padding: 16px 20px; background: var(--amber-glow2); border: 1px solid var(--amber-dim); border-left: 3px solid var(--amber); border-radius: 4px; font-style: italic; font-size: 18px; color: var(--text-bright); line-height: 1.5; max-width: 680px; }
+.header-right { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; padding-top: 4px; flex-shrink: 0; }
+.badge { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; border: 1px solid var(--border); color: var(--text-dim); }
+.badge.live { border-color: var(--amber-dim); color: var(--amber); }
+.tier-legend { display: flex; gap: 24px; padding: 14px 48px; background: var(--surface); border-bottom: 1px solid var(--border); align-items: center; flex-wrap: wrap; }
+.tier-legend-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin-right: 4px; }
+.tier-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); }
+.tier-dot { width: 8px; height: 8px; border-radius: 50%; }
+.td-1 { background: var(--text-dim); } .td-2 { background: var(--amber); } .td-3 { background: var(--green); }
+.main { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 140px); }
+.nav { border-right: 1px solid var(--border); padding: 28px 0; position: sticky; top: 0; height: fit-content; }
+.nav-section { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); padding: 10px 24px 6px; }
+.nav-link { display: flex; align-items: center; gap: 10px; padding: 8px 24px; font-family: var(--mono); font-size: 11px; color: var(--text-dim); cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; text-decoration: none; }
+.nav-link:hover { color: var(--text); background: var(--surface); }
+.nav-link.active { color: var(--amber); border-left-color: var(--amber); background: var(--amber-glow2); }
+.nav-num { font-size: 9px; width: 16px; color: var(--slate-dim); flex-shrink: 0; }
+.content { padding: 40px 52px 80px; max-width: 820px; }
+.section { margin-bottom: 48px; scroll-margin-top: 24px; }
+.section-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin-bottom: 8px; }
+.section h2 { font-family: var(--display); font-size: 30px; letter-spacing: 0.04em; color: var(--text-bright); margin-bottom: 6px; line-height: 1.1; }
+.section-sub { font-size: 14px; color: var(--text-dim); margin-bottom: 24px; font-family: var(--mono); }
+.pillar { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 14px; transition: border-color 0.2s; }
+.pillar:hover { border-color: var(--border2); }
+.pillar.open { border-color: var(--amber-dim); }
+.tier1 { padding: 18px 22px; display: flex; align-items: flex-start; gap: 16px; cursor: pointer; user-select: none; }
+.pillar-num { font-family: var(--display); font-size: 36px; line-height: 1; color: var(--border2); flex-shrink: 0; width: 36px; transition: color 0.2s; }
+.pillar.open .pillar-num { color: var(--amber); }
+.tier1-body { flex: 1; }
+.pillar-title { font-family: var(--display); font-size: 20px; letter-spacing: 0.05em; color: var(--text-bright); margin-bottom: 4px; }
+.pillar-hook { font-size: 16px; color: var(--text); line-height: 1.55; font-style: italic; }
+.tier1-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+.expand-btn { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--amber); background: none; border: 1px solid var(--amber-dim); padding: 4px 10px; border-radius: 2px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.expand-btn:hover { background: var(--amber-glow); }
+.pillar-tags { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+.ptag { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border-radius: 2px; border: 1px solid var(--border); color: var(--text-dim); }
+.ptag.proof { border-color: var(--green); color: var(--green); }
+.tier2 { display: none; padding: 0 22px 22px 74px; border-top: 1px solid var(--border); padding-top: 18px; animation: slideIn 0.2s ease; }
+.pillar.open .tier2 { display: block; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.tier2 p { font-size: 16px; line-height: 1.75; color: var(--text); margin-bottom: 14px; }
+.term { color: var(--amber); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; cursor: pointer; transition: color 0.15s; position: relative; }
+.term:hover { color: #f0b840; }
+.term-detail { display: none; position: absolute; z-index: 500; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 320px; background: var(--surface2); border: 1px solid var(--amber-dim); border-radius: 6px; padding: 14px 16px; font-style: normal; font-size: 13px; line-height: 1.6; color: var(--text); box-shadow: 0 8px 32px rgba(0,0,0,0.5); pointer-events: none; }
+.term-detail::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--amber-dim); }
+.term:hover .term-detail { display: block; }
+.term-detail-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); margin-bottom: 6px; }
+.term-detail code { display: inline-block; background: var(--bg); border: 1px solid var(--border); padding: 2px 6px; border-radius: 3px; font-family: var(--mono); font-size: 11px; color: var(--green); margin: 2px 0; }
+.proof-block { background: var(--bg); border: 1px solid var(--border); border-left: 2px solid var(--green); border-radius: 4px; padding: 12px 16px; margin: 12px 0; font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--text-dim); }
+.proof-block-title { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+.script-block { background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; padding: 14px 18px; margin: 14px 0; font-style: italic; font-size: 15px; line-height: 1.75; color: var(--text-bright); position: relative; }
+.script-block::before { content: 'SAY THIS'; position: absolute; top: -9px; left: 14px; background: var(--surface2); padding: 0 6px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; color: var(--amber); font-style: normal; }
+.script-hl { color: var(--amber); font-style: normal; }
+.script-metric { color: var(--green); font-style: normal; font-family: var(--mono); font-size: 13px; }
+.ref-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+.ref-table th { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); text-align: left; padding: 8px 14px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.ref-table td { padding: 10px 14px; border-bottom: 1px solid rgba(37,47,69,0.6); vertical-align: top; line-height: 1.5; }
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-table tr:hover td { background: var(--amber-glow2); }
+.ref-table .claim { font-weight: 600; color: var(--text-bright); font-size: 13px; }
+.ref-table .proof { font-family: var(--mono); font-size: 11px; color: var(--green); }
+.ref-table .file { color: var(--slate); font-family: var(--mono); font-size: 11px; }
+.hook-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; padding: 24px 28px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s; }
+.hook-card:hover { border-color: var(--amber-dim); }
+.hook-card.open { border-color: var(--amber-dim); }
+.hook-title { font-family: var(--display); font-size: 16px; letter-spacing: 0.06em; color: var(--text-bright); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.hook-short { font-size: 15px; color: var(--text); font-style: italic; line-height: 1.55; }
+.hook-expand { display: none; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+.hook-card.open .hook-expand { display: block; }
+.divider { height: 1px; background: linear-gradient(90deg, var(--border), transparent); margin: 36px 0; }
+.followup-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.fq { background: var(--surface); border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+.fq-q { padding: 13px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 15px; color: var(--text); transition: background 0.15s; }
+.fq-q:hover { background: var(--surface2); }
+.fq-q-text { font-style: italic; }
+.fq-toggle { font-family: var(--mono); font-size: 11px; color: var(--amber); flex-shrink: 0; }
+.fq-a { display: none; padding: 14px 18px; border-top: 1px solid var(--border); background: var(--bg); font-size: 14.5px; line-height: 1.7; color: var(--text); }
+.fq.open .fq-a { display: block; }
+.fq-short { color: var(--text-bright); font-size: 15px; margin-bottom: 10px; line-height: 1.55; }
+.fq-detail { color: var(--text-dim); font-size: 13.5px; border-top: 1px dashed var(--border); margin-top: 10px; padding-top: 10px; line-height: 1.7; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+code { display: inline-block; background: var(--bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; font-family: var(--mono); font-size: 12px; color: var(--green); }
+@media (max-width: 700px) { .main { grid-template-columns: 1fr; } .nav { display: none; } .content { padding: 24px 20px 60px; } .header { padding: 20px; } .tier-legend { padding: 12px 20px; } }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="eyebrow">PurpleLens · Interview Prep</div>
+    <h1>SAFE ENTERPRISE AI<br><span>PRODUCTION</span></h1>
+    <div class="the-question">"How would you put an AI product like this into production safely in a huge enterprise?"</div>
+  </div>
+  <div class="header-right">
+    <div class="badge live">▶ Active Prep</div>
+    <div class="badge">Tier 1 → Tier 2 → Tier 3</div>
+    <div class="badge">Based on real POC code</div>
+  </div>
+</div>
+<div class="tier-legend">
+  <span class="tier-legend-label">How to use:</span>
+  <div class="tier-item"><div class="tier-dot td-1"></div> Always visible — 1–2 sentence flash answer</div>
+  <div class="tier-item"><div class="tier-dot td-2"></div> Click card → deeper explanation</div>
+  <div class="tier-item"><div class="tier-dot td-3"></div> <span style="text-decoration:underline;text-decoration-style:dotted;color:var(--green);">Underlined terms</span> → specific proof / code details on hover</div>
+</div>
+<div class="main">
+<nav class="nav">
+  <div class="nav-section">Sections</div>
+  <a class="nav-link active" href="#opening"><span class="nav-num">00</span>Opening Hook</a>
+  <a class="nav-link" href="#pillars"><span class="nav-num">01–04</span>The 4 Pillars</a>
+  <a class="nav-link" href="#followups"><span class="nav-num">05</span>Follow-up Drills</a>
+  <a class="nav-link" href="#evidence"><span class="nav-num">06</span>Evidence Kit</a>
+  <div class="nav-section" style="margin-top:16px;">Quick Pillars</div>
+  <a class="nav-link" href="#p1"><span class="nav-num">P1</span>Untrusted</a>
+  <a class="nav-link" href="#p2"><span class="nav-num">P2</span>Staged</a>
+  <a class="nav-link" href="#p3"><span class="nav-num">P3</span>Measured</a>
+  <a class="nav-link" href="#p4"><span class="nav-num">P4</span>Non-Decisive</a>
+</nav>
+<div class="content">
+
+  <div class="section" id="opening">
+    <div class="section-label">Section 00</div>
+    <h2>The Opening Hook</h2>
+    <div class="section-sub">Say this first. Every time. Earns the right to the rest.</div>
+    <div class="hook-card" onclick="toggleHook(this)">
+      <div class="hook-title">15-Second Opening (Flash Card) <span style="font-family:var(--mono);font-size:10px;color:var(--amber);">▼ full script</span></div>
+      <div class="hook-short">"I've done this. PurpleLens is an AI SOC system I invented at an MSSP managing 60+ enterprise clients. Let me walk you through exactly how we put it into production safely — four principles, three deployment stages."</div>
+      <div class="hook-expand">
+        <div class="script-block">"I've done this. PurpleLens is an <span class="script-hl">AI-driven SOC analysis system</span> I invented and helped deploy at an MSSP managing <span class="script-metric">60+ enterprise clients</span>.<br><br>Let me walk you through how we put it into production safely.<br><br>We built on <span class="script-hl">four principles</span>: treat the AI as untrusted input, stage the rollout to prove value before expanding risk, measure before you claim, and ensure the AI never owns a decision.<br><br>The POC is open source — I can show you the actual security code. The production evolution is documented. I'm happy to go deep on any layer."</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:10px;">✓ Framework before features &nbsp;·&nbsp; ✓ Credibility via real code &nbsp;·&nbsp; ✓ Invites drill-down on your terms</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section" id="pillars">
+    <div class="section-label">Section 01–04</div>
+    <h2>The 4 Safety Pillars</h2>
+    <div class="section-sub">Click any pillar to expand. Hover underlined terms for code-level details. Press 1–4 to jump.</div>
+
+    <div class="pillar" id="p1">
+      <div class="tier1" onclick="togglePillar(this.parentElement)">
+        <div class="pillar-num">01</div>
+        <div class="tier1-body">
+          <div class="pillar-title">TREAT THE AI AS UNTRUSTED</div>
+          <div class="pillar-hook">We enforced behavior at three distinct layers before any output reached a human — input sanitization, response guardrails, and evidence traceability. Not monitoring. Enforcement.</div>
+        </div>
+        <div class="tier1-right">
+          <button class="expand-btn" onclick="event.stopPropagation()">▼ EXPAND</button>
+          <div class="pillar-tags"><span class="ptag">security-first</span><span class="ptag proof">security.py</span></div>
+        </div>
+      </div>
+      <div class="tier2">
+        <p>In enterprise, the biggest AI failure mode isn't a bad model — it's trusting the model's output without verification. We built <span class="term">three enforcement layers<div class="term-detail"><div class="term-detail-title">The 3 Enforcement Layers</div>1. <code>prompt_firewall_event()</code> — sanitizes every log field before LLM sees it<br>2. <code>validate_output()</code> — regex guardrails on raw LLM response text<br>3. <code>validate_semantic_output()</code> — verifies every evidence citation maps to a real event</div></span> before any output reached an analyst.</p>
+        <p>The <span class="term">prompt injection firewall<div class="term-detail"><div class="term-detail-title">prompt_firewall_event()</div>Recursive tree-walker — checks every dict key and value in every event. Six rules, two actions: <code>redact</code> (sanitize and continue) or <code>quarantine</code> (drop event entirely). Quarantined events never reach the LLM.</div></span> walks every field of every log event before the LLM sees it. Live telemetry is adversarial input — a threat actor can embed instructions in log data to manipulate an AI analyzer. We didn't hope the model would resist that. We stripped it before it arrived.</p>
+        <p>The <span class="term">output policy layer<div class="term-detail"><div class="term-detail-title">PROHIBITED_PATTERNS (security.py)</div>Regex list that blocks the LLM from claiming it: blocked something, removed something, confirmed something definitively, or took any action. Any match → output rejected. This is institutional policy enforced in code.</div></span> blocked the LLM from making authority claims — it couldn't say "I have blocked" or "This is confirmed malicious." The LLM guides, the analyst decides.</p>
+        <p>The <span class="term">semantic validation layer<div class="term-detail"><div class="term-detail-title">validate_semantic_output()</div>Checks every Evidence object: does source_file + record_index actually exist in the loaded event set? If the LLM cited an event that wasn't in the data, the finding is rejected. No hallucinated citations reach analysts.</div></span> prevented hallucinated evidence. Every Finding had to cite a real event by file and line number. The schema enforced this: <code>evidence: List[Evidence]</code> with <code>min_length=1</code>.</p>
+        <div class="script-block">"Before I talk about features, I address security architecture — that's where enterprise AI implementations fail. We treated the AI as an <span class="script-hl">untrusted component</span>. Input sanitized before the model sees it. Output validated before an analyst sees it. Three enforcement layers — not monitoring, <span class="script-hl">enforcement</span>."</div>
+        <div class="proof-block"><div class="proof-block-title">📂 Proof — Point to this code</div><code>src/security.py</code> → <code>prompt_firewall_event()</code>, <code>PROHIBITED_PATTERNS</code>, <code>validate_semantic_output()</code><br><code>src/schemas.py</code> → <code>Finding.evidence</code> min_length=1, confidence bounds 0.0–1.0</div>
+      </div>
+    </div>
+
+    <div class="pillar" id="p2">
+      <div class="tier1" onclick="togglePillar(this.parentElement)">
+        <div class="pillar-num">02</div>
+        <div class="tier1-body">
+          <div class="pillar-title">STAGE THE ROLLOUT</div>
+          <div class="pillar-hook">We ran two retrospective batch phases before going real-time. Each stage proved safety before expanding scope. One client first. Thirty days. Then scale.</div>
+        </div>
+        <div class="tier1-right">
+          <button class="expand-btn" onclick="event.stopPropagation()">▼ EXPAND</button>
+          <div class="pillar-tags"><span class="ptag">deployment</span><span class="ptag proof">EVOLUTION.md</span></div>
+        </div>
+      </div>
+      <div class="tier2">
+        <p>We didn't go straight to real-time analyst integration. We built a <span class="term">validation ladder<div class="term-detail"><div class="term-detail-title">The 3-Stage Deployment Ladder</div>Stage 1: Batch over SOAR auto-closed events (zero analyst exposure)<br>Stage 2: Batch over analyst shift determinations (retrospective only)<br>Stage 3: Real-time per-event on analyst claim (one client first, then scale)</div></span> — each stage proving the prior one was safe before expanding scope.</p>
+        <p><span class="term">Stage 1<div class="term-detail"><div class="term-detail-title">Stage 1 — Batch QA on Auto-Closed Events</div>Scheduled job ran against SOAR auto-closed events. Zero production risk — if the model was wrong, no analyst had acted on it. Proved pipeline stability under real log diversity. Flagged any high-concern event the SOAR playbook auto-closed incorrectly → T3 alert.</div></span> was a scheduled batch job over SOAR auto-closed events. Completely invisible to analysts. If the model was wrong, nobody acted on it. It proved the guardrails held under production log diversity.</p>
+        <p><span class="term">Stage 2<div class="term-detail"><div class="term-detail-title">Stage 2 — End-of-Shift QA on Analyst Determinations</div>Ran at shift end over all analyst-marked-benign events. Still retrospective. Generated a shift report for management + detection engineering. Flagged high-confidence discordances for T3 review. Gave detection engineering the first structured daily intelligence brief.</div></span> added end-of-shift QA over analyst determinations. Still retrospective — disagreement went into a shift report for management, not a real-time alert to the analyst. Detection engineering used those reports to calibrate SOAR playbooks.</p>
+        <p>Only after both batch stages validated did we move to <span class="term">Stage 3<div class="term-detail"><div class="term-detail-title">Stage 3 — Real-Time SOAR Integration</div>SOAR webhook fires when analyst claims a ticket → FastAPI endpoint → SIEM API fetches triggering event + surrounding 72h context → PurpleLens pipeline → report written to PostgreSQL (tenant-scoped) → SOAR pulls report → renders in PurpleLens box in the ticket UI.</div></span> — real-time per-event analysis inside the SOAR ticket. And even then: <strong>one client first, thirty days, then expand.</strong></p>
+        <div class="script-block">"We didn't go straight to real-time. We built a <span class="script-hl">validation ladder</span> — two batch phases, both retrospective, zero analyst exposure. Stage 1 over auto-closed events. Stage 2 over analyst shift determinations. Only after both proved safe did we go real-time. And even then: <span class="script-metric">one client, 30 days, then scale.</span>"</div>
+        <div class="proof-block"><div class="proof-block-title">📂 Proof — Reference this doc</div><code>docs/EVOLUTION.md</code> → Stage 1, 2, 3 architecture documented<br><code>src/main.py</code> → clean pipeline stages (trigger-agnostic by design)</div>
+      </div>
+    </div>
+
+    <div class="pillar" id="p3">
+      <div class="tier1" onclick="togglePillar(this.parentElement)">
+        <div class="pillar-num">03</div>
+        <div class="tier1-body">
+          <div class="pillar-title">MEASURE BEFORE YOU CLAIM</div>
+          <div class="pillar-hook">Our governance metric was analyst concordance rate — how often analysts agreed with the LLM's hypothesis. That metric drove model calibration and told us when we had drift before it caused a miss.</div>
+        </div>
+        <div class="tier1-right">
+          <button class="expand-btn" onclick="event.stopPropagation()">▼ EXPAND</button>
+          <div class="pillar-tags"><span class="ptag">governance</span><span class="ptag proof">V2_SPEC.md</span></div>
+        </div>
+      </div>
+      <div class="tier2">
+        <p>Enterprise AI implementations fail when teams claim outcomes they can't measure. We defined our <span class="term">governance metric<div class="term-detail"><div class="term-detail-title">Analyst Concordance Rate</div>Did the analyst's final determination align with the LLM's hypothesis and confidence score? LLM says "Likely Benign (0.82)" → analyst marks benign → concordance. LLM says "High Concern (0.88)" → analyst marks benign → discordance → T3 flag.</div></span> before writing a line of production code: analyst concordance rate.</p>
+        <p>The LLM expressed a <span class="term">hypothesis with a confidence score<div class="term-detail"><div class="term-detail-title">Confidence Score Format</div>Pydantic schema enforces: confidence: float (ge=0.0, le=1.0). Output examples: "Likely Benign (0.82)", "Possible Lateral Movement — Investigate (0.71)", "High Concern — Escalate Recommended (0.88)". Analyst owns the final call. Always.</div></span>. We tracked: did the analyst agree? That metric served three functions: model quality signal, analyst performance signal, and trust calibration over time.</p>
+        <p>Sustained discordance on a specific event type was a <span class="term">model drift signal<div class="term-detail"><div class="term-detail-title">Model Drift Detection via Concordance</div>If concordance rate for a specific severity band drops below threshold (default 0.75 in V2 spec) → ops alert fires. Means model calibration has degraded on that pattern — before it causes a missed detection. Drives retraining/prompt revision cycles.</div></span> — not an analyst problem. That's how we detected degradation before it caused a missed detection.</p>
+        <div class="script-block">"Our governance metric was <span class="script-hl">analyst concordance rate</span>. When concordance dropped on a specific event type, that was <span class="script-hl">model drift</span> — not analyst error. We detected degradation <span class="script-metric">before</span> it caused a miss. We didn't claim a number until the data supported it."</div>
+        <div class="proof-block"><div class="proof-block-title">📂 Proof — Reference this spec</div><code>docs/V2_SPEC.md</code> → <code>AnalystConcordance</code> schema, concordance rate tracking, drift alert threshold<br><code>docs/EVOLUTION.md</code> → Alignment Metric section</div>
+      </div>
+    </div>
+
+    <div class="pillar" id="p4">
+      <div class="tier1" onclick="togglePillar(this.parentElement)">
+        <div class="pillar-num">04</div>
+        <div class="tier1-body">
+          <div class="pillar-title">THE AI NEVER OWNS A DECISION</div>
+          <div class="pillar-hook">Technical guardrails in the codebase prevented the model from claiming it acted or concluded. The LLM hypothesized. The analyst determined. That boundary was enforced in code, not policy.</div>
+        </div>
+        <div class="tier1-right">
+          <button class="expand-btn" onclick="event.stopPropagation()">▼ EXPAND</button>
+          <div class="pillar-tags"><span class="ptag">governance</span><span class="ptag">adoption</span><span class="ptag proof">security.py</span></div>
+        </div>
+      </div>
+      <div class="tier2">
+        <p>This was both a security design and an adoption strategy. The <span class="term">PROHIBITED_PATTERNS list<div class="term-detail"><div class="term-detail-title">PROHIBITED_PATTERNS (security.py)</div>Regex patterns that reject LLM output containing: "I have blocked/removed/deleted/remediated", "This is definitely malicious/benign", "System modified/updated/patched", "Confirmed/Certain/Guaranteed that". Any match → output rejected before analyst sees it. Not a prompt instruction — enforced by code.</div></span> technically prevented the model from claiming it had taken action or confirmed a threat. Not a prompt instruction — enforced by code.</p>
+        <p>In the <span class="term">PurpleLens box<div class="term-detail"><div class="term-detail-title">The PurpleLens Box (SOAR UI)</div>Text panel inside the SOAR ticket UI, rendered when analyst claims the ticket. Shows: Confidence score + guidance label, Hypothesis, IoCs, Next Steps (how to investigate), Tracking (related events, entity history). Read-only. No buttons, no actions. Analyst reads it, then begins their own investigation.</div></span> inside the SOAR ticket, output was always framed as hypothesis and guidance, never conclusion or action. Analysts saw a confidence score and recommended next steps. They made the call.</p>
+        <p>This is why analysts <strong>trusted it</strong>. The system never competed with their judgment. It did the T1 groundwork so they could focus on the judgment call itself. That framing drove adoption faster than any mandate could. It also maps directly to <span class="term">NIST AI RMF<div class="term-detail"><div class="term-detail-title">NIST AI Risk Management Framework</div>The AI RMF governs: GOVERN (policies + accountability), MAP (risk identification), MEASURE (metrics + monitoring), MANAGE (response + improvement). PurpleLens's human-in-the-loop design maps to the MANAGE function: human oversight is the primary control for high-stakes AI outputs in regulated environments.</div></span> and meaningful human oversight for high-stakes decisions.</p>
+        <div class="script-block">"The AI never owned a decision. <span class="script-hl">Technical guardrails</span> — not policy, code — prevented the model from claiming it had acted, blocked, or confirmed anything. It hypothesized. It recommended. <span class="script-hl">The analyst determined.</span> That was also the adoption strategy: analysts trusted it because it never competed with their judgment."</div>
+        <div class="proof-block"><div class="proof-block-title">📂 Proof — Point to this code</div><code>src/security.py</code> → <code>PROHIBITED_PATTERNS</code> — literal enforcement patterns<br><code>docs/EVOLUTION.md</code> → Security Architecture Principle section</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section" id="followups">
+    <div class="section-label">Section 05</div>
+    <h2>Follow-Up Drills</h2>
+    <div class="section-sub">Likely probes after your opening. Short answer always visible. Click for depth.</div>
+    <div class="followup-list">
+
+      <div class="fq">
+        <div class="fq-q" onclick="toggleFQ(this.parentElement)"><span class="fq-q-text">"How did you handle tenant isolation at the data layer?"</span><span class="fq-toggle">▼</span></div>
+        <div class="fq-a">
+          <div class="fq-short">Every table had a <code>tenant_id</code> column. Every query filtered by it. PostgreSQL row-level security as defense-in-depth. Per-tenant credentials in Azure Key Vault, never in application code.</div>
+          <div class="fq-detail">Three-layered isolation: application layer (every repo method filters by tenant_id), database layer (PostgreSQL RLS policy — even a bug in app code can't return another tenant's data), and credential layer (per-tenant SIEM/SOAR API keys in Azure Key Vault, fetched via managed identity at request time). Rolled out to one client first — thirty days of clean concordance data — before expanding. The <code>docs/V2_SPEC.md</code> has the exact PostgreSQL RLS policy syntax.</div>
+        </div>
+      </div>
+
+      <div class="fq">
+        <div class="fq-q" onclick="toggleFQ(this.parentElement)"><span class="fq-q-text">"What happens when the model drifts or starts giving bad guidance?"</span><span class="fq-toggle">▼</span></div>
+        <div class="fq-a">
+          <div class="fq-short">Analyst concordance rate was our canary. Sustained analyst disagreement on a specific event type meant model calibration had degraded — not that analysts were wrong. That triggered prompt revision or retraining.</div>
+          <div class="fq-detail">We didn't wait for a missed detection. Concordance rate was tracked per confidence band — if "High Concern" calls were consistently being marked benign, that was the signal. In V2 the threshold is configurable per tenant (default 0.75). When it breaks, an ops alert fires. The shift report surfaced this weekly. Detection engineering used it to retune both model prompts and SOAR playbooks simultaneously.</div>
+        </div>
+      </div>
+
+      <div class="fq">
+        <div class="fq-q" onclick="toggleFQ(this.parentElement)"><span class="fq-q-text">"How did you handle change management and analyst adoption?"</span><span class="fq-toggle">▼</span></div>
+        <div class="fq-a">
+          <div class="fq-short">We never framed PurpleLens as replacing analyst judgment. It gave analysts a running start — T1 groundwork done before they began investigating. That framing killed resistance before it started.</div>
+          <div class="fq-detail">Four specific decisions drove adoption: (1) The PurpleLens box was read-only — no buttons, no actions. (2) Analysts saw a confidence score, not a verdict — "Likely Benign (0.82)" invites agreement or challenge. (3) Stages 1 and 2 were invisible to analysts — by the time Stage 3 launched, management had months of data showing the system worked. Analysts heard "this caught things we missed" before they ever used it. (4) The shift report gave T3 visibility — they became advocates because the system made their oversight work easier.</div>
+        </div>
+      </div>
+
+      <div class="fq">
+        <div class="fq-q" onclick="toggleFQ(this.parentElement)"><span class="fq-q-text">"How did you handle compliance and data residency?"</span><span class="fq-toggle">▼</span></div>
+        <div class="fq-a">
+          <div class="fq-short">All AI inference ran through Azure OpenAI Service — Azure-hosted, satisfying data residency for most enterprise contracts. Per-tenant data classification gated what telemetry could leave the client environment.</div>
+          <div class="fq-detail">Azure OpenAI was the deliberate choice over public OpenAI API for exactly this reason — Azure's data processing agreements cover SOC 2 and most GDPR obligations. For clients with FedRAMP or HIPAA requirements, the architecture supports on-premises model hosting because the LLM provider is abstracted in the codebase — swap the endpoint, not the pipeline.</div>
+        </div>
+      </div>
+
+      <div class="fq">
+        <div class="fq-q" onclick="toggleFQ(this.parentElement)"><span class="fq-q-text">"What was your incident response plan if the AI gave dangerous guidance?"</span><span class="fq-toggle">▼</span></div>
+        <div class="fq-a">
+          <div class="fq-short">The AI never took action — so the blast radius of bad guidance was bounded by the analyst who reviewed it. The PROHIBITED_PATTERNS layer and human-in-the-loop requirement ensured no automated downstream consequence of a bad model output.</div>
+          <div class="fq-detail">Three containment layers: (1) The model physically cannot claim to have taken action — PROHIBITED_PATTERNS rejects that output before an analyst sees it. (2) Every analysis run is logged to an immutable audit table — trace any bad guidance to specific prompts, events, and model versions. (3) Model versioning meant rollback within one deployment cycle. No autonomous action = bounded blast radius. That's the architectural safety property.</div>
+        </div>
+      </div>
+
+      <div class="fq">
+        <div class="fq-q" onclick="toggleFQ(this.parentElement)"><span class="fq-q-text">"Walk me through what happens technically when an analyst claims a ticket."</span><span class="fq-toggle">▼</span></div>
+        <div class="fq-a">
+          <div class="fq-short">SOAR webhook fires → FastAPI validates tenant + authenticates → SIEM API fetches event + 72h context → pipeline sanitizes, correlates, analyzes, validates → report written to PostgreSQL → SOAR pulls report → renders in PurpleLens box. Target: under 30 seconds.</div>
+          <div class="fq-detail">Full sequence: (1) Analyst clicks "Claim" in SOAR. (2) SOAR webhook fires to <code>POST /api/v1/analyze/event</code> with event_id, tenant_id, analyst_id. (3) FastAPI validates Bearer token against Azure Key Vault, extracts TenantContext. (4) Task enqueued to Celery worker (API returns 202 immediately). (5) Worker calls SIEM API — fetch triggering event + surrounding 72h window. (6) All SIEM data through <code>prompt_firewall_event()</code>. (7) <code>correlate_events()</code> clusters related events. (8) <code>analyze_events()</code> → Azure OpenAI. (9) <code>validate_output()</code> + <code>validate_semantic_output()</code>. (10) <code>generate_report()</code>. (11) Written to PostgreSQL (tenant-scoped). (12) SOAR callback webhook. (13) PurpleLens box renders in ticket.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section" id="evidence">
+    <div class="section-label">Section 06</div>
+    <h2>Evidence Kit</h2>
+    <div class="section-sub">Every claim maps to real code or a real document. Point to these when they probe.</div>
+    <table class="ref-table">
+      <thead><tr><th>When you claim...</th><th>Point to this</th><th>What it proves</th></tr></thead>
+      <tbody>
+        <tr><td class="claim">Prompt injection firewall</td><td class="proof"><code>src/security.py</code><br><code>prompt_firewall_event()</code></td><td class="file">Recursive sanitizer, 6 injection rules, quarantine vs. redact — real code</td></tr>
+        <tr><td class="claim">LLM output enforcement</td><td class="proof"><code>src/security.py</code><br><code>PROHIBITED_PATTERNS</code></td><td class="file">Regex list blocking authority claims — enforced in code, not policy</td></tr>
+        <tr><td class="claim">Evidence traceability</td><td class="proof"><code>src/schemas.py</code><br><code>validate_semantic_output()</code></td><td class="file">Every Finding must cite real source_file:record_index — no hallucinated citations</td></tr>
+        <tr><td class="claim">Schema-enforced output contract</td><td class="proof"><code>src/schemas.py</code><br><code>AnalysisOutput</code></td><td class="file">Pydantic model: evidence min_length=1, confidence 0.0–1.0, status literals</td></tr>
+        <tr><td class="claim">3-stage staged rollout</td><td class="proof"><code>docs/EVOLUTION.md</code></td><td class="file">Full architecture of each stage, trigger type, and safety validation</td></tr>
+        <tr><td class="claim">Analyst concordance governance</td><td class="proof"><code>docs/EVOLUTION.md</code><br>Alignment Metric section</td><td class="file">Concordance definition, three functions it served, drift detection</td></tr>
+        <tr><td class="claim">Tenant isolation design</td><td class="proof"><code>docs/V2_SPEC.md</code><br>Phase 2 — DB Layer</td><td class="file">PostgreSQL RLS policy, tenant_id on every table, Key Vault scoping</td></tr>
+        <tr><td class="claim">Full production architecture</td><td class="proof"><code>docs/EVOLUTION.md</code><br>Architecture Diagram</td><td class="file">Azure stack, FastAPI, PostgreSQL, Key Vault, SOAR webhook, delivery layer</td></tr>
+        <tr><td class="claim">AWS event correlation</td><td class="proof"><code>src/aws_correlate.py</code></td><td class="file">Proximity clustering, 3 strategies, deterministic SHA1 cluster IDs</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:20px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:5px;font-family:var(--mono);font-size:12px;color:var(--text-dim);"><span style="color:var(--amber);">github.com/mwill20/purplelens-soc</span> — public repo, real code, production evolution in <code>docs/</code></div>
+  </div>
+
+</div>
+</div>
+<script>
+function togglePillar(el) {
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.pillar').forEach(p => { p.classList.remove('open'); const b = p.querySelector('.expand-btn'); if (b) b.textContent = '▼ EXPAND'; });
+  if (!wasOpen) { el.classList.add('open'); const b = el.querySelector('.expand-btn'); if (b) b.textContent = '▲ COLLAPSE'; setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50); }
+}
+function toggleHook(el) { el.classList.toggle('open'); }
+function toggleFQ(el) {
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.fq').forEach(f => { f.classList.remove('open'); const t = f.querySelector('.fq-toggle'); if (t) t.textContent = '▼'; });
+  if (!wasOpen) { el.classList.add('open'); const t = el.querySelector('.fq-toggle'); if (t) t.textContent = '▲'; }
+}
+const navLinks = document.querySelectorAll('.nav-link');
+const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { const id = entry.target.id; navLinks.forEach(l => { l.classList.remove('active'); if (l.getAttribute('href') === '#' + id) l.classList.add('active'); }); } }); }, { threshold: 0.3, rootMargin: '-60px 0px -60px 0px' });
+document.querySelectorAll('[id]').forEach(el => observer.observe(el));
+document.addEventListener('keydown', (e) => { const map = { '1': 'p1', '2': 'p2', '3': 'p3', '4': 'p4' }; if (map[e.key]) { const el = document.getElementById(map[e.key]); if (el) togglePillar(el); } });
+</script>
+</body>
+</html>
