@@ -1,8 +1,8 @@
 # Usage:
-#   .\scripts\export_gcp_logs.ps1 -ProjectId "purplelens-lab-core" -OutputPath "data\gcp_log_pack\minilab_ground_truth_complete.json"
+#   .\scripts\export_gcp_logs.ps1 -ProjectId "threatprism-lab-core" -OutputPath "data\gcp_log_pack\minilab_ground_truth_complete.json"
 #
 # Purpose:
-#   Export targeted GCP audit logs using gcloud into a JSON file compatible with PurpleLens.
+#   Export targeted GCP audit logs using gcloud into a JSON file compatible with ThreatPrism.
 #
 # Limitations:
 #   - Requires gcloud CLI installed and authenticated.

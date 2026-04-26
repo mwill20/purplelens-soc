@@ -1,8 +1,8 @@
-# Lesson: AIOps for Security Engineers - Operability First (PurpleLens Anchor)
+# Lesson: AIOps for Security Engineers - Operability First (ThreatPrism Anchor)
 
 Time: 45-60 minutes
 
-Goal: Understand AIOps in plain English, then apply it to a CLI pipeline (PurpleLens) with real run artifacts and failure drills.
+Goal: Understand AIOps in plain English, then apply it to a CLI pipeline (ThreatPrism) with real run artifacts and failure drills.
 
 ---
 
@@ -56,9 +56,9 @@ Minimal viable implementation = run_id + JSONL logs + metrics.json + a runbook.
 
 ---
 
-## Section 4 - PurpleLens mapping (anchor example)
+## Section 4 - ThreatPrism mapping (anchor example)
 
-PurpleLens is CLI-first, so a **request = one CLI run**.
+ThreatPrism is CLI-first, so a **request = one CLI run**.
 
 **Correlation ID:** `run_id` (one run, one folder, one timeline)
 
@@ -67,7 +67,7 @@ ingest -> normalize -> sanitize -> enrich -> llm_analyze -> validate_output -> r
 
 **AIOps mapping table:**
 
-| AIOps concept | PurpleLens implementation |
+| AIOps concept | ThreatPrism implementation |
 | --- | --- |
 | Observe | `runs/<run_id>/run_log.jsonl`, `runs/<run_id>/metrics.json` |
 | Detect | `error_count`, `top_errors`, exception logs |
@@ -101,7 +101,7 @@ The good_run sample includes an `llm_analyze` stage and token totals so you can 
 
 If you want to refresh these samples later, copy from `runs/<run_id>/` into those folders.
 
-### Step 1: Run PurpleLens
+### Step 1: Run ThreatPrism
 
 PowerShell:
 ```powershell
@@ -226,7 +226,7 @@ python scripts/failure_drill_1.py --execute
 python scripts/evidence_artifact.py --run-id <run_id>
 ```
 
-This gives you real AIOps experience on PurpleLens: run correlation, failure diagnosis, and evidence capture.
+This gives you real AIOps experience on ThreatPrism: run correlation, failure diagnosis, and evidence capture.
 
 ---
 
@@ -243,7 +243,7 @@ When complete, check the run artifacts for `llm_analyze` stage entries and token
 
 ---
 
-## Section 8 - Generalize beyond PurpleLens
+## Section 8 - Generalize beyond ThreatPrism
 
 Apply the same spine to:
 
@@ -289,7 +289,7 @@ Reflection questions:
 5) How would this scale to 10,000 events?
 
 2-minute talk track:
-> "PurpleLens is a CLI SOC assistant. I added an AIOps V1 harness so each run produces structured JSONL logs and a metrics summary tied to a run_id. I can break the pipeline on purpose and recover using only logs and metrics, then write a mini RCA. This proves the system is operable and audit-ready, not just a demo."
+> "ThreatPrism is a CLI SOC assistant. I added an AIOps V1 harness so each run produces structured JSONL logs and a metrics summary tied to a run_id. I can break the pipeline on purpose and recover using only logs and metrics, then write a mini RCA. This proves the system is operable and audit-ready, not just a demo."
 
 ---
 

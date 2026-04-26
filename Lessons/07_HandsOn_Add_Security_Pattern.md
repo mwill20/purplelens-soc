@@ -8,7 +8,7 @@ Prerequisites: Lessons 01-06.
 
 ## Why this matters
 
-PurpleLens treats LLM output as untrusted input. The prompt firewall sanitizes input logs before the LLM, but we still need output guardrails in case the model recommends unsafe actions. This lesson extends those guardrails.
+ThreatPrism treats LLM output as untrusted input. The prompt firewall sanitizes input logs before the LLM, but we still need output guardrails in case the model recommends unsafe actions. This lesson extends those guardrails.
 
 ---
 

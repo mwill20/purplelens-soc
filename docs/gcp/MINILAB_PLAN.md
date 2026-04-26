@@ -3,7 +3,7 @@
 **Status:** APPROVED  
 **Date:** January 3, 2026  
 **Branch:** `enhancement/gcp-mini-lab`  
-**Spec Reference:** `docs/PurpleLens_NorthStar_Enhancement_2_GCP_MiniLab.md`
+**Spec Reference:** `docs/ThreatPrism_NorthStar_Enhancement_2_GCP_MiniLab.md`
 
 ---
 
@@ -15,7 +15,7 @@ The purpose of this mini-lab is to demonstrate **cloud security engineering intu
 ## 2. Project & Identity Model
 
 ### Project Scope
-- **Primary Project:** `purplelens-lab-core` (Conceptual)
+- **Primary Project:** `threatprism-lab-core` (Conceptual)
 - **Scope:** Single project to minimize complexity.
 
 ### Identity Model
@@ -24,7 +24,7 @@ The purpose of this mini-lab is to demonstrate **cloud security engineering intu
    - **Role:** Simulates an administrator performing sensitive manual actions (e.g., breaking glass, changing IAM).
 
 2. **Automation Service Account (Machine Intent)**
-   - **Identity:** `terraform-runner@purplelens-lab-core.iam.gserviceaccount.com`
+   - **Identity:** `terraform-runner@threatprism-lab-core.iam.gserviceaccount.com`
    - **Role:** Simulates CI/CD or IaC pipelines.
    - **Signal:** High velocity, consistent user agent (`Terraform/1.5.0`, `Cloud SDK`).
 

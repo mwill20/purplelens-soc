@@ -1,312 +1,193 @@
+# ThreatPrism
+
+AI-Assisted SOC Analysis with Deterministic Guardrails
+
 <div align="center">
-  <img src="docs/PurpleLens-SOC-Logo.png" alt="PurpleLens SOC Logo" width="400"/>
+  <img src="docs/ThreatPrism.png" alt="ThreatPrism logo" width="420"/>
 </div>
 
-# PurpleLens - AI-Assisted SOC Analysis with Deterministic Guardrails
+ThreatPrism is an AI-assisted SOC analysis pipeline with deterministic guardrails, evidence-first reporting, and multi-source security log ingestion.
 
-## Overview
-PurpleLens is a CLI SOC analysis system that ingests Windows EVTX, AWS CloudTrail logs, and GCP Audit Logs, normalizes them into a consistent event envelope, attaches provenance, uses a constrained LLM to extract structured intelligence. Every claim is evidence-backed, validated against schemas and policy guardrails, and rendered into a deterministic report that is stored in SQLite for auditability.
+## What It Is
 
-This is not a chatbot or an automated responder. It is a guardrail-first analysis pipeline designed to make cloud and host security and telemetry review faster while preserving defensibility.
+ThreatPrism is a CLI-first SOC analysis system that ingests Windows EVTX-derived JSONL, AWS CloudTrail logs, and GCP Audit Logs. It normalizes events into a common envelope, applies prompt-injection guardrails, uses an LLM only for structured extraction, validates the output, renders deterministic reports, and persists analysis records to SQLite.
 
-## Installation
+ThreatPrism assists SOC analysts; it does not execute response actions.
 
-1. Clone the repo and enter it.
+## Why It Exists
 
-   ```bash
-   git clone https://github.com/mwill20/purplelens-soc.git
-   cd purplelens-soc
-   ```
+Security analysts often need to triage noisy host and cloud telemetry without losing provenance or over-trusting generated text. ThreatPrism keeps deterministic processing around the model boundary so AI can help summarize and structure evidence while the system preserves traceability, validation, and analyst control.
 
-2. Create the virtual environment:
+The tool is designed for analyst augmentation, not autonomous remediation.
 
-   ```powershell
-   python -m venv .venv
-   ```
+## Architecture
 
-3. Activate it:
+ThreatPrism uses a linear pipeline:
 
-   ```powershell
-   .venv\Scripts\Activate.ps1
-   ```
-
-   - If you get an execution policy error, run:
-
-      ```powershell
-      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-      ```
-
-4. Install dependencies.
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-6. Upgrade pip:
-
-   ```powershell
-   .venv\Scripts\python.exe -m pip install --upgrade pip
-   ```
-
-7. Configure your API key (OpenAI or Gemini).
-
-   ```powershell
-   Copy-Item .env.example .env
-   # Edit .env and add:
-   # OPENAI_API_KEY=sk-...
-   # GEMINI_API_KEY=AIza...
-   ```
-
-   ```bash
-   cp .env.example .env
-   ```
-
-## Dataset Preparation (Windows EVTX)
-PurpleLens expects EVTX to be pre-parsed into JSONL.
-The repo includes a small Windows sample set at `data/evtx_sample/` for demos.
-
-1. Clone EVTX-ATTACK-SAMPLES.
-   ```powershell
-   git clone https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES.git
-   ```
-2. Copy a small set of `.evtx` files into `data\evtx_raw\`.
-3. Convert to JSONL.
-   ```powershell
-   .\scripts\prep_evtx.ps1 -InputPath ".\data\evtx_raw" -OutputPath ".\data\evtx_parsed"
-   ```
-
-## Usage
-Minimal run:
-   ```bash
-   python -m src.main --input data/evtx_sample
-   ```
-
-Verbose logging:
-   ```bash
-   python -m src.main --input data/evtx_sample --verbose
-   ```
-
-   Validation only (no LLM calls):
-   ```bash
-   python -m src.main --input data/evtx_sample --dry-run
-   ```
-
-Write report to file (always saved in `reports/` regardless):
-   ```bash
-   python -m src.main --input data/evtx_sample --output file
-   ```
-
-Prompt injection lab (dry-run):
-   ```bash
-   python -m src.main --input data/redteam/prompt_injection_windows.jsonl --source windows --debug --dry-run
-   ```
-
-Model compatibility:
-- OpenAI: requires `response_format={"type":"json_object"}` support (for example `gpt-4o`).
-- Gemini: use a JSON-capable model (for example `gemini-flash-latest`).
-
-## LLM Providers
-Gemini is the default. To use OpenAI, set `OPENAI_API_KEY` and pass `--provider openai`.
-
-Gemini (default):
-```bash
-python -m src.main --input data/evtx_sample --model gemini-flash-latest
+```text
+Source -> Ingest -> Normalize -> Sanitize -> Enrich -> LLM Analyze -> Validate Output -> Report -> Persist
 ```
 
-OpenAI:
+<div align="center">
+  <img src="docs/ThreatPrism_Architecture.png" alt="ThreatPrism architecture overview" width="900"/>
+</div>
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full architecture guide.
+
+## Supported Inputs
+
+- Windows event logs pre-parsed from EVTX to JSONL
+- AWS CloudTrail JSON or JSONL
+- AWS CloudTrail CSV after conversion with `scripts/aws_csv_to_jsonl.py`
+- GCP Audit Logs JSON or JSONL
+- Prompt-injection lab datasets under `data/redteam/`
+
+ThreatPrism processes one source type per run. Mixed-source correlation is a future enhancement.
+
+## Processing Pipeline
+
+1. Detect the source type from CLI flags, file extensions, and schema markers.
+2. Ingest records from the selected source.
+3. Normalize records into a common event envelope with `source_file`, `record_index`, and optional `event_id`.
+4. Sanitize instruction-like content before model analysis.
+5. Enrich cloud logs with deterministic context such as plane tags and identity hints.
+6. Send constrained batches to the selected LLM provider unless `--dry-run` is used.
+7. Validate model output against schemas, policy rules, and optional semantic checks.
+8. Render the report with Python.
+9. Persist run metadata, findings, hypotheses, IOCs, and report text to SQLite.
+
+## Guardrails
+
+- LLM inputs and outputs are treated as untrusted.
+- LLM output is constrained, validated, and policy-checked before reporting.
+- Pydantic schemas define the structured output contract.
+- Policy checks block unsafe authority claims and completed-action language.
+- Prompt firewall logic redacts or quarantines instruction-like strings before LLM analysis.
+- `--dry-run` validates ingestion and guardrail behavior without external LLM calls.
+
+## Evidence-First Reporting
+
+Reports are deterministic and evidence-first. The LLM does not write the narrative report; Python renders structured findings into a repeatable text format.
+
+Every finding must cite provenance:
+
+- `source_file`
+- `record_index`
+- `event_id` when available, such as GCP `insertId`
+
+## Observability / AIOps Artifacts
+
+Each run writes operational artifacts under `runs/<run_id>/`:
+
+- `run_log.jsonl`
+- `metrics.json`
+- `what_broke.md` on failure
+- `evidence.txt` when generated with the evidence helper
+
+Useful helpers:
+
 ```bash
+python scripts/evidence_artifact.py --run-id <run_id>
+python scripts/failure_drill_1.py
+```
+
+See [RUNBOOK.md](RUNBOOK.md) and [docs/THREATPRISM_AIOPS_CODEX_SPEC.md](docs/THREATPRISM_AIOPS_CODEX_SPEC.md).
+
+## Example Workflow
+
+Validate the bundled Windows sample without calling an LLM:
+
+```bash
+python -m src.main --input data/evtx_sample --dry-run
+```
+
+Convert the bundled AWS sample CSV and validate ingestion:
+
+```bash
+python scripts/aws_csv_to_jsonl.py data/sample_cloudtrail.csv data/sample_aws.jsonl
+python -m src.main --input data/sample_aws.jsonl --source aws --dry-run
+```
+
+Validate the bundled GCP synthetic mini-lab:
+
+```bash
+python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --dry-run
+```
+
+Run model-backed analysis only after configuring a real provider key:
+
+```bash
+python -m src.main --input data/evtx_sample --provider gemini --model gemini-flash-latest
 python -m src.main --input data/evtx_sample --provider openai --model gpt-4o
 ```
 
-## AIOps V1 Ops Harness
-- Each run writes artifacts to `runs/<run_id>/`:
-  - `run_log.jsonl` (structured logs)
-  - `metrics.json` (run summary)
-  - `what_broke.md` (only on failure)
-  - `evidence.txt` (generated by script)
-- Prompt injection metrics live in `metrics.json`: `prompt_injection_hits`, `events_sanitized`, `events_quarantined`.
-- Runbook: `RUNBOOK.md`
-- Evidence helper: `python scripts/evidence_artifact.py --run-id <run_id>`
-- Failure drill: `python scripts/failure_drill_1.py`
+## Security Limitations
 
-## Lessons (AI Security + Tool Deep Dive)
-The `Lessons/` folder contains a full, interview-ready curriculum that teaches AI security concepts and provides an in-depth walkthrough of the PurpleLens tool.
-Start here: `Lessons/00_Index.md` (lesson index + roadmap).
-Prompt injection lab: `Lessons/19_Prompt_Injection_Defense_Lab.md`
+- ThreatPrism does not determine that activity is definitively malicious.
+- ThreatPrism does not isolate hosts, disable accounts, block network traffic, or modify cloud resources.
+- LLM extraction can be incomplete or incorrect, so analyst review is required.
+- AWS and GCP plane tagging is heuristic and conservative.
+- Binary EVTX parsing is out of scope; EVTX must be converted to JSONL first.
+- Raw CloudTrail records and sensitive request/response payloads are intentionally not stored in SQLite.
+- External LLM calls require valid provider credentials and should not be used for local validation unless explicitly intended.
 
-## Data Sources and Detection
-PurpleLens supports three source types and processes one type per run:
-- Windows EVTX (JSONL)
-- AWS CloudTrail (JSON/JSONL; CSV via prep script)
-- GCP Audit Logs (JSON/JSONL)
+## Run Locally
 
-Auto-detection uses file extension, schema markers, and `gcp_` filename prefixes. Mixed directories require `--source`.
+Clone the future public repository URL:
+
 ```bash
-python -m src.main --input data/sample_aws.jsonl --source aws
-python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp
+git clone https://github.com/mwill20/threatprism.git
+cd threatprism
 ```
 
-## AWS CloudTrail
-### Dataset and Prep
-Sample data is included in the repo at `data/sample_cloudtrail.csv`.
-```powershell
-python scripts/aws_csv_to_jsonl.py data/sample_cloudtrail.csv data/sample_aws.jsonl
-python -m src.main --input data/sample_aws.jsonl --source aws
-```
+Create and activate a virtual environment:
 
-### Analysis Behavior
-- Plane tagging: conservative control/data/telemetry classification.
-- Correlation: proximity-based clustering with deterministic IDs.
-- Prompt batching: cluster-aware batches for token efficiency.
-
-### Data Minimization
-Raw CloudTrail records are never stored in the database. Only normalized fields and a SHA256 hash are persisted for security purposes and storage efficiency.
-
-## GCP Audit Logs
-### Inputs
-The repo includes:
-- `data/gcp_synthetic_minilab.jsonl` (small synthetic set, used for initial setup and testing only)
-- `data/gcp_log_pack/minilab_ground_truth_complete.json` (created from purpose built live GCP project)
-
-### Quick Start
-```powershell
-python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --dry-run
-python -m src.main --input data/gcp_log_pack/minilab_ground_truth_complete.json --source gcp --dry-run
-```
-
-### GCP Enrichment
-GCP ingestion adds deterministic signals:
-- Actor type (human vs service account)
-- Automation tool hints from user agent
-- Workload identity detection
-- Cross-project heuristics
-
-Debug output for enrichment:
-```powershell
-python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --debug
-```
-
-## Guardrails and Validation
-- All LLM inputs and outputs are treated as untrusted. 
-- Schema enforcement: Pydantic models define the LLM contract.
-- Policy guardrails: regex checks block action claims and unsafe patterns.
-- Deterministic reporting: Python renders the report; the LLM does not.
-- Prompt firewall: input sanitization and quarantine for instruction-like strings.
-- Optional semantic judge: enable with `--semantic-judge` to add a second-pass LLM validation.
-
-## Prompt Injection Defense
-- Sanitization happens before the LLM in the `sanitize` stage (redact or quarantine).
-- Quarantined events are excluded from `llm_analyze`.
-- Ops artifacts record the outcome in `runs/<run_id>/run_log.jsonl` and `metrics.json`.
-- Lab dataset: `data/redteam/prompt_injection_windows.jsonl` (see `Lessons/19_Prompt_Injection_Defense_Lab.md`).
-
-## Evidence and Provenance
-Every finding must cite:
-- `source_file`
-- `record_index`
-- `event_id` (GCP uses `insertId`)
-
-This enables audit-ready, replayable analysis without relying on model memory or inference.
-
-## Output and Persistence
-- Reports are saved to `reports/analysis_<run_id>.txt`.
-- SQLite database at `db/analysis.db` stores run metadata, findings, hypotheses, IOCs, and report text.
-
-## Architecture
-The pipeline is intentionally linear and deterministic:
-```
-Source -> Ingest -> Normalize -> Sanitize -> Enrich -> LLM Analyze -> Validate Output -> Report -> Persist
-```
-<div align="center">
-   <img src="docs/PurpleLens_SOC_Architecture.png" alt="PurpleLens Architecture Overview" width="900"/>
-</div>
-
-See the full architecture guide for details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-
-## Testing
-Tests are organized by phase and feature area.
 ```bash
-pytest tests/
-pytest tests/test_phase1a.py
-pytest tests/test_full_flow.py
+python -m venv .venv
 ```
 
-AWS and GCP-specific tests are under `tests/`.
+PowerShell:
 
-### Jailbreak harness (optional)
-Replay a corpus of jailbreak prompts against the current prompts/policies:
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+bash:
+
 ```bash
-python scripts/jailbreak_harness.py --prompts data/redteam/jailbreak_prompts.jsonl --provider gemini --model gemini-flash-latest
-# or: --provider openai --model gpt-4o
-```
-Outputs: `runs/<run_id>/jailbreak_results.json`, `runs/<run_id>/run_log.jsonl`, `runs/<run_id>/metrics.json` (with `jailbreak_attempts` and `jailbreak_successes`).
-
-## Project Structure
-```
-src/
-    main.py             # CLI orchestration
-    ingest.py           # EVTX ingestion
-    ingest_aws.py        # AWS CloudTrail ingestion
-    ingest_gcp.py        # GCP Audit Log ingestion
-    llm_analyze.py       # LLM extraction + batching
-    schemas.py           # Pydantic contracts
-    security.py          # Policy guardrails
-    report.py            # Deterministic report rendering
-    storage.py           # SQLite persistence
-scripts/
-    prep_evtx.ps1        # EVTX -> JSONL converter
-    aws_csv_to_jsonl.py  # CloudTrail CSV converter
-    check_demo_db.py     # DB verification helper
-    export_gcp_logs.ps1  # GCP Audit Logs export (PowerShell)
-    export_gcp_logs.sh   # GCP Audit Logs export (bash)
-    append_exposure.py   # Demo data helper
-    verify_gcp_enrichment.py
-    README.md
-
-data/
-    evtx_sample/         # Small JSONL demo set for Windows
-    evtx_parsed/         # Local JSONL outputs (optional)
-    sample_cloudtrail.csv
-    gcp_synthetic_minilab.jsonl
-    redteam/             # Prompt injection lab dataset
-    gcp_log_pack/
+source .venv/bin/activate
 ```
 
-## Known Weaknesses and Constraints
-- CLI-only; no GUI.
-- One source type per run (no mixed-source correlation).
-- Windows EVTX must be pre-parsed into JSONL; binary EVTX parsing is out of scope.
-- AWS CloudTrail CSV requires preprocessing; only JSON/JSONL is ingested directly.
-- GCP and AWS plane tagging is heuristic and conservative; unknown is a valid outcome.
-- LLM output is non-deterministic; reports are deterministic but extraction quality depends on the model and input quality.
-- **This tool does not make determinations or take actions** - it provides structured evidence for analyst review.
-- **AWS CloudTrail Dataset Anonymization:** The Kaggle CloudTrail dataset contains anonymized/truncated IP addresses (e.g., "255.253" instead of full IPs like "255.253.176.24"). This limits geolocation analysis but is typical for security training datasets that protect user privacy.
-- Raw CloudTrail records and sensitive request/response payloads are intentionally not stored.
-- Models that do not support `response_format` will fail.
+Install dependencies:
 
-## Future Enhancements
-- Streamlit or web UI for analyst workflows.
-- Multi-source correlation across Windows, AWS, and GCP in a single run.
-- Streaming ingestion for near-real-time analysis.
-- Provider-agnostic LLM adapter with offline/fallback modes.
-- MITRE ATT&CK tagging in schemas and reports.
-- Secondary validator model for semantic guardrails.
-- IOC enrichment and normalization (e.g., SID resolution, hash metadata).
-- Event caching and deduplication to reduce repeated analysis cost.
-- Report de-duplication via semantic merging to reduce overlap.
-- Production database (PostgreSQL/MySQL) for multi-user environments and RBAC.
-- Analyst determination records linked to `run_id` for auditability.
-- Expanded security scanning for PII/PHI, prompt injection signals, and safety violations.
+```bash
+pip install -r requirements.txt
+```
 
+Optional provider setup for non-dry-run analysis:
+
+```bash
+cp .env.example .env
+```
+
+Then add `GEMINI_API_KEY` or `OPENAI_API_KEY` to `.env`.
+
+Safe local validation commands:
+
+```bash
+python -m src.main --input data/evtx_sample --dry-run
+python -m pytest
+python -m compileall .
+```
+
+## Project Status
+
+ThreatPrism is a local CLI project for AI-assisted SOC analysis experiments and demonstrations. Current functionality includes Windows, AWS, and GCP ingestion paths; deterministic reporting; SQLite persistence; prompt-injection guardrails; and run-level observability artifacts.
+
+Planned improvements include a richer analyst UI, multi-source correlation, stronger offline evaluation workflows, and broader detection coverage.
 
 ## License and Attribution
-- License: MIT (`LICENSE`)
-- EVTX dataset: https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES
-- AWS dataset: https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud
-- OpenAI or Gemini API required for LLM extraction
 
-## Documentation
-Additional guides and runbooks live in `docs/`:
-- `docs/ARCHITECTURE.md`
-- `docs/DEMO_SCRIPT.md`
-- `docs/TROUBLESHOOTING.md`
+- License: MIT, see [LICENSE](LICENSE)
+- EVTX dataset: <https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES>
+- AWS dataset: <https://www.kaggle.com/datasets/nobukim/aws-cloudtrails-dataset-from-flaws-cloud>

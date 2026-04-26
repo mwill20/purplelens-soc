@@ -1,4 +1,4 @@
-﻿"""
+"""
 Usage:
   pytest tests/test_phase1e.py
 
@@ -26,7 +26,7 @@ def test_help_flag():
     )
 
     assert result.returncode == 0, "Help should exit with code 0"
-    assert "PurpleLens AI SOC Assistant" in result.stdout
+    assert "ThreatPrism AI SOC Assistant" in result.stdout
     assert "--input INPUT" in result.stdout
     assert "--output" in result.stdout
     assert "--model" in result.stdout

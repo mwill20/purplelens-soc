@@ -4,7 +4,7 @@
 **Overseer:** GitHub Copilot  
 **Enhancement:** GCP Mini-Lab (Enhancement 2)  
 **Branch:** `enhancement/gcp-mini-lab` (not yet created)  
-**Specification:** `docs/PurpleLens_NorthStar_Enhancement_2_GCP_MiniLab.md`
+**Specification:** `docs/ThreatPrism_NorthStar_Enhancement_2_GCP_MiniLab.md`
 
 ---
 

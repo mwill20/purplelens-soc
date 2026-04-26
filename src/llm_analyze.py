@@ -65,7 +65,7 @@ SCHEMA_JSON = json.dumps(AnalysisOutput.model_json_schema(), indent=2)
 
 # Windows-specific prompt: JSON only, evidence required, no speculation without data
 SYSTEM_PROMPT = f"""
-You are the PurpleLens AI SOC Assistant. Analyze provided Windows log
+You are the ThreatPrism AI SOC Assistant. Analyze provided Windows log
 events and extract structured intelligence strictly conforming to the following
 JSON schema:
 
@@ -86,7 +86,7 @@ RULES:
 
 # AWS CloudTrail-specific prompt: adds plane/cluster context, identity focus
 AWS_SYSTEM_PROMPT = f"""
-You are the PurpleLens AI SOC Assistant. Analyze provided AWS CloudTrail
+You are the ThreatPrism AI SOC Assistant. Analyze provided AWS CloudTrail
 security events and extract structured intelligence strictly conforming to the
 following JSON schema:
 
@@ -111,7 +111,7 @@ RULES:
 
 # GCP Audit Log-specific prompt: automation signals, workload identity, crypto ops
 GCP_SYSTEM_PROMPT = f"""
-You are the PurpleLens AI SOC Assistant. Analyze provided Google Cloud Platform
+You are the ThreatPrism AI SOC Assistant. Analyze provided Google Cloud Platform
 Audit Logs and extract structured intelligence strictly conforming to the
 following JSON schema:
 
@@ -142,7 +142,7 @@ RULES:
 """.strip()
 
 SEMANTIC_JUDGE_SYSTEM_PROMPT = """
-You are a validation judge for PurpleLens analysis output. Validate that each
+You are a validation judge for ThreatPrism analysis output. Validate that each
 finding's evidence references exist in the provided events and that the
 excerpt is plausibly grounded in the event summary.
 

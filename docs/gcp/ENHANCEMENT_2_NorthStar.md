@@ -1,4 +1,4 @@
-# PurpleLens SOC — Enhancement 2 NorthStar (GCP Mini-Lab Log Generation + Ingest)
+# ThreatPrism SOC — Enhancement 2 NorthStar (GCP Mini-Lab Log Generation + Ingest)
 
 **Branch name:** `enhancement/gcp-mini-lab`  
 **Owner roles:** Architect (you) → Overseer (review) → Primary Engineer (execute 1 phase at a time)  
@@ -21,7 +21,7 @@ This is not a “become a GCP product expert” exercise. Products change; the a
 
 ## 2) Non‑negotiable architecture invariants (do not change)
 
-Same invariants as the core PurpleLens tool:
+Same invariants as the core ThreatPrism tool:
 
 1. **LLM is extraction-only** (JSON-only, schema-validated)
 2. **Evidence required** (source_file + record_index referenced)
@@ -35,7 +35,7 @@ Same invariants as the core PurpleLens tool:
 
 ### In scope
 - A tiny GCP “mini-lab” that generates a **small set** of high-signal audit events
-- Export logs to **JSONL** in a PurpleLens-ingestable format
+- Export logs to **JSONL** in a ThreatPrism-ingestable format
 - Ingest those logs through a new adapter (or extend existing ingest to accept GCP JSONL)
 - Demonstrate control-plane and telemetry-plane reasoning via report sections
 
@@ -374,7 +374,7 @@ def compute_raw_hash(raw_event: dict) -> str:
 
 **Engineer tasks**
 - Produce `docs/GCP_MINILAB_PLAN.md` containing:
-  - target project naming convention (e.g., `purplelens-lab-*`)
+  - target project naming convention (e.g., `threatprism-lab-*`)
   - identities to use (1 human, 1 CI service account)
   - event checklist (6–10 event types)
   - safety notes (avoid real org assets)
@@ -397,7 +397,7 @@ def compute_raw_hash(raw_event: dict) -> str:
 ---
 
 ### Phase 1 — Log export format + ingestion adapter (core pipeline piece)
-**Goal:** Decide the JSONL shape and ensure PurpleLens can ingest it.
+**Goal:** Decide the JSONL shape and ensure ThreatPrism can ingest it.
 
 **Engineer tasks**
 - Define a canonical JSONL record that preserves:
@@ -871,7 +871,7 @@ The Phase 0 mini-lab validates the harness with **8 high-signal events**. For pr
 
 - “I’m demonstrating **cloud security intuition**, not memorizing product trivia.”
 - “This lab produces controlled examples of **identity and visibility pipeline mutations**.”
-- “PurpleLens treats logs as untrusted input, forces evidence-backed extraction, and emits deterministic reporting with an audit trail.”
+- “ThreatPrism treats logs as untrusted input, forces evidence-backed extraction, and emits deterministic reporting with an audit trail.”
 
 ---
 

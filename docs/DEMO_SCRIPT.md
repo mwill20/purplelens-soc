@@ -1,4 +1,4 @@
-# PurpleLens SOC Demo Script and Runbook
+# ThreatPrism SOC Demo Script and Runbook
 
 Purpose: A concise, accurate demo guide for interviews and technical walkthroughs.  
 Duration: 5-10 minutes  
@@ -33,7 +33,7 @@ python -m src.main --input data/gcp_synthetic_minilab.jsonl --source gcp --dry-r
 
 ### 1) Opening (30 seconds)
 What to say:
-> "PurpleLens is a guardrail-first SOC analysis pipeline. It ingests Windows, AWS, or GCP logs, normalizes them, uses an LLM only for structured extraction, and produces a deterministic report with evidence citations and SQLite persistence."
+> "ThreatPrism is a guardrail-first SOC analysis pipeline. It ingests Windows, AWS, or GCP logs, normalizes them, uses an LLM only for structured extraction, and produces a deterministic report with evidence citations and SQLite persistence."
 
 Key points:
 - CLI-only, deterministic output.

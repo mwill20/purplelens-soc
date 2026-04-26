@@ -1,7 +1,7 @@
-# PurpleLens SOC v2 — Technical Specification
+# ThreatPrism SOC v2 — Technical Specification
 ## Claude Code Handoff Document
 
-> **Purpose:** This document is the authoritative specification for building `purplelens-soc-v2`. It is written for Claude Code (or any AI pair-programmer) to execute incrementally. The POC (`purplelens-soc`) is the foundation. This spec describes what must be added, changed, or extended to achieve production-grade enterprise capability.
+> **Purpose:** This document is the authoritative specification for building `threatprism-v2`. It is written for Claude Code (or any AI pair-programmer) to execute incrementally. The POC (`threatprism`) is the foundation. This spec describes what must be added, changed, or extended to achieve production-grade enterprise capability.
 >
 > **Architect/Auditor:** Claude (Anthropic) — reconstruct and review all PRs against this spec.
 > **Build order:** Follow phases sequentially. Do not skip ahead. Each phase must pass its own tests before the next begins.
@@ -10,8 +10,8 @@
 
 ## Repository
 
-- **New repo:** `purplelens-soc-v2` (do not modify `purplelens-soc`)
-- **Base:** Copy all `src/` from `purplelens-soc` as starting point
+- **New repo:** `threatprism-v2` (do not modify `threatprism`)
+- **Base:** Copy all `src/` from `threatprism` as starting point
 - **Language:** Python 3.11+
 - **Package manager:** `pip` with `requirements.txt` (migrate to `pyproject.toml` in Phase 2)
 - **Cloud target:** Microsoft Azure
@@ -126,7 +126,7 @@ GET /api/v1/health
 ```
 
 ### Auth design
-- Per-tenant API keys stored in Azure Key Vault: `secret/{tenant_id}/purplelens-api-key`
+- Per-tenant API keys stored in Azure Key Vault: `secret/{tenant_id}/threatprism-api-key`
 - API key delivered in `Authorization: Bearer <key>` header
 - Middleware resolves `tenant_id` from key → injects `TenantContext` into request state
 - Service-to-service (batch trigger, SOAR callback): Azure Managed Identity
@@ -249,7 +249,7 @@ Body: {
   "request_id": "...",
   "event_id": "...",
   "analyst_id": "...",
-  "report": "<full report text for PurpleLens box>",
+  "report": "<full report text for ThreatPrism box>",
   "confidence": 0.82,
   "guidance": "Likely Benign"
 }
@@ -320,7 +320,7 @@ class SIEMClient(ABC):
 ### Concordance recording flow
 1. Analyst makes determination in SOAR (closes/escalates ticket)
 2. SOAR fires concordance webhook to `POST /api/v1/concordance`
-3. PurpleLens records: analyst determination vs. LLM guidance → `concordant: bool`
+3. ThreatPrism records: analyst determination vs. LLM guidance → `concordant: bool`
 4. Concordance rate aggregated per analyst, per tenant, per shift
 
 ### Shift report generation

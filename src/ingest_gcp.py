@@ -1,6 +1,6 @@
 """
 GCP Audit Log Ingestion Adapter.
-Handles multiple GCP export formats and normalizes to PurpleLens standard envelope.
+Handles multiple GCP export formats and normalizes to ThreatPrism standard envelope.
 
 Supports:
 - JSON Arrays (Cloud Logging export to Storage)
@@ -112,7 +112,7 @@ def normalize_gcp_audit(
     rec: Dict[str, Any], source_file: str, idx: int
 ) -> Dict[str, Any]:
     """
-    Translate a raw GCP Audit Log into the PurpleLens standard envelope.
+    Translate a raw GCP Audit Log into the ThreatPrism standard envelope.
 
     Args:
         rec: Raw GCP audit log dictionary
@@ -120,7 +120,7 @@ def normalize_gcp_audit(
         idx: Record index within the file (for evidence tracking)
 
     Returns:
-        Normalized event dictionary matching PurpleLens schema
+        Normalized event dictionary matching ThreatPrism schema
     """
     # 1. Extract Core GCP Structures
     pp = rec.get("protoPayload") or {}

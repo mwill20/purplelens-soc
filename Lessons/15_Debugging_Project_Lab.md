@@ -1,6 +1,6 @@
-# Lesson 15: Debugging Project Lab (PurpleLens)
+# Lesson 15: Debugging Project Lab (ThreatPrism)
 
-This lesson is a hands-on debugging workshop that uses your PurpleLens project as the demo environment. You will practice a repeatable debugging workflow, learn where to look for signals, and verify fixes using the same tools the pipeline uses in production.
+This lesson is a hands-on debugging workshop that uses your ThreatPrism project as the demo environment. You will practice a repeatable debugging workflow, learn where to look for signals, and verify fixes using the same tools the pipeline uses in production.
 
 Prerequisites: Lesson 09 (Debugging Bootcamp) or equivalent comfort with tracebacks and basic logging.
 
@@ -23,7 +23,7 @@ git checkout lessons-practice
 ## Learning Goals
 
 By the end of this lesson, you will be able to:
-- Reproduce and isolate failures in the PurpleLens pipeline
+- Reproduce and isolate failures in the ThreatPrism pipeline
 - Use console logs, run logs, and targeted inspection to find root causes
 - Debug the specific phases: ingest, analyze, validate, report, store
 - Explain your debugging workflow clearly in an interview

@@ -1,13 +1,13 @@
-# PurpleLens: From POC to Production
+# ThreatPrism: From POC to Production
 ## The Invention Story — Interview Reference Document
 
-> **Author's note:** This document reconstructs the production evolution of PurpleLens from the open-source POC (`purplelens-soc`) through three deployment stages to a live enterprise platform. It is written for interview preparation and accurate technical storytelling. The production codebase is proprietary IP of 11:11 Systems/Ntirety and is not represented here. This document is grounded in the POC source code, the inventor's direct recall of architectural decisions, and engineering inference from the POC's own structure.
+> **Author's note:** This document reconstructs the production evolution of ThreatPrism from the open-source POC (`threatprism`) through three deployment stages to a live enterprise platform. It is written for interview preparation and accurate technical storytelling. The production codebase is proprietary IP of 11:11 Systems/Ntirety and is not represented here. This document is grounded in the POC source code, the inventor's direct recall of architectural decisions, and engineering inference from the POC's own structure.
 
 ---
 
 ## The Invention Context
 
-PurpleLens originated inside a multi-tenant MSSP SOC managing security operations for 60+ enterprise clients simultaneously. The environment was a high-volume, multi-cloud operation — AWS CloudTrail, GCP Audit Logs, and Windows EVTX telemetry all flowing into a centralized SIEM and SOAR platform running on Azure.
+ThreatPrism originated inside a multi-tenant MSSP SOC managing security operations for 60+ enterprise clients simultaneously. The environment was a high-volume, multi-cloud operation — AWS CloudTrail, GCP Audit Logs, and Windows EVTX telemetry all flowing into a centralized SIEM and SOAR platform running on Azure.
 
 The problem was not a lack of detection coverage. The problem was **analyst cognitive load at MSSP scale**.
 
@@ -20,7 +20,7 @@ A Tier 1 analyst beginning work on a SOAR ticket had to:
 
 At 60+ clients, this process was repeated hundreds of times per shift. Alert fatigue and inconsistency were structural problems, not individual ones. The question was: **can an AI do the T1 groundwork so the analyst can focus on judgment, not retrieval?**
 
-The answer was PurpleLens.
+The answer was ThreatPrism.
 
 ---
 
@@ -70,13 +70,13 @@ These were the gaps that the three production deployment stages addressed.
 ### Stage 1: Batch QA Over Auto-Closed SOAR Events
 **Problem:** The SOAR platform automated closure of thousands of events per shift using playbooks and known-benign pattern matching. But automation has blind spots. A misconfigured playbook, a novel TTP that looks like a benign pattern, or a threshold edge case could auto-close something that should have been investigated.
 
-**Solution:** PurpleLens was deployed as a **scheduled batch job** (Azure Scheduler / cron) that ran against all SOAR auto-closed events from the prior period.
+**Solution:** ThreatPrism was deployed as a **scheduled batch job** (Azure Scheduler / cron) that ran against all SOAR auto-closed events from the prior period.
 
 **How it worked:**
 1. Scheduled trigger fires (e.g., every 4 hours)
 2. Job queries SOAR API for all auto-closed events in the window
 3. Event IDs passed to SIEM API — raw telemetry fetched per event
-4. PurpleLens pipeline runs across the batch
+4. ThreatPrism pipeline runs across the batch
 5. Any event where LLM output returned high-concern findings despite auto-close status → alert fired to T3
 6. Results persisted to PostgreSQL per-run
 
@@ -104,13 +104,13 @@ These were the gaps that the three production deployment stages addressed.
 1. Shift-end trigger fires (configurable per shift schedule)
 2. Job queries SOAR for all analyst-closed (marked benign) events from that shift, by analyst ID
 3. Telemetry fetched from SIEM per event
-4. PurpleLens pipeline runs
+4. ThreatPrism pipeline runs
 5. Findings surfaced in a **shift report** delivered to: the shift manager, T3 lead, and detection engineering team
 6. Events where LLM confidence score indicated high concern despite benign closure → flagged for T3 review
 
 **What the shift report contained:**
 - Summary of analyst activity (volume, closure rates by analyst)
-- Events PurpleLens flagged as high-concern despite benign determination
+- Events ThreatPrism flagged as high-concern despite benign determination
 - Hypothesis and IoC summary per flagged event
 - Recommended next steps per flagged finding
 - Confidence scores for every determination
@@ -119,7 +119,7 @@ These were the gaps that the three production deployment stages addressed.
 - **Analyst QA layer** — passive, non-confrontational. No analyst was alerted in real-time. The report went to management and engineering.
 - **Rule refinement fuel** — detection engineering used the shift reports to identify SOAR playbook gaps and tune detection rules.
 - **Manager visibility** — for the first time, shift managers had a structured daily intelligence brief on what happened, not just ticket counts.
-- **Analyst accountability signal** — over time, patterns emerged in which analysts consistently agreed with PurpleLens guidance vs. which had high disagreement rates.
+- **Analyst accountability signal** — over time, patterns emerged in which analysts consistently agreed with ThreatPrism guidance vs. which had high disagreement rates.
 
 **Architecture additions over Stage 1:**
 - Per-analyst event scoping in SOAR query
@@ -130,23 +130,23 @@ These were the gaps that the three production deployment stages addressed.
 ---
 
 ### Stage 3: Real-Time Per-Event Analysis on Analyst Claim
-**Problem:** Stages 1 and 2 were retrospective. By the time the batch ran, the analyst had already made a determination — possibly wrong. The real value of PurpleLens was giving analysts the AI's analysis **before** they made the call, not after.
+**Problem:** Stages 1 and 2 were retrospective. By the time the batch ran, the analyst had already made a determination — possibly wrong. The real value of ThreatPrism was giving analysts the AI's analysis **before** they made the call, not after.
 
-**Solution:** PurpleLens was integrated directly into the SOAR analyst workflow as a **real-time, per-event, on-demand analysis** triggered at the moment an analyst claimed a ticket.
+**Solution:** ThreatPrism was integrated directly into the SOAR analyst workflow as a **real-time, per-event, on-demand analysis** triggered at the moment an analyst claimed a ticket.
 
 **The Analyst Experience:**
 1. Analyst opens a SOAR ticket and clicks "Claim"
 2. The claim action fires a SOAR webhook
-3. Webhook payload (event ID, tenant ID, analyst ID) hits the PurpleLens FastAPI endpoint
+3. Webhook payload (event ID, tenant ID, analyst ID) hits the ThreatPrism FastAPI endpoint
 4. Pipeline runs: SIEM API fetches the triggering event + surrounding context (same time window, same source entity) + historical events for that entity
-5. PurpleLens analysis completes
+5. ThreatPrism analysis completes
 6. Report written to PostgreSQL (tenant-scoped)
-7. SOAR pulls the report and renders it in the **PurpleLens box** — a text panel inside the ticket UI
-8. Analyst reads the PurpleLens report before beginning their investigation
+7. SOAR pulls the report and renders it in the **ThreatPrism box** — a text panel inside the ticket UI
+8. Analyst reads the ThreatPrism report before beginning their investigation
 
-**What the PurpleLens box showed:**
+**What the ThreatPrism box showed:**
 ```
-┌─ PurpleLens Analysis ─────────────────────────────────────────┐
+┌─ ThreatPrism Analysis ─────────────────────────────────────────┐
 │ Confidence: 0.82 — Likely Benign                              │
 │                                                               │
 │ HYPOTHESIS                                                    │
@@ -164,7 +164,7 @@ These were the gaps that the three production deployment stages addressed.
 │                                                               │
 │ TRACKING                                                      │
 │ Related events: 3 in 72h window, all benign pattern          │
-│ Last PurpleLens analysis for this entity: 7 days ago, benign │
+│ Last ThreatPrism analysis for this entity: 7 days ago, benign │
 └───────────────────────────────────────────────────────────────┘
 ```
 
@@ -179,7 +179,7 @@ This was the security architecture principle from the POC made operational: `PRO
 **Tenant isolation implementation:**
 - Each enterprise client (tenant) had a scoped PostgreSQL schema or row-level security by `tenant_id`
 - SIEM API credentials per tenant stored in Azure Key Vault, fetched at request time via managed identity
-- PurpleLens pipeline context was tenant-scoped: event fetch, enrichment, and report storage all namespaced by `tenant_id`
+- ThreatPrism pipeline context was tenant-scoped: event fetch, enrichment, and report storage all namespaced by `tenant_id`
 - SOAR webhook payload included `tenant_id` — validated against an allowlist before processing
 - Rolled out to one client first. Validated alignment metrics over 30 days. Expanded incrementally.
 
@@ -229,11 +229,11 @@ This metric served three functions:
 │  Fetch triggering event raw telemetry                           │
 │  Fetch surrounding events (configurable time window)            │
 │  Fetch entity history (same actor/IP/host, 72h default)         │
-│  Normalize to PurpleLens event schema                           │
+│  Normalize to ThreatPrism event schema                           │
 └─────────────────────────┬───────────────────────────────────────┘
                           │
 ┌─────────────────────────▼───────────────────────────────────────┐
-│                 PURPLELENS PIPELINE (from POC)                  │
+│                 THREATPRISM PIPELINE (from POC)                  │
 │  prompt_firewall_event() → sanitize all telemetry fields        │
 │  correlate_events() → cluster related events by actor/time      │
 │  analyze_events() → LLM analysis with schema-enforced output    │
@@ -254,7 +254,7 @@ This metric served three functions:
 │                  DELIVERY LAYER                                 │
 │  Stage 1 & 2: SOAR notification + PostgreSQL report table       │
 │  Stage 2: Shift report (structured text → email/SOAR channel)   │
-│  Stage 3: SOAR webhook callback → PurpleLens box in ticket UI   │
+│  Stage 3: SOAR webhook callback → ThreatPrism box in ticket UI   │
 │  Analyst UI: text panel in SOAR ticket (no separate dashboard)  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -281,7 +281,7 @@ This principle never changed from POC to production. It became an institutional 
 - The LLM recommends next steps. The analyst investigates.
 - The LLM never takes action. The analyst owns the outcome.
 
-This was not just a safety design — it was the adoption strategy. Analysts trusted PurpleLens because it never competed with their judgment. It gave them a running start.
+This was not just a safety design — it was the adoption strategy. Analysts trusted ThreatPrism because it never competed with their judgment. It gave them a running start.
 
 ---
 
@@ -291,13 +291,13 @@ This was not just a safety design — it was the adoption strategy. Analysts tru
 At an MSSP managing 60+ enterprise clients, T1 analysts were spending 3-4 hours per shift on manual event investigation groundwork — pulling context from SIEMs, formulating hypotheses, deciding where to start. Alert fatigue and inconsistent determinations were structural problems.
 
 **The Invention:**
-I designed and built PurpleLens — an AI-driven SOC analysis pipeline that treated the LLM as an untrusted component: input sanitized before it touches the model, output validated before an analyst sees it, and human determination always final. The POC is open-source at github.com/mwill20/purplelens-soc.
+I designed and built ThreatPrism — an AI-driven SOC analysis pipeline that treated the LLM as an untrusted component: input sanitized before it touches the model, output validated before an analyst sees it, and human determination always final. The POC is open-source at github.com/mwill20/threatprism.
 
 **The Evolution:**
 We deployed in three stages. Stage 1 validated the pipeline against SOAR auto-closed events — proving the system was stable and the guardrails held under production log diversity. Stage 2 added end-of-shift QA over analyst determinations — giving management and detection engineering a structured shift intelligence brief for the first time. Stage 3 was the full integration: real-time per-event analysis delivered inside the SOAR ticket the moment an analyst claimed it, giving every analyst a T1-level running start before they began investigation.
 
 **The Outcome:**
-At MSSP scale — 60+ enterprise clients on Azure, multi-cloud telemetry, PostgreSQL with tenant-scoped isolation — PurpleLens reduced analyst investigation start time and provided the detection engineering team with a continuous signal for rule refinement. The governance metric was analyst concordance rate: how often analysts agreed with the LLM's hypothesis and confidence score. That metric drove both model calibration and analyst coaching decisions.
+At MSSP scale — 60+ enterprise clients on Azure, multi-cloud telemetry, PostgreSQL with tenant-scoped isolation — ThreatPrism reduced analyst investigation start time and provided the detection engineering team with a continuous signal for rule refinement. The governance metric was analyst concordance rate: how often analysts agreed with the LLM's hypothesis and confidence score. That metric drove both model calibration and analyst coaching decisions.
 
 **The Principle That Never Changed:**
 From the first line of code to the last production deployment: LLM output is untrusted input. We enforce behavior, not hope for compliance.

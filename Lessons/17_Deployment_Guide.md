@@ -54,26 +54,26 @@ lesson. Replace placeholders with your project values.
 
 Build and push:
 ```
-gcloud artifacts repositories create purplelens \
+gcloud artifacts repositories create threatprism \
   --repository-format=docker --location=us-central1
 
 gcloud builds submit --tag \
-  us-central1-docker.pkg.dev/<project>/purplelens/purplelens:latest .
+  us-central1-docker.pkg.dev/<project>/threatprism/threatprism:latest .
 ```
 
 Create the job:
 ```
-gcloud run jobs create purplelens-job \
-  --image us-central1-docker.pkg.dev/<project>/purplelens/purplelens:latest \
+gcloud run jobs create threatprism-job \
+  --image us-central1-docker.pkg.dev/<project>/threatprism/threatprism:latest \
   --region us-central1 \
-  --service-account purplelens-sa@<project>.iam.gserviceaccount.com \
+  --service-account threatprism-sa@<project>.iam.gserviceaccount.com \
   --set-env-vars PROVIDER=gemini,MODEL=gemini-flash-latest \
   --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest
 ```
 
 Execute with stable outputs:
 ```
-gcloud run jobs execute purplelens-job --region us-central1 \
+gcloud run jobs execute threatprism-job --region us-central1 \
   --args="--input-gcs=gs://<bucket>/inputs/sample.jsonl,--output-gcs=gs://<bucket>/outputs,--run-tag=demo-001"
 ```
 

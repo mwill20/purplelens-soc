@@ -73,7 +73,7 @@ def _execute_drill() -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="PurpleLens Failure Drill #1")
+    parser = argparse.ArgumentParser(description="ThreatPrism Failure Drill #1")
     parser.add_argument(
         "--execute",
         action="store_true",

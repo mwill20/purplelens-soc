@@ -95,7 +95,7 @@ def _build_evidence(run_dir: Path) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate PurpleLens evidence artifact")
+    parser = argparse.ArgumentParser(description="Generate ThreatPrism evidence artifact")
     parser.add_argument("--run-id", help="Specific run_id to extract")
     args = parser.parse_args()
 

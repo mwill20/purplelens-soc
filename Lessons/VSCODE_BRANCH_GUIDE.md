@@ -59,7 +59,7 @@ BESPIN AI SECURITY ANALYST ASSISTANT
 │   ├── 📄 BASELINE_VERIFICATION_2026-01-02.md     ← NEW FILE
 │   ├── 📄 BRANCH_STRATEGY_AWS_CloudTrail.md       ← NEW FILE
 │   ├── 📄 GIT_BRANCHES_EXPLAINED.md               ← NEW FILE
-│   └── 📄 PurpleLens_NorthStar_Enhancement_1_AWS_CloudTrail.md
+│   └── 📄 ThreatPrism_NorthStar_Enhancement_1_AWS_CloudTrail.md
 ├── 📁 src
 ├── 📁 tests
 ├── 📄 CONTRIBUTING.md                              ← NEW FILE

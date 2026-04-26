@@ -1,6 +1,6 @@
-﻿# Lesson 12: Live Demo - Interview Presentation Guide
+# Lesson 12: Live Demo - Interview Presentation Guide
 
-Demo walkthrough for presenting PurpleLens live. It is aligned to the current code and repo layout.
+Demo walkthrough for presenting ThreatPrism live. It is aligned to the current code and repo layout.
 
 Gemini quick-switch (PowerShell):
 ```powershell
@@ -42,7 +42,7 @@ Before the demo, verify:
   - `data/evtx_raw` (raw EVTX sample for binary vs JSONL contrast)
   - Optional: `data/evtx_parsed` if you want to show local conversion output
 - Optional: `db/analysis.db` has prior runs.
-- Architecture diagram ready: `docs/PurpleLens_SOC_Architecture.png`.
+- Architecture diagram ready: `docs/ThreatPrism_Architecture.png`.
 - Diagram reflects current pipeline: sanitize (prompt firewall), optional semantic judge, AIOps artifacts, and red-team dataset.
 - AWS sample path ready:
   - `data/sample_cloudtrail.csv` (in repo)
@@ -123,7 +123,7 @@ Narration tips (short and simple):
 
 ### Opening statement
 
-> "I built PurpleLens, an AI-assisted Windows event log analysis tool for SOC analysts. Let me show you the problem it solves."
+> "I built ThreatPrism, an AI-assisted Windows event log analysis tool for SOC analysts. Let me show you the problem it solves."
 
 Pain point: Raw EVTX files are binary and not human readable.
 ```powershell
@@ -144,7 +144,7 @@ Get-Content data\evtx_sample\Execution_wmic.jsonl -TotalCount 1 |
 
 ### Show the architecture diagram
 
-- Open `docs/PurpleLens_SOC_Architecture.png`
+- Open `docs/ThreatPrism_Architecture.png`
 - Point to sanitize (prompt firewall), validate_output (schema + policy + semantic), and AIOps artifacts
 
 Conversion:
@@ -370,7 +370,7 @@ Emphasize:
 
 ## Closing Statement (1 minute)
 
-"PurpleLens turns raw Windows event logs into structured, evidence-backed findings.
+"ThreatPrism turns raw Windows event logs into structured, evidence-backed findings.
 
 The pipeline is:
 > modular,

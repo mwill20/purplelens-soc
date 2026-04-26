@@ -60,7 +60,7 @@ SOURCE → INGEST → PARSE → NORMALIZE → ENRICH → STORE → QUERY → ALE
 **Why This Matters**:
 - Vendors differ. Architecture does not.
 - If you can reason through this flow, you can reason about most security platforms.
-- The trust boundary explains *why* PurpleLens does deterministic parsing before AI analysis.
+- The trust boundary explains *why* ThreatPrism does deterministic parsing before AI analysis.
 
 ---
 
@@ -83,7 +83,7 @@ Source → Ingest → Parse | Normalize → Enrich → Store → AI/Analysis
 Never run AI before this line↑                                    
 ```
 
-This aligns directly with the PurpleLens design philosophy.
+This aligns directly with the ThreatPrism design philosophy.
 
 ---
 
@@ -161,7 +161,7 @@ Goal is **intuition**, not tool mastery.
 
 3. [Google Cloud Architecture Framework - Security](https://cloud.google.com/architecture/framework/security/logging-detection-response) - 25 min
    - Focus on: Detection and response section
-   - Note patterns that mirror your PurpleLens architecture
+   - Note patterns that mirror your ThreatPrism architecture
 
 **Concrete Deliverable**:
 Write 3-5 sentences answering: "What is a cloud audit log and why does it matter for security?"
@@ -531,7 +531,7 @@ Create an enriched version of all 4 logs with at least 2 enrichment fields each.
 
 ---
 
-## Week 3 — Mapping to PurpleLens + GCP Proof
+## Week 3 — Mapping to ThreatPrism + GCP Proof
 
 **Goal**: Connect cloud concepts to your system + demonstrate GCP capability.
 
@@ -543,11 +543,11 @@ Create an enriched version of all 4 logs with at least 2 enrichment fields each.
 
 **Create an Architecture Mapping Document**:
 
-Create file: `docs/PurpleLens_Cloud_Extension_Design.md`
+Create file: `docs/ThreatPrism_Cloud_Extension_Design.md`
 
 **Section 1: Current State**
 ```
-PurpleLens Phase 1 (Ingest):
+ThreatPrism Phase 1 (Ingest):
 - Source: Local EVTX files
 - Ingest: Python script reads from filesystem
 - Parse: evtx library converts to JSON
@@ -612,10 +612,10 @@ Complete the mapping document with all 6 sections. This becomes your interview t
 
 **Practice answering** (record yourself):
 
-**Question 1**: "How would you extend PurpleLens to handle cloud logs?"
- that operates post-trust-boundary. Currently, it ingests EVTX files, but the architecture supports any structured log source. To add GCP audit logs, I'd: (1) Add a cloud ingestion module using the Cloud Logging API, (2) Parse to extract JSON fields, (3) Cross the trust boundary with validation, (4) Create a normalization layer that maps GCP's schema to our common security event format—things like principalEmail becomes 'actor', methodName becomes 'action', (5) Route normalized events through the existing enrichment and LLM analysis phase unchanged, (6) Update the storage layer to use BigQuery for scale. The core insight—that AI operates on structured, validated data after the trust boundary—remains the same regardless of source. This is why PurpleLens can extend to cloud, containers, network logs, or any future source without changing the analysis logic. The trust boundary is preserved: we never run AI on raw, unvalidated logs
+**Question 1**: "How would you extend ThreatPrism to handle cloud logs?"
+ that operates post-trust-boundary. Currently, it ingests EVTX files, but the architecture supports any structured log source. To add GCP audit logs, I'd: (1) Add a cloud ingestion module using the Cloud Logging API, (2) Parse to extract JSON fields, (3) Cross the trust boundary with validation, (4) Create a normalization layer that maps GCP's schema to our common security event format—things like principalEmail becomes 'actor', methodName becomes 'action', (5) Route normalized events through the existing enrichment and LLM analysis phase unchanged, (6) Update the storage layer to use BigQuery for scale. The core insight—that AI operates on structured, validated data after the trust boundary—remains the same regardless of source. This is why ThreatPrism can extend to cloud, containers, network logs, or any future source without changing the analysis logic. The trust boundary is preserved: we never run AI on raw, unvalidated logs
 **Good answer structure**:
-> "PurpleLens is designed with a source-agnostic analysis layer. Currently, it ingests EVTX files, but the architecture supports any structured log source. To add GCP audit logs, I'd: (1) Add a cloud ingestion module using the Cloud Logging API, (2) Create a normalization layer that maps GCP's JSON schema to our common security event format, (3) Route normalized events through the existing LLM analysis phase unchanged, (4) Update the storage layer to use BigQuery for scale. The core insight—that AI operates on structured, validated data—remains the same regardless of source. This is why PurpleLens can extend to cloud, containers, network logs, or any future source without changing the analysis logic."
+> "ThreatPrism is designed with a source-agnostic analysis layer. Currently, it ingests EVTX files, but the architecture supports any structured log source. To add GCP audit logs, I'd: (1) Add a cloud ingestion module using the Cloud Logging API, (2) Create a normalization layer that maps GCP's JSON schema to our common security event format, (3) Route normalized events through the existing LLM analysis phase unchanged, (4) Update the storage layer to use BigQuery for scale. The core insight—that AI operates on structured, validated data—remains the same regardless of source. This is why ThreatPrism can extend to cloud, containers, network logs, or any future source without changing the analysis logic."
 
 **Question 2**: "What's the difference between cloud logs and endpoint logs?"
 
@@ -624,8 +624,8 @@ Complete the mapping document with all 6 sections. This becomes your interview t
 
 **Question 3**: "Why not just send all logs to an LLM and ask it to find threats?"
 
-**Good answer**:the trust boundary. First, LLMs are expensive—analyzing millions of raw logs would cost tens of thousands per day. Second, LLMs hallucinate—without structured constraints, they'll invent threats from malformed or ambiguous data. Third, legal and compliance require provenance—you can't defend 'the AI said so' in court when the input was unvalidated raw text. The correct approach respects the trust boundary: ingest, parse, validate, then cross into trusted territory where we normalize and enrich. Only after that do we apply AI to high-fidelity, structured artifacts. This is what PurpleLens does: deterministic preprocessing ensures evidence integrity and crosses the trust boundary safely, then AI augments human analysis with explanations and MITRE mappings. The AI is a force multiplier operating on validated data, not a replacement for engineering rigor. We never run AI before the trust boundary—that would be operationally dangerous and forensically indefensible
-> "Three reasons: cost, accuracy, and evidence. First, LLMs are expensive—analyzing millions of raw logs would cost tens of thousands per day. Second, LLMs hallucinate—without structured constraints, they'll invent threats. Third, legal and compliance require provenance—you can't defend 'the AI said so' in court. The correct approach is: parse to structure, filter noise, enrich with context, then apply AI to high-fidelity artifacts. This is what PurpleLens does: deterministic preprocessing ensures evidence integrity, AI augments human analysis with explanations and MITRE mappings. The AI is a force multiplier, not a replacement for engineering rigor."
+**Good answer**:the trust boundary. First, LLMs are expensive—analyzing millions of raw logs would cost tens of thousands per day. Second, LLMs hallucinate—without structured constraints, they'll invent threats from malformed or ambiguous data. Third, legal and compliance require provenance—you can't defend 'the AI said so' in court when the input was unvalidated raw text. The correct approach respects the trust boundary: ingest, parse, validate, then cross into trusted territory where we normalize and enrich. Only after that do we apply AI to high-fidelity, structured artifacts. This is what ThreatPrism does: deterministic preprocessing ensures evidence integrity and crosses the trust boundary safely, then AI augments human analysis with explanations and MITRE mappings. The AI is a force multiplier operating on validated data, not a replacement for engineering rigor. We never run AI before the trust boundary—that would be operationally dangerous and forensically indefensible
+> "Three reasons: cost, accuracy, and evidence. First, LLMs are expensive—analyzing millions of raw logs would cost tens of thousands per day. Second, LLMs hallucinate—without structured constraints, they'll invent threats. Third, legal and compliance require provenance—you can't defend 'the AI said so' in court. The correct approach is: parse to structure, filter noise, enrich with context, then apply AI to high-fidelity artifacts. This is what ThreatPrism does: deterministic preprocessing ensures evidence integrity, AI augments human analysis with explanations and MITRE mappings. The AI is a force multiplier, not a replacement for engineering rigor."
 
 **Concrete Deliverable**:
 Record 2-minute answers to all 3 questions. Listen back. Refine until confident.
@@ -647,8 +647,8 @@ Record 2-minute answers to all 3 questions. Listen back. Refine until confident.
    - Set budget alert at $5
 
 2. **Create project**:
-   - Project name: `purplelens-demo`
-   - Project ID: `purplelens-demo-[random]` (must be unique)
+   - Project name: `threatprism-demo`
+   - Project ID: `threatprism-demo-[random]` (must be unique)
    - Location: No organization
 
 3. **Enable APIs**:
@@ -668,7 +668,7 @@ Record 2-minute answers to all 3 questions. Listen back. Refine until confident.
 5. **Authenticate**:
    ```powershell
    gcloud auth login
-   gcloud config set project purplelens-demo-[your-project-id]
+   gcloud config set project threatprism-demo-[your-project-id]
    ```
 
 ---
@@ -677,7 +677,7 @@ Record 2-minute answers to all 3 questions. Listen back. Refine until confident.
 
 ```powershell
 # Create bucket for log output
-gsutil mb -l us-central1 gs://purplelens-audit-logs
+gsutil mb -l us-central1 gs://threatprism-audit-logs
 
 # Verify
 gsutil ls
@@ -710,8 +710,8 @@ def fetch_audit_logs(request):
     storage_client = storage.Client()
     
     # Configuration
-    project_id = "purplelens-demo-[your-project-id]"  # CHANGE THIS
-    bucket_name = "purplelens-audit-logs"
+    project_id = "threatprism-demo-[your-project-id]"  # CHANGE THIS
+    bucket_name = "threatprism-audit-logs"
     
     # Fetch logs from last 1 hour
     filter_str = (
@@ -774,18 +774,18 @@ gcloud functions deploy fetch-audit-logs `
 1. **Trigger the function**:
    ```powershell
    # Get the function URL from deployment output, then:
-   Invoke-WebRequest -Uri "https://us-central1-purplelens-demo-[project-id].cloudfunctions.net/fetch-audit-logs"
+   Invoke-WebRequest -Uri "https://us-central1-threatprism-demo-[project-id].cloudfunctions.net/fetch-audit-logs"
    ```
 
 2. **Check Cloud Storage**:
    ```powershell
-   gsutil ls gs://purplelens-audit-logs/
-   gsutil cat gs://purplelens-audit-logs/audit_logs_*.json
+   gsutil ls gs://threatprism-audit-logs/
+   gsutil cat gs://threatprism-audit-logs/audit_logs_*.json
    ```
 
 3. **Screenshot evidence**:
    - GCP Console → Cloud Functions → fetch-audit-logs (deployed)
-   - Cloud Storage → purplelens-audit-logs → audit_logs_*.json file
+   - Cloud Storage → threatprism-audit-logs → audit_logs_*.json file
    - File contents showing JSON logs
 
 ---
@@ -799,10 +799,10 @@ Create: `docs/GCP_Deployment_Reflection.md`
 2. What was easier? (Managed services? APIs?)
 3. How does this compare to local development? (No servers to manage!)
 4. What would you need for production? (Auth, monitoring, error handling, cost controls)
-5. How does this fit PurpleLens? (Cloud ingestion module proven viable)
+5. How does this fit ThreatPrism? (Cloud ingestion module proven viable)
 
 **Example reflection**:
-> The hardest part was getting IAM permissions right—the service account needed both Logging Viewer and Storage Object Creator roles. The easiest part was deployment: gcloud CLI handles everything. Compared to local dev, there's no server management, but debugging is harder without direct console access. For production, I'd need proper authentication (not --allow-unauthenticated), Cloud Monitoring for observability, error handling with retries, and cost alerts. This proves PurpleLens can extend to cloud sources: the function pulls real GCP logs and stores them structured, ready for the existing analysis pipeline.
+> The hardest part was getting IAM permissions right—the service account needed both Logging Viewer and Storage Object Creator roles. The easiest part was deployment: gcloud CLI handles everything. Compared to local dev, there's no server management, but debugging is harder without direct console access. For production, I'd need proper authentication (not --allow-unauthenticated), Cloud Monitoring for observability, error handling with retries, and cost alerts. This proves ThreatPrism can extend to cloud sources: the function pulls real GCP logs and stores them structured, ready for the existing analysis pipeline.
 
 **Concrete Deliverable**:
 - [ ] Cloud Function deployed successfully
@@ -842,7 +842,7 @@ You've completed the plan when you can:
 
 **Week 3 Success**:
 - Show GCP Console screenshots of working Cloud Function
-- Explain how PurpleLens would extend to cloud (with architecture diagram)
+- Explain how ThreatPrism would extend to cloud (with architecture diagram)
 - Answer "Do you have cloud experience?" with "Yes, I deployed to GCP and here's what I built"
 's the difference between **parsing** and **normalizing**?
 - What is the **trust boundary** and why does it matter?
@@ -893,13 +893,13 @@ This is the bridge between interview success and real-world AI Security Engineer
 
 ---
 
-## Integration with PurpleLens Lessons
+## Integration with ThreatPrism Lessons
 
 ### Complementary Learning Tracks
 
-The existing PurpleLens lessons and this cloud plan are **mutually reinforcing**, not competing:
+The existing ThreatPrism lessons and this cloud plan are **mutually reinforcing**, not competing:
 
-**PurpleLens Track** (Understanding what you built):
+**ThreatPrism Track** (Understanding what you built):
 - Teaches system architecture and implementation details
 - Provides deep technical grounding
 - Shows mastery of existing solution
@@ -918,7 +918,7 @@ The existing PurpleLens lessons and this cloud plan are **mutually reinforcing**
   - GCP Audit Logs overview
   - IAM concepts
   - Log routing patterns
-- **Tue/Thu**: PurpleLens lessons (1-2 hrs each)
+- **Tue/Thu**: ThreatPrism lessons (1-2 hrs each)
   - Lesson 01: Architecture Guide
   - Lesson 02: Understanding The Harness
 
@@ -931,7 +931,7 @@ The existing PurpleLens lessons and this cloud plan are **mutually reinforcing**
   - Install and run locally
   - Ingest sample logs
   - Observe parsing effects
-- **Tue/Thu/Sat**: PurpleLens lessons (1-2 hrs each)
+- **Tue/Thu/Sat**: ThreatPrism lessons (1-2 hrs each)
   - Lesson 03: Phase1 Ingest Deep Dive
   - Lesson 04: LLM Analysis Deep Dive
   - Lesson 10: Database Deep Dive
@@ -942,7 +942,7 @@ The existing PurpleLens lessons and this cloud plan are **mutually reinforcing**
 
 #### Week 3: Synthesis + Proof
 - **Mon/Tue**: Conceptual mapping (2 hrs each)
-  - Map cloud logs to PurpleLens architecture
+  - Map cloud logs to ThreatPrism architecture
   - Document extension strategy
 - **Wed/Thu**: Minimal GCP deployment (2-4 hrs)
   - Set up GCP account
@@ -959,7 +959,7 @@ The existing PurpleLens lessons and this cloud plan are **mutually reinforcing**
 
 ### Interview Narrative (Post-Completion)
 
-> "I built PurpleLens to demonstrate AI-augmented security analysis with strong architectural principles. After your feedback on cloud experience, I studied GCP audit logging and data pipeline patterns. I deployed a Cloud Function that ingests GCP logs to prove I can work with cloud platforms. More importantly, I can now explain how PurpleLens would extend architecturally—the ingestion layer would normalize multiple log sources, the LLM analysis phase would remain source-agnostic, and the evidence chain would maintain integrity regardless of whether logs come from EVTX files or cloud APIs. The core insight—that AI belongs after structure, not before—applies universally."
+> "I built ThreatPrism to demonstrate AI-augmented security analysis with strong architectural principles. After your feedback on cloud experience, I studied GCP audit logging and data pipeline patterns. I deployed a Cloud Function that ingests GCP logs to prove I can work with cloud platforms. More importantly, I can now explain how ThreatPrism would extend architecturally—the ingestion layer would normalize multiple log sources, the LLM analysis phase would remain source-agnostic, and the evidence chain would maintain integrity regardless of whether logs come from EVTX files or cloud APIs. The core insight—that AI belongs after structure, not before—applies universally."
 
 This shows:
 - **Depth**: You know your system intimately
@@ -992,7 +992,7 @@ This shows:
 
 **Conservative estimate** (for interview readiness):
 - Cloud Plan: 15-20 hours over 3 weeks
-- Critical PurpleLens Lessons: 8-12 hours
+- Critical ThreatPrism Lessons: 8-12 hours
 - **Total**: 23-32 hours
 
 **Realistic schedule**:

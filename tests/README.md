@@ -1,6 +1,6 @@
 # Tests
 
-This folder contains pytest-compatible tests for the PurpleLens pipeline.
+This folder contains pytest-compatible tests for the ThreatPrism pipeline.
 
 ## Recommended usage
 Run the full suite with pytest:

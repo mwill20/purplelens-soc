@@ -1,4 +1,4 @@
-# PurpleLens SOC - Enhancement 1 NorthStar (AWS CloudTrail Branch)
+# ThreatPrism SOC - Enhancement 1 NorthStar (AWS CloudTrail Branch)
 
 Branch name: `enhancement/aws-cloudtrail`
 Owner roles: Architect -> Overseer (reviewer, enhancer, troubleshooter, approver, tester) -> Primary Engineer (execution)
@@ -6,13 +6,13 @@ Owner roles: Architect -> Overseer (reviewer, enhancer, troubleshooter, approver
 
 ## 1) Why this enhancement exists (interview-aligned)
 
-This branch exists to demonstrate that PurpleLens is a log-agnostic SOC analysis harness:
+This branch exists to demonstrate that ThreatPrism is a log-agnostic SOC analysis harness:
 
 - It can ingest and normalize a different artifact type (AWS CloudTrail).
 - It can use an LLM only for structured extraction (no actions, no false authority).
 - It produces a deterministic, evidence-cited SOC report and persists to SQLite for auditability.
 
-Directly support and enhancement of PurpleLens project:
+Directly support and enhancement of ThreatPrism project:
 - ingest + analyze + (light) correlate security artifacts with GenAI context,
 - produce a clear final report,
 - demonstrate code quality + security acumen + prompting strategy.
@@ -129,7 +129,7 @@ REDACT_FIELDS = [
 
 In scope:
 - CloudTrail dataset ingestion (Kaggle Flaws CloudTrail set)
-- Normalization into the PurpleLens event envelope
+- Normalization into the ThreatPrism event envelope
 - Minimal correlation primitives (same actor / same resource / same time-window)
 - Same single-run CLI experience: `python -m src.main --input ...`
 - Small demo dataset (e.g., 50-200 events) to keep LLM prompts stable
@@ -459,7 +459,7 @@ Overseer acceptance checks:
 
 ## 6) Interview narrative anchors (what you say out loud)
 
-- "PurpleLens is a harness: ingestion -> constrained extraction -> deterministic report."
+- "ThreatPrism is a harness: ingestion -> constrained extraction -> deterministic report."
 - "AWS support is an adapter: I normalized CloudTrail into the same evidence-first event envelope."
 - "The LLM never acts; it extracts structured findings; Python writes the report and stores the audit trail."
 
