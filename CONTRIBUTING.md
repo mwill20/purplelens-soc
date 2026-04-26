@@ -1,4 +1,4 @@
-﻿# Contributing to PurpleLens
+# Contributing to ThreatPrism
 
 ## Branch Protection Policy
 

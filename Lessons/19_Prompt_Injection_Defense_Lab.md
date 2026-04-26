@@ -1,8 +1,8 @@
-# Lesson 19: Prompt Injection Defense Lab (PurpleLens)
+# Lesson 19: Prompt Injection Defense Lab (ThreatPrism)
 
 Time: 30-45 minutes
 
-Goal: Practice prompt-injection defense using PurpleLens run artifacts and verify that the sanitize stage blocks or redacts malicious strings before the LLM.
+Goal: Practice prompt-injection defense using ThreatPrism run artifacts and verify that the sanitize stage blocks or redacts malicious strings before the LLM.
 
 ---
 
@@ -19,7 +19,7 @@ git checkout -b lab/prompt-injection-defense
 
 Security logs are untrusted input. Attackers can embed instructions inside log fields to trick the model.
 
-PurpleLens defends against this with:
+ThreatPrism defends against this with:
 - A prompt firewall that **redacts** instruction-like strings.
 - **Quarantine** logic that removes unsafe events before LLM analysis.
 - Ops artifacts that prove the defense worked.

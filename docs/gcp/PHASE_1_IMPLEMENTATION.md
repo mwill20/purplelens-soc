@@ -9,7 +9,7 @@
 
 ## Overview
 
-Phase 1 implements **Ingestion & Normalization** for GCP Audit Logs, enabling the PurpleLens pipeline to ingest, detect, and normalize Google Cloud Platform security events alongside existing Windows (EVTX) and AWS (CloudTrail) sources.
+Phase 1 implements **Ingestion & Normalization** for GCP Audit Logs, enabling the ThreatPrism pipeline to ingest, detect, and normalize Google Cloud Platform security events alongside existing Windows (EVTX) and AWS (CloudTrail) sources.
 
 ---
 
@@ -35,7 +35,7 @@ Phase 1 implements **Ingestion & Normalization** for GCP Audit Logs, enabling th
 - Minimal envelope structure (matches AWS pattern)
 - Evidence anchoring: `insertId` → `event_id`
 - Data minimization: SHA-256 hash computation (`raw_hash`)
-- Normalization: GCP `protoPayload` → PurpleLens standard fields
+- Normalization: GCP `protoPayload` → ThreatPrism standard fields
 
 **4. `data/gcp_log_pack/minilab_synthetic.jsonl`**
 - 3-event synthetic log for testing

@@ -1,4 +1,4 @@
-﻿"""
+"""
 Usage:
   pytest tests/test_phase1d.py
 
@@ -42,7 +42,7 @@ def test_success_report_structure():
 
     report = generate_report(analysis)
 
-    assert "PURPLELENS AI SOC ASSISTANT" in report
+    assert "THREATPRISM AI SOC ASSISTANT" in report
     assert "Analysis Report" in report
     assert "## FINDINGS" in report
     assert "## HYPOTHESES" in report

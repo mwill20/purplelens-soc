@@ -23,8 +23,8 @@ Target time: 12-15 minutes demo + 5-10 minutes Q&A.
 
 ### Clone the repo
 ```powershell
-git clone https://github.com/mwill20/purplelens-soc.git
-cd purplelens-soc
+git clone https://github.com/mwill20/threatprism.git
+cd threatprism
 ```
 
 ### Verify Python
@@ -255,7 +255,7 @@ Control plane changes have high blast radius.
 Telemetry changes can blind detection.  
 Data plane changes indicate possible exfil or access.
 
-In PurpleLens:
+In ThreatPrism:
 - Plane tagging is deterministic and conservative.
 - Used as context, not proof of malicious intent.
 
@@ -281,7 +281,7 @@ The LLM is extraction-only: inputs are sanitized, outputs must match the schema,
 
 ## 9) Final Close (30 seconds)
 
-"PurpleLens is a constrained, evidence-first SOC analysis pipeline.  
+"ThreatPrism is a constrained, evidence-first SOC analysis pipeline.  
 It normalizes and sanitizes logs, applies guardrails, uses AI only for structured extraction,  
 then produces a deterministic report with provenance and an audit trail."
 

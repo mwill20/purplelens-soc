@@ -1,6 +1,6 @@
 # Architecture
 
-PurpleLens is a CLI-first security analysis pipeline that ingests log files
+ThreatPrism is a CLI-first security analysis pipeline that ingests log files
 from Windows, AWS CloudTrail, and GCP Cloud Logging, runs LLM-driven analysis,
 validates the result, and writes a deterministic report plus a SQLite record of
 the run. The goal is demo-grade realism with clear, explainable phases.

@@ -51,7 +51,7 @@ Checked items are confirmed present in minilab_ground_truth_complete.json.
 [ ] google.iam.admin.v1.DeleteServiceAccountKey (cleanup / evasion)
 
 [x] cloudresourcemanager.googleapis.com/SetIamPolicy (project IAM)
-[x] Cross-project project_id reference (includes 'purplelens-production-database')
+[x] Cross-project project_id reference (includes 'threatprism-production-database')
 
 [ ] google.logging.v2.MetricsServiceV2.CreateLogMetric
 [ ] google.logging.v2.MetricsServiceV2.DeleteLogMetric
@@ -69,7 +69,7 @@ Checked items are confirmed present in minilab_ground_truth_complete.json.
 --------------------------------------------------------------------------------
 3. USAGE INSTRUCTIONS
 --------------------------------------------------------------------------------
-This file is the primary input for the Bespin/PurpleLens detection engine.
+This file is the primary input for the Bespin/ThreatPrism detection engine.
 
 Command to Reproduce Analysis:
 > python -m src.main --input data/gcp_log_pack/minilab_ground_truth_complete.json --debug

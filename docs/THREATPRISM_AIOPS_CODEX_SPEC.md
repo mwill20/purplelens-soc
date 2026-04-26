@@ -1,8 +1,8 @@
-# PURPLELENS_AIOPS_CODEX_SPEC.md
+# THREATPRISM_AIOPS_CODEX_SPEC.md
 ## Purpose
-This document is a **CodeX build spec** to add a minimal, portable **AIOps V1 ops harness** into the existing PurpleLens project without rewriting the architecture.
+This document is a **CodeX build spec** to add a minimal, portable **AIOps V1 ops harness** into the existing ThreatPrism project without rewriting the architecture.
 
-**Goal:** Make PurpleLens operable and debuggable like a real service by adding:
+**Goal:** Make ThreatPrism operable and debuggable like a real service by adding:
 - **OBSERVE:** structured JSON logs + correlation ID (`run_id`) + minimal metrics (latency, error_count, tokens/cost)
 - **RUNBOOK:** how to run, how to debug, known failures
 - **FAILURE DRILL #1:** intentionally break the pipeline and recover using logs + metrics
@@ -27,8 +27,8 @@ Once implemented, the run artifacts will live under runs/<run_id>/ and the lesso
 
 ---
 
-## Define "Request" in PurpleLens
-PurpleLens is CLI-first, so a "request" is:
+## Define "Request" in ThreatPrism
+ThreatPrism is CLI-first, so a "request" is:
 
 - **One CLI execution / analysis run**
 
@@ -46,9 +46,9 @@ Everything should correlate to a single `run_id`.
 6) `scripts/failure_drill_1.py` (new)
 7) `scripts/evidence_artifact.py` (new)
 8) `README.md` (update: point to RUNBOOK + ops harness)
-9) Minimal edits to the PurpleLens entrypoint (where the run starts) to wrap pipeline execution with ops context.
+9) Minimal edits to the ThreatPrism entrypoint (where the run starts) to wrap pipeline execution with ops context.
 
-> Note: If PurpleLens has a different folder layout, adapt paths but keep the same intent and artifacts.
+> Note: If ThreatPrism has a different folder layout, adapt paths but keep the same intent and artifacts.
 
 ---
 
@@ -134,7 +134,7 @@ Template (5 bullets):
 
 ## Failure Drill #1 (must exist)
 Create `scripts/failure_drill_1.py` that:
-1) Prints exact commands to run PurpleLens normally (do not start automatically).
+1) Prints exact commands to run ThreatPrism normally (do not start automatically).
 2) Runs a "good" analysis command (or provides a sample command) and captures:
    - the `run_id`
    - where the run artifacts are
@@ -185,7 +185,7 @@ Create `RUNBOOK.md` with:
 ---
 
 ## Integration Points (where CodeX should hook in)
-CodeX must identify the PurpleLens entrypoint where a run begins (likely `main.py` / `cli.py` / similar) and wrap:
+CodeX must identify the ThreatPrism entrypoint where a run begins (likely `main.py` / `cli.py` / similar) and wrap:
 
 - run start: create ops context + run folder
 - per-stage calls: add start/end logging + timing
@@ -214,7 +214,7 @@ CodeX must identify the PurpleLens entrypoint where a run begins (likely `main.p
 
 ## Acceptance Criteria (Definition of Done)
 AIOps V1 is complete when:
-- Running PurpleLens creates `runs/<run_id>/` with `run_log.jsonl` and `metrics.json`.
+- Running ThreatPrism creates `runs/<run_id>/` with `run_log.jsonl` and `metrics.json`.
 - Each run has a `run_id` present in every log line.
 - At least 5 stages emit start/end logs with durations.
 - A failure run produces `what_broke.md` and increments `error_count`.

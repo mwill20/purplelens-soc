@@ -143,7 +143,7 @@ BESPIN AI SECURITY ANALYST ASSISTANT
 │   ├── ARCHITECTURE.md
 │   ├── BASELINE_VERIFICATION_2026-01-02.md          ← NEW (only on this branch)
 │   ├── BRANCH_STRATEGY_AWS_CloudTrail.md            ← NEW (only on this branch)
-│   ├── PurpleLens_NorthStar_Enhancement_1_AWS_CloudTrail.md
+│   ├── ThreatPrism_NorthStar_Enhancement_1_AWS_CloudTrail.md
 │   └── ...
 ├── src\
 ├── tests\

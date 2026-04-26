@@ -12,7 +12,7 @@ from google.cloud import storage
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Cloud Run Jobs wrapper for PurpleLens batch analysis."
+        description="Cloud Run Jobs wrapper for ThreatPrism batch analysis."
     )
     parser.add_argument(
         "--input-gcs",

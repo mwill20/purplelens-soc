@@ -1,4 +1,4 @@
-# PurpleLens Interview Prep - Lesson Index
+# ThreatPrism Interview Prep - Lesson Index
 
 Welcome to your structured learning path. Each lesson builds confidence so
 nothing feels unclear during your interview.
@@ -32,7 +32,7 @@ nothing feels unclear during your interview.
 - [ ] Lesson 15: Debugging Project Lab - [15_Debugging_Project_Lab.md](15_Debugging_Project_Lab.md)
 - [ ] Lesson 16: Logging Masterclass - [16_Logging_Masterclass.md](16_Logging_Masterclass.md)
 - [ ] Lesson 17: Deployment Guide - [17_Deployment_Guide.md](17_Deployment_Guide.md)
-- [ ] Lesson 18: AIOps With PurpleLens - [LESSON_AIOPS_WITH_PURPLELENS.md](LESSON_AIOPS_WITH_PURPLELENS.md)
+- [ ] Lesson 18: AIOps With ThreatPrism - [LESSON_AIOPS_WITH_THREATPRISM.md](LESSON_AIOPS_WITH_THREATPRISM.md)
 - [ ] Lesson 19: Prompt Injection Defense Lab - [19_Prompt_Injection_Defense_Lab.md](19_Prompt_Injection_Defense_Lab.md)
 - [ ] Lesson 20: Jailbreak Hardening Lab - [20_Jailbreak_Hardening_Lab.md](20_Jailbreak_Hardening_Lab.md)
 
@@ -54,11 +54,11 @@ nothing feels unclear during your interview.
 Use this when starting a new chat session:
 
 ```
-I'm working through the PurpleLens AI SOC Assistant interview prep lessons.
+I'm working through the ThreatPrism AI SOC Assistant interview prep lessons.
 I'm currently on Lesson [number]: [name]
 
 Context:
-- Project: PurpleLens AI SOC Assistant
+- Project: ThreatPrism AI SOC Assistant
 - Location: C:\Projects\Bespin AI Security Analyst Assistant
 - Current lesson file: Lessons/[XX]_[Name].md
 - Goal: [specific question or activity from the lesson]

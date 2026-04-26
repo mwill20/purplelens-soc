@@ -1,5 +1,5 @@
 """
-CLI entrypoint for the PurpleLens AI SOC Assistant.
+CLI entrypoint for the ThreatPrism AI SOC Assistant.
 - "This is the entrypoint and control plane: parse args, configure logging, then run the pipeline."
 - "The pipeline is a straight line: ingest -> normalize -> sanitize -> enrich -> llm_analyze -> validate_output -> report -> persist."
 - "Report output is saved to `reports/` and the path is printed, so the demo can always show the file."
@@ -180,7 +180,7 @@ def parse_args() -> argparse.Namespace:  # CLI options (input path, output mode,
             - db: path to SQLite database
             - verbose/debug/dry_run: logging and run controls
     """
-    parser = argparse.ArgumentParser(description="PurpleLens AI SOC Assistant")
+    parser = argparse.ArgumentParser(description="ThreatPrism AI SOC Assistant")
     parser.add_argument(
         "--input",
         required=True,

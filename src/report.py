@@ -219,7 +219,7 @@ def _header_lines(subtitle: str) -> List[str]:
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     return [
         "=" * 80,
-        "PURPLELENS AI SOC ASSISTANT",
+        "THREATPRISM AI SOC ASSISTANT",
         subtitle,
         f"Report Timestamp (UTC): {timestamp}",
         "=" * 80,

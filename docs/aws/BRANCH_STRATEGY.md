@@ -9,7 +9,7 @@
 
 ## 🎯 Branch Purpose
 
-Add AWS CloudTrail ingestion adapter to PurpleLens while preserving:
+Add AWS CloudTrail ingestion adapter to ThreatPrism while preserving:
 - Core pipeline integrity
 - Windows EVTX functionality (zero regression)
 - Architecture invariants (LLM extraction-only, evidence-mandatory, deterministic reports)
@@ -150,7 +150,7 @@ Measure-Command { .\.venv\Scripts\python.exe -m src.main --source aws --input da
 git push origin enhancement/aws-cloudtrail
 
 # Create PR via GitHub UI or CLI
-gh pr create --base master --head enhancement/aws-cloudtrail --title "Add AWS CloudTrail ingestion adapter" --body "See docs/PurpleLens_NorthStar_Enhancement_1_AWS_CloudTrail.md for design rationale."
+gh pr create --base master --head enhancement/aws-cloudtrail --title "Add AWS CloudTrail ingestion adapter" --body "See docs/ThreatPrism_NorthStar_Enhancement_1_AWS_CloudTrail.md for design rationale."
 ```
 
 ---

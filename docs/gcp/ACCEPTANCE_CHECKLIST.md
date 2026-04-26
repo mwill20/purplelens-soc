@@ -7,7 +7,7 @@ Spec anchors:
 - [docs/gcp/MINILAB_PLAN.md](docs/gcp/MINILAB_PLAN.md)
 
 ## 1) Goal (What “done” means)
-Deliver a **small, high-signal** GCP Audit Log dataset and a working PurpleLens pipeline path that:
+Deliver a **small, high-signal** GCP Audit Log dataset and a working ThreatPrism pipeline path that:
 - Ingests real GCP Cloud Audit Log JSON (no live GCP connectivity)
 - Produces a report with evidence-backed findings that cite **source_file + record_index + insertId**
 - Demonstrates cloud security reasoning using **identity + plane (control/data/telemetry) + blast radius**
@@ -41,7 +41,7 @@ Dataset must contain at least one event for each item below (validated by method
 - [ ] `google.logging.v2.ConfigServiceV2.UpdateSink` (must include evidence of an exclusion filter argument)
 
 ### C. Lateral Movement / Cross-Project
-- [ ] `cloudresourcemanager.googleapis.com/SetIamPolicy` referencing a *different* project than the lab core (e.g., `purplelens-production-database`)
+- [ ] `cloudresourcemanager.googleapis.com/SetIamPolicy` referencing a *different* project than the lab core (e.g., `threatprism-production-database`)
 
 ### D. Impact / Destruction
 - [ ] `cloudkms.googleapis.com/CreateCryptoKey` (or equivalent KMS create operation)

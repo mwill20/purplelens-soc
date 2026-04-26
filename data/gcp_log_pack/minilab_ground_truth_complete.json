@@ -3,7 +3,7 @@
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
-        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+        "principalEmail": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
       },
       "requestMetadata": {
         "callerIp": "192.0.2.1",
@@ -11,24 +11,24 @@
       },
       "serviceName": "iam.googleapis.com",
       "methodName": "google.iam.admin.v1.CreateServiceAccountKey",
-      "resourceName": "projects/purplelens-lab-core/serviceAccounts/victim-app@purplelens-lab-core.iam.gserviceaccount.com/keys/new"
+      "resourceName": "projects/threatprism-lab-core/serviceAccounts/victim-app@threatprism-lab-core.iam.gserviceaccount.com/keys/new"
     },
     "insertId": "synthetic-persistence-001",
     "resource": {
       "type": "service_account",
       "labels": {
-        "project_id": "purplelens-lab-core",
-        "email_id": "victim-app@purplelens-lab-core.iam.gserviceaccount.com"
+        "project_id": "threatprism-lab-core",
+        "email_id": "victim-app@threatprism-lab-core.iam.gserviceaccount.com"
       }
     },
     "timestamp": "2026-01-03T10:00:00Z",
     "severity": "NOTICE",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "receiveTimestamp": "2026-01-03T10:00:01Z"
   },
   {
     "insertId": "973y0le8gvlg",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -43,9 +43,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -72,7 +72,7 @@
             }
           ]
         },
-        "resource": "purplelens-lab-core",
+        "resource": "threatprism-lab-core",
         "updateMask": "auditConfigs,bindings,etag"
       },
       "requestMetadata": {
@@ -81,7 +81,7 @@
         "destinationAttributes": {},
         "requestAttributes": {}
       },
-      "resourceName": "projects/purplelens-lab-core",
+      "resourceName": "projects/threatprism-lab-core",
       "serviceName": "cloudresourcemanager.googleapis.com",
       "status": {
         "code": 3,
@@ -91,7 +91,7 @@
     "receiveTimestamp": "2026-01-04T15:43:42.585254988Z",
     "resource": {
       "labels": {
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "project"
     },
@@ -100,7 +100,7 @@
   },
   {
     "insertId": "-qwgg9gf1iqdk2",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -111,9 +111,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -122,9 +122,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -143,7 +143,7 @@
             },
             {
               "members": [
-                "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+                "serviceAccount:terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
               ],
               "role": "roles/iam.serviceAccountAdmin"
             },
@@ -169,7 +169,7 @@
         "destinationAttributes": {},
         "requestAttributes": {}
       },
-      "resourceName": "projects/purplelens-lab-core",
+      "resourceName": "projects/threatprism-lab-core",
       "response": {
         "@type": "type.googleapis.com/google.iam.v1.Policy",
         "bindings": [
@@ -181,7 +181,7 @@
           },
           {
             "members": [
-              "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+              "serviceAccount:terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
             ],
             "role": "roles/iam.serviceAccountAdmin"
           },
@@ -218,7 +218,7 @@
     "receiveTimestamp": "2026-01-04T15:41:37.338505129Z",
     "resource": {
       "labels": {
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "project"
     },
@@ -227,7 +227,7 @@
   },
   {
     "insertId": "lz09ptf1pgk92",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -237,7 +237,7 @@
             "tokenPrefix": "ya29.c.c0AYnqXlhOYqJvexSlnfpBozo5_5"
           }
         },
-        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+        "principalEmail": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
       },
       "authorizationInfo": [
         {
@@ -251,7 +251,7 @@
       "request": {
         "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
         "lifetime": "3600s",
-        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "name": "projects/-/serviceAccounts/terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
         "scope": [
           "openid",
           "https://www.googleapis.com/auth/userinfo.email",
@@ -272,8 +272,8 @@
     "receiveTimestamp": "2026-01-04T15:19:44.018211315Z",
     "resource": {
       "labels": {
-        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
-        "project_id": "purplelens-lab-core",
+        "email_id": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
+        "project_id": "threatprism-lab-core",
         "unique_id": "114193339470602582752"
       },
       "type": "service_account"
@@ -283,7 +283,7 @@
   },
   {
     "insertId": "ujw19ne6l8o5",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -298,9 +298,9 @@
           "granted": true,
           "permission": "cloudkms.cryptoKeyVersions.destroy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+          "resource": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+            "name": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
             "service": "google.cloud.kms",
             "type": "cloudkms.googleapis.com/CryptoKeyVersion"
           }
@@ -310,7 +310,7 @@
       "methodName": "DestroyCryptoKeyVersion",
       "request": {
         "@type": "type.googleapis.com/google.cloud.kms.v1.DestroyCryptoKeyVersionRequest",
-        "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1"
+        "name": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1"
       },
       "requestMetadata": {
         "callerIp": "34.19.14.43",
@@ -326,11 +326,11 @@
           "global"
         ]
       },
-      "resourceName": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+      "resourceName": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
       "serviceName": "cloudkms.googleapis.com",
       "status": {
         "code": 9,
-        "message": "The request cannot be fulfilled. Resource projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1 has value DESTROY_SCHEDULED in field crypto_key_version.state."
+        "message": "The request cannot be fulfilled. Resource projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1 has value DESTROY_SCHEDULED in field crypto_key_version.state."
       }
     },
     "receiveTimestamp": "2026-01-04T15:18:40.808027703Z",
@@ -340,7 +340,7 @@
         "crypto_key_version_id": "1",
         "key_ring_id": "lab-keyring",
         "location": "global",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "cloudkms_cryptokeyversion"
     },
@@ -349,7 +349,7 @@
   },
   {
     "insertId": "6ez1kpe58fcs",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -364,9 +364,9 @@
           "granted": true,
           "permission": "cloudkms.cryptoKeys.create",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring",
+          "resource": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
+            "name": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
             "service": "google.cloud.kms",
             "type": "cloudkms.googleapis.com/CryptoKey"
           }
@@ -384,7 +384,7 @@
           }
         },
         "cryptoKeyId": "top-secret-key",
-        "parent": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring"
+        "parent": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring"
       },
       "requestMetadata": {
         "callerIp": "34.19.14.43",
@@ -400,11 +400,11 @@
           "global"
         ]
       },
-      "resourceName": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
+      "resourceName": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
       "serviceName": "cloudkms.googleapis.com",
       "status": {
         "code": 6,
-        "message": "CryptoKey projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key already exists."
+        "message": "CryptoKey projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key already exists."
       }
     },
     "receiveTimestamp": "2026-01-04T15:18:25.047444253Z",
@@ -413,7 +413,7 @@
         "crypto_key_id": "top-secret-key",
         "key_ring_id": "lab-keyring",
         "location": "global",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "cloudkms_cryptokey"
     },
@@ -422,7 +422,7 @@
   },
   {
     "insertId": "erqyg2f113yud",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -432,7 +432,7 @@
             "tokenPrefix": "ya29.c.c0AYnqXlgGpy0v5gf7kuwd7KYGRC"
           }
         },
-        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+        "principalEmail": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
       },
       "authorizationInfo": [
         {
@@ -446,7 +446,7 @@
       "request": {
         "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
         "lifetime": "3600s",
-        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "name": "projects/-/serviceAccounts/terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
         "scope": [
           "openid",
           "https://www.googleapis.com/auth/userinfo.email",
@@ -467,8 +467,8 @@
     "receiveTimestamp": "2026-01-04T15:15:20.178515239Z",
     "resource": {
       "labels": {
-        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
-        "project_id": "purplelens-lab-core",
+        "email_id": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
+        "project_id": "threatprism-lab-core",
         "unique_id": "114193339470602582752"
       },
       "type": "service_account"
@@ -478,7 +478,7 @@
   },
   {
     "insertId": "ujw19ne6l6ld",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -493,9 +493,9 @@
           "granted": true,
           "permission": "cloudkms.cryptoKeyVersions.destroy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+          "resource": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+            "name": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
             "service": "google.cloud.kms",
             "type": "cloudkms.googleapis.com/CryptoKeyVersion"
           }
@@ -505,7 +505,7 @@
       "methodName": "DestroyCryptoKeyVersion",
       "request": {
         "@type": "type.googleapis.com/google.cloud.kms.v1.DestroyCryptoKeyVersionRequest",
-        "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1"
+        "name": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1"
       },
       "requestMetadata": {
         "callerIp": "34.19.14.43",
@@ -521,7 +521,7 @@
           "global"
         ]
       },
-      "resourceName": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
+      "resourceName": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key/cryptoKeyVersions/1",
       "serviceName": "cloudkms.googleapis.com",
       "status": {}
     },
@@ -532,7 +532,7 @@
         "crypto_key_version_id": "1",
         "key_ring_id": "lab-keyring",
         "location": "global",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "cloudkms_cryptokeyversion"
     },
@@ -541,7 +541,7 @@
   },
   {
     "insertId": "8m5eg8e6xo1g",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -556,9 +556,9 @@
           "granted": true,
           "permission": "cloudkms.cryptoKeys.create",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring",
+          "resource": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
+            "name": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
             "service": "google.cloud.kms",
             "type": "cloudkms.googleapis.com/CryptoKey"
           }
@@ -576,7 +576,7 @@
           }
         },
         "cryptoKeyId": "top-secret-key",
-        "parent": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring"
+        "parent": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring"
       },
       "requestMetadata": {
         "callerIp": "34.19.14.43",
@@ -592,7 +592,7 @@
           "global"
         ]
       },
-      "resourceName": "projects/purplelens-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
+      "resourceName": "projects/threatprism-lab-core/locations/global/keyRings/lab-keyring/cryptoKeys/top-secret-key",
       "serviceName": "cloudkms.googleapis.com",
       "status": {}
     },
@@ -602,7 +602,7 @@
         "crypto_key_id": "top-secret-key",
         "key_ring_id": "lab-keyring",
         "location": "global",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "cloudkms_cryptokey"
     },
@@ -611,7 +611,7 @@
   },
   {
     "insertId": "1px1bx8e804pk",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -621,7 +621,7 @@
             "tokenPrefix": "ya29.c.c0AYnqXlgJUHndTNeeouyXkHsXOw"
           }
         },
-        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+        "principalEmail": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
       },
       "userAgent": "Terraform/1.5.7 (+https://www.terraform.io) google-api-go-client/0.123.0",
       "authorizationInfo": [
@@ -636,7 +636,7 @@
       "request": {
         "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
         "lifetime": "3600s",
-        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "name": "projects/-/serviceAccounts/terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
         "scope": [
           "openid",
           "https://www.googleapis.com/auth/userinfo.email",
@@ -657,8 +657,8 @@
     "receiveTimestamp": "2026-01-04T15:12:28.998182761Z",
     "resource": {
       "labels": {
-        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
-        "project_id": "purplelens-lab-core",
+        "email_id": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
+        "project_id": "threatprism-lab-core",
         "unique_id": "114193339470602582752"
       },
       "type": "service_account"
@@ -668,7 +668,7 @@
   },
   {
     "insertId": "erqyg2f110dpy",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -678,7 +678,7 @@
             "tokenPrefix": "ya29.c.c0AYnqXlgBbW6hlWcKRYLGGKlZ_v"
           }
         },
-        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+        "principalEmail": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
       },
       "authorizationInfo": [
         {
@@ -692,7 +692,7 @@
       "request": {
         "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
         "lifetime": "3600s",
-        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "name": "projects/-/serviceAccounts/terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
         "scope": [
           "openid",
           "https://www.googleapis.com/auth/userinfo.email",
@@ -713,8 +713,8 @@
     "receiveTimestamp": "2026-01-04T14:57:07.613991795Z",
     "resource": {
       "labels": {
-        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
-        "project_id": "purplelens-lab-core",
+        "email_id": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
+        "project_id": "threatprism-lab-core",
         "unique_id": "114193339470602582752"
       },
       "type": "service_account"
@@ -724,7 +724,7 @@
   },
   {
     "insertId": "-llyqsvf1iiddq",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -735,9 +735,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -746,9 +746,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -761,7 +761,7 @@
           "bindings": [
             {
               "members": [
-                "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+                "serviceAccount:terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
               ],
               "role": "roles/iam.serviceAccountAdmin"
             },
@@ -787,7 +787,7 @@
         "destinationAttributes": {},
         "requestAttributes": {}
       },
-      "resourceName": "projects/purplelens-lab-core",
+      "resourceName": "projects/threatprism-lab-core",
       "response": {
         "@type": "type.googleapis.com/google.iam.v1.Policy",
         "bindings": [
@@ -799,7 +799,7 @@
           },
           {
             "members": [
-              "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+              "serviceAccount:terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
             ],
             "role": "roles/iam.serviceAccountAdmin"
           },
@@ -830,7 +830,7 @@
     "receiveTimestamp": "2026-01-04T14:54:41.418586858Z",
     "resource": {
       "labels": {
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "project"
     },
@@ -839,7 +839,7 @@
   },
   {
     "insertId": "1wb529nf1tbqxx",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -849,7 +849,7 @@
             "tokenPrefix": "ya29.c.c0AYnqXlj3d6d2PGatk4w-T1e3Cd"
           }
         },
-        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+        "principalEmail": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
       },
       "authorizationInfo": [
         {
@@ -863,7 +863,7 @@
       "request": {
         "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
         "lifetime": "3600s",
-        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "name": "projects/-/serviceAccounts/terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
         "scope": [
           "openid",
           "https://www.googleapis.com/auth/userinfo.email",
@@ -884,8 +884,8 @@
     "receiveTimestamp": "2026-01-04T14:53:12.515301116Z",
     "resource": {
       "labels": {
-        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
-        "project_id": "purplelens-lab-core",
+        "email_id": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
+        "project_id": "threatprism-lab-core",
         "unique_id": "114193339470602582752"
       },
       "type": "service_account"
@@ -895,7 +895,7 @@
   },
   {
     "insertId": "c9hyhif2ja1wt",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -905,7 +905,7 @@
             "tokenPrefix": "ya29.c.c0AYnqXliT_oKyc9n86irXc5mFZv"
           }
         },
-        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+        "principalEmail": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
       },
       "authorizationInfo": [
         {
@@ -919,7 +919,7 @@
       "request": {
         "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
         "lifetime": "3600s",
-        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "name": "projects/-/serviceAccounts/terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
         "scope": [
           "openid",
           "https://www.googleapis.com/auth/userinfo.email",
@@ -940,8 +940,8 @@
     "receiveTimestamp": "2026-01-04T14:50:53.235768073Z",
     "resource": {
       "labels": {
-        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
-        "project_id": "purplelens-lab-core",
+        "email_id": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
+        "project_id": "threatprism-lab-core",
         "unique_id": "114193339470602582752"
       },
       "type": "service_account"
@@ -951,7 +951,7 @@
   },
   {
     "insertId": "aia2sf1lmdtv",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -961,7 +961,7 @@
             "tokenPrefix": "ya29.c.c0AYnqXlgISCzz68a-KdCsaCJE-z"
           }
         },
-        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+        "principalEmail": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
       },
       "authorizationInfo": [
         {
@@ -975,7 +975,7 @@
       "request": {
         "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
         "lifetime": "3600s",
-        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "name": "projects/-/serviceAccounts/terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
         "scope": [
           "openid",
           "https://www.googleapis.com/auth/userinfo.email",
@@ -996,8 +996,8 @@
     "receiveTimestamp": "2026-01-04T14:40:53.084662495Z",
     "resource": {
       "labels": {
-        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
-        "project_id": "purplelens-lab-core",
+        "email_id": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
+        "project_id": "threatprism-lab-core",
         "unique_id": "114193339470602582752"
       },
       "type": "service_account"
@@ -1007,7 +1007,7 @@
   },
   {
     "insertId": "13gg1xmez6g89",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1017,7 +1017,7 @@
             "tokenPrefix": "ya29.c.c0AYnqXljIN1MP0B3nlzCQcb67cJ"
           }
         },
-        "principalEmail": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+        "principalEmail": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
       },
       "authorizationInfo": [
         {
@@ -1031,7 +1031,7 @@
       "request": {
         "@type": "type.googleapis.com/google.iam.credentials.v1.GenerateAccessTokenRequest",
         "lifetime": "3600s",
-        "name": "projects/-/serviceAccounts/terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+        "name": "projects/-/serviceAccounts/terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
         "scope": [
           "openid",
           "https://www.googleapis.com/auth/userinfo.email",
@@ -1052,8 +1052,8 @@
     "receiveTimestamp": "2026-01-04T14:39:42.582408519Z",
     "resource": {
       "labels": {
-        "email_id": "terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
-        "project_id": "purplelens-lab-core",
+        "email_id": "terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
+        "project_id": "threatprism-lab-core",
         "unique_id": "114193339470602582752"
       },
       "type": "service_account"
@@ -1063,7 +1063,7 @@
   },
   {
     "insertId": "bfwv3je2htxe",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1078,9 +1078,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -1089,9 +1089,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -1110,14 +1110,14 @@
             },
             {
               "members": [
-                "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+                "serviceAccount:terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
               ],
               "role": "roles/iam.serviceAccountAdmin"
             }
           ],
           "etag": "BwZHiiZhNaI="
         },
-        "resource": "purplelens-lab-core"
+        "resource": "threatprism-lab-core"
       },
       "requestMetadata": {
         "callerIp": "34.19.14.43",
@@ -1125,13 +1125,13 @@
         "destinationAttributes": {},
         "requestAttributes": {}
       },
-      "resourceName": "projects/purplelens-lab-core",
+      "resourceName": "projects/threatprism-lab-core",
       "response": {
         "@type": "type.googleapis.com/google.iam.v1.Policy",
         "bindings": [
           {
             "members": [
-              "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+              "serviceAccount:terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
             ],
             "role": "roles/iam.serviceAccountAdmin"
           },
@@ -1150,7 +1150,7 @@
           "bindingDeltas": [
             {
               "action": "ADD",
-              "member": "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com",
+              "member": "serviceAccount:terraform-runner@threatprism-lab-core.iam.gserviceaccount.com",
               "role": "roles/iam.serviceAccountAdmin"
             }
           ]
@@ -1162,7 +1162,7 @@
     "receiveTimestamp": "2026-01-04T14:36:19.418937629Z",
     "resource": {
       "labels": {
-        "project_id": "purplelens-production-database"
+        "project_id": "threatprism-production-database"
       },
       "type": "project"
     },
@@ -1171,7 +1171,7 @@
   },
   {
     "insertId": "29q4fgev8avi",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1195,7 +1195,7 @@
       "methodName": "google.iam.admin.v1.DeleteServiceAccountKey",
       "request": {
         "@type": "type.googleapis.com/google.iam.admin.v1.DeleteServiceAccountKeyRequest",
-        "name": "projects/-/serviceAccounts/victim-app@purplelens-lab-core.iam.gserviceaccount.com/keys/cfe81ea15073a7c6eaea152ec5ae03d67c2af0d0"
+        "name": "projects/-/serviceAccounts/victim-app@threatprism-lab-core.iam.gserviceaccount.com/keys/cfe81ea15073a7c6eaea152ec5ae03d67c2af0d0"
       },
       "requestMetadata": {
         "callerIp": "34.127.11.7",
@@ -1213,8 +1213,8 @@
     "receiveTimestamp": "2026-01-04T17:44:20.030463147Z",
     "resource": {
       "labels": {
-        "email_id": "victim-app@purplelens-lab-core.iam.gserviceaccount.com",
-        "project_id": "purplelens-lab-core",
+        "email_id": "victim-app@threatprism-lab-core.iam.gserviceaccount.com",
+        "project_id": "threatprism-lab-core",
         "unique_id": "104837142829871986884"
       },
       "type": "service_account"
@@ -1224,7 +1224,7 @@
   },
   {
     "insertId": "-6c6vn9e8pz0g",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1239,9 +1239,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -1250,9 +1250,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -1287,7 +1287,7 @@
             },
             {
               "members": [
-                "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+                "serviceAccount:terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
               ],
               "role": "roles/iam.serviceAccountAdmin"
             },
@@ -1306,7 +1306,7 @@
           ],
           "etag": "BwZHkccaIW0="
         },
-        "resource": "purplelens-lab-core",
+        "resource": "threatprism-lab-core",
         "updateMask": "auditConfigs,bindings,etag,version"
       },
       "requestMetadata": {
@@ -1315,7 +1315,7 @@
         "destinationAttributes": {},
         "requestAttributes": {}
       },
-      "resourceName": "projects/purplelens-lab-core",
+      "resourceName": "projects/threatprism-lab-core",
       "response": {
         "@type": "type.googleapis.com/google.iam.v1.Policy",
         "auditConfigs": [
@@ -1343,7 +1343,7 @@
           },
           {
             "members": [
-              "serviceAccount:terraform-runner@purplelens-lab-core.iam.gserviceaccount.com"
+              "serviceAccount:terraform-runner@threatprism-lab-core.iam.gserviceaccount.com"
             ],
             "role": "roles/iam.serviceAccountAdmin"
           },
@@ -1372,7 +1372,7 @@
     "receiveTimestamp": "2026-01-04T17:43:15.427036003Z",
     "resource": {
       "labels": {
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "project"
     },
@@ -1381,7 +1381,7 @@
   },
   {
     "insertId": "-76l24xe8zxo4",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1396,9 +1396,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -1425,7 +1425,7 @@
             }
           ]
         },
-        "resource": "purplelens-lab-core",
+        "resource": "threatprism-lab-core",
         "updateMask": "auditConfigs,bindings,etag"
       },
       "requestMetadata": {
@@ -1434,7 +1434,7 @@
         "destinationAttributes": {},
         "requestAttributes": {}
       },
-      "resourceName": "projects/purplelens-lab-core",
+      "resourceName": "projects/threatprism-lab-core",
       "serviceName": "cloudresourcemanager.googleapis.com",
       "status": {
         "code": 3,
@@ -1444,7 +1444,7 @@
     "receiveTimestamp": "2026-01-04T17:41:53.153760868Z",
     "resource": {
       "labels": {
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "project"
     },
@@ -1453,7 +1453,7 @@
   },
   {
     "insertId": "u91o19e3lox0",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1468,9 +1468,9 @@
           "granted": true,
           "permission": "resourcemanager.projects.setIamPolicy",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core",
+          "resource": "projects/threatprism-lab-core",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core",
+            "name": "projects/threatprism-lab-core",
             "service": "cloudresourcemanager.googleapis.com",
             "type": "cloudresourcemanager.googleapis.com/Project"
           }
@@ -1497,7 +1497,7 @@
             }
           ]
         },
-        "resource": "purplelens-lab-core",
+        "resource": "threatprism-lab-core",
         "updateMask": "auditConfigs,bindings,etag"
       },
       "requestMetadata": {
@@ -1506,7 +1506,7 @@
         "destinationAttributes": {},
         "requestAttributes": {}
       },
-      "resourceName": "projects/purplelens-lab-core",
+      "resourceName": "projects/threatprism-lab-core",
       "serviceName": "cloudresourcemanager.googleapis.com",
       "status": {
         "code": 3,
@@ -1516,7 +1516,7 @@
     "receiveTimestamp": "2026-01-04T17:41:17.668894287Z",
     "resource": {
       "labels": {
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "project"
     },
@@ -1525,7 +1525,7 @@
   },
   {
     "insertId": "vcuw4ydl3fz",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1540,9 +1540,9 @@
           "granted": true,
           "permission": "logging.sinks.update",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+          "resource": "projects/threatprism-lab-core/sinks/gap-fill-sink",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+            "name": "projects/threatprism-lab-core/sinks/gap-fill-sink",
             "service": "logging.googleapis.com",
             "type": "logging.googleapis.com/LogSink"
           }
@@ -1555,7 +1555,7 @@
           "filter": "resource.type=\"gce_instance\" AND NOT protoPayload.methodName=\"DeleteServiceAccountKey\"",
           "name": "gap-fill-sink"
         },
-        "sinkName": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+        "sinkName": "projects/threatprism-lab-core/sinks/gap-fill-sink",
         "uniqueWriterIdentity": true,
         "updateMask": "filter"
       },
@@ -1568,7 +1568,7 @@
           "time": "2026-01-04T17:40:35.747097386Z"
         }
       },
-      "resourceName": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+      "resourceName": "projects/threatprism-lab-core/sinks/gap-fill-sink",
       "serviceName": "logging.googleapis.com",
       "status": {}
     },
@@ -1577,7 +1577,7 @@
       "labels": {
         "destination": "",
         "name": "gap-fill-sink",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "logging_sink"
     },
@@ -1586,7 +1586,7 @@
   },
   {
     "insertId": "15wg4lfdb8q8",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1601,9 +1601,9 @@
           "granted": true,
           "permission": "logging.sinks.create",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+          "resource": "projects/threatprism-lab-core/sinks/gap-fill-sink",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+            "name": "projects/threatprism-lab-core/sinks/gap-fill-sink",
             "service": "logging.googleapis.com",
             "type": "logging.googleapis.com/LogSink"
           }
@@ -1612,9 +1612,9 @@
       "methodName": "google.logging.v2.ConfigServiceV2.CreateSink",
       "request": {
         "@type": "type.googleapis.com/google.logging.v2.CreateSinkRequest",
-        "parent": "projects/purplelens-lab-core",
+        "parent": "projects/threatprism-lab-core",
         "sink": {
-          "destination": "storage.googleapis.com/purplelens-sink-24502",
+          "destination": "storage.googleapis.com/threatprism-sink-24502",
           "filter": "resource.type=\"gce_instance\"",
           "name": "gap-fill-sink"
         },
@@ -1629,7 +1629,7 @@
           "time": "2026-01-04T17:39:46.935560002Z"
         }
       },
-      "resourceName": "projects/purplelens-lab-core/sinks/gap-fill-sink",
+      "resourceName": "projects/threatprism-lab-core/sinks/gap-fill-sink",
       "serviceName": "logging.googleapis.com",
       "status": {}
     },
@@ -1638,7 +1638,7 @@
       "labels": {
         "destination": "",
         "name": "gap-fill-sink",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "logging_sink"
     },
@@ -1647,7 +1647,7 @@
   },
   {
     "insertId": "1dq1e1vdgb8i",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1662,9 +1662,9 @@
           "granted": true,
           "permission": "logging.logMetrics.delete",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+          "resource": "projects/threatprism-lab-core/metrics/gap-fill-metric",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+            "name": "projects/threatprism-lab-core/metrics/gap-fill-metric",
             "service": "logging.googleapis.com",
             "type": "logging.googleapis.com/LogMetric"
           }
@@ -1673,7 +1673,7 @@
       "methodName": "google.logging.v2.MetricsServiceV2.DeleteLogMetric",
       "request": {
         "@type": "type.googleapis.com/google.logging.v2.DeleteLogMetricRequest",
-        "metricName": "projects/purplelens-lab-core/metrics/gap-fill-metric"
+        "metricName": "projects/threatprism-lab-core/metrics/gap-fill-metric"
       },
       "requestMetadata": {
         "callerIp": "34.127.11.7",
@@ -1684,7 +1684,7 @@
           "time": "2026-01-04T17:39:23.419327640Z"
         }
       },
-      "resourceName": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+      "resourceName": "projects/threatprism-lab-core/metrics/gap-fill-metric",
       "serviceName": "logging.googleapis.com",
       "status": {}
     },
@@ -1692,7 +1692,7 @@
     "resource": {
       "labels": {
         "name": "logging.googleapis.com/user/gap-fill-metric",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "metric"
     },
@@ -1701,7 +1701,7 @@
   },
   {
     "insertId": "1nftsssdhxga",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1716,9 +1716,9 @@
           "granted": true,
           "permission": "logging.logMetrics.create",
           "permissionType": "ADMIN_WRITE",
-          "resource": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+          "resource": "projects/threatprism-lab-core/metrics/gap-fill-metric",
           "resourceAttributes": {
-            "name": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+            "name": "projects/threatprism-lab-core/metrics/gap-fill-metric",
             "service": "logging.googleapis.com",
             "type": "logging.googleapis.com/LogMetric"
           }
@@ -1732,7 +1732,7 @@
           "filter": "resource.type=\"gce_instance\"",
           "name": "gap-fill-metric"
         },
-        "parent": "projects/purplelens-lab-core"
+        "parent": "projects/threatprism-lab-core"
       },
       "requestMetadata": {
         "callerIp": "34.127.11.7",
@@ -1743,7 +1743,7 @@
           "time": "2026-01-04T17:39:21.317022750Z"
         }
       },
-      "resourceName": "projects/purplelens-lab-core/metrics/gap-fill-metric",
+      "resourceName": "projects/threatprism-lab-core/metrics/gap-fill-metric",
       "serviceName": "logging.googleapis.com",
       "status": {}
     },
@@ -1751,7 +1751,7 @@
     "resource": {
       "labels": {
         "name": "logging.googleapis.com/user/gap-fill-metric",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "metric"
     },
@@ -1760,7 +1760,7 @@
   },
   {
     "insertId": "qp46ctf5kw7ih",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1773,7 +1773,7 @@
         {
           "granted": true,
           "permission": "storage.objects.get",
-          "resource": "projects/_/buckets/purplelens-final-25664/objects/secret.txt",
+          "resource": "projects/_/buckets/threatprism-final-25664/objects/secret.txt",
           "resourceAttributes": {}
         }
       ],
@@ -1795,16 +1795,16 @@
           "us-central1"
         ]
       },
-      "resourceName": "projects/_/buckets/purplelens-final-25664/objects/secret.txt",
+      "resourceName": "projects/_/buckets/threatprism-final-25664/objects/secret.txt",
       "serviceName": "storage.googleapis.com",
       "status": {}
     },
     "receiveTimestamp": "2026-01-04T18:05:09.799373316Z",
     "resource": {
       "labels": {
-        "bucket_name": "purplelens-final-25664",
+        "bucket_name": "threatprism-final-25664",
         "location": "us-central1",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "gcs_bucket"
     },
@@ -1813,7 +1813,7 @@
   },
   {
     "insertId": "qz3l9yday69",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1826,7 +1826,7 @@
         {
           "granted": true,
           "permission": "storage.buckets.setIamPolicy",
-          "resource": "projects/_/buckets/purplelens-leak-32350",
+          "resource": "projects/_/buckets/threatprism-leak-32350",
           "resourceAttributes": {}
         }
       ],
@@ -1845,7 +1845,7 @@
           "us-central1"
         ]
       },
-      "resourceName": "projects/_/buckets/purplelens-leak-32350",
+      "resourceName": "projects/_/buckets/threatprism-leak-32350",
       "serviceData": {
         "@type": "type.googleapis.com/google.iam.v1.logging.AuditData",
         "policyDelta": {
@@ -1864,9 +1864,9 @@
     "receiveTimestamp": "2026-01-04T18:36:12.551203356Z",
     "resource": {
       "labels": {
-        "bucket_name": "purplelens-leak-32350",
+        "bucket_name": "threatprism-leak-32350",
         "location": "us-central1",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "gcs_bucket"
     },
@@ -1875,7 +1875,7 @@
   },
   {
     "insertId": "1qzp1ftf2xvdcy",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Fdata_access",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1888,7 +1888,7 @@
         {
           "granted": true,
           "permission": "storage.buckets.getIamPolicy",
-          "resource": "projects/_/buckets/purplelens-leak-32350",
+          "resource": "projects/_/buckets/threatprism-leak-32350",
           "resourceAttributes": {}
         }
       ],
@@ -1907,16 +1907,16 @@
           "us-central1"
         ]
       },
-      "resourceName": "projects/_/buckets/purplelens-leak-32350",
+      "resourceName": "projects/_/buckets/threatprism-leak-32350",
       "serviceName": "storage.googleapis.com",
       "status": {}
     },
     "receiveTimestamp": "2026-01-04T18:36:11.268153730Z",
     "resource": {
       "labels": {
-        "bucket_name": "purplelens-leak-32350",
+        "bucket_name": "threatprism-leak-32350",
         "location": "us-central1",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "gcs_bucket"
     },
@@ -1925,7 +1925,7 @@
   },
   {
     "insertId": "1179g2pe9nn56",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
     "protoPayload": {
       "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
       "authenticationInfo": {
@@ -1938,7 +1938,7 @@
         {
           "granted": true,
           "permission": "storage.buckets.create",
-          "resource": "projects/_/buckets/purplelens-leak-32350",
+          "resource": "projects/_/buckets/threatprism-leak-32350",
           "resourceAttributes": {}
         }
       ],
@@ -1949,14 +1949,14 @@
           "bindings": [
             {
               "members": [
-                "projectViewer:purplelens-lab-core"
+                "projectViewer:threatprism-lab-core"
               ],
               "role": "roles/storage.legacyObjectReader"
             },
             {
               "members": [
-                "projectOwner:purplelens-lab-core",
-                "projectEditor:purplelens-lab-core"
+                "projectOwner:threatprism-lab-core",
+                "projectEditor:threatprism-lab-core"
               ],
               "role": "roles/storage.legacyObjectOwner"
             }
@@ -1977,24 +1977,24 @@
           "us-central1"
         ]
       },
-      "resourceName": "projects/_/buckets/purplelens-leak-32350",
+      "resourceName": "projects/_/buckets/threatprism-leak-32350",
       "serviceData": {
         "@type": "type.googleapis.com/google.iam.v1.logging.AuditData",
         "policyDelta": {
           "bindingDeltas": [
             {
               "action": "ADD",
-              "member": "projectEditor:purplelens-lab-core",
+              "member": "projectEditor:threatprism-lab-core",
               "role": "roles/storage.legacyBucketOwner"
             },
             {
               "action": "ADD",
-              "member": "projectOwner:purplelens-lab-core",
+              "member": "projectOwner:threatprism-lab-core",
               "role": "roles/storage.legacyBucketOwner"
             },
             {
               "action": "ADD",
-              "member": "projectViewer:purplelens-lab-core",
+              "member": "projectViewer:threatprism-lab-core",
               "role": "roles/storage.legacyBucketReader"
             }
           ]
@@ -2006,9 +2006,9 @@
     "receiveTimestamp": "2026-01-04T18:36:02.038584379Z",
     "resource": {
       "labels": {
-        "bucket_name": "purplelens-leak-32350",
+        "bucket_name": "threatprism-leak-32350",
         "location": "us-central1",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       },
       "type": "gcs_bucket"
     },
@@ -2028,7 +2028,7 @@
       },
       "serviceName": "storage.googleapis.com",
       "methodName": "storage.setIamPolicy",
-      "resourceName": "projects/_/buckets/purplelens-marketing-assets-v2",
+      "resourceName": "projects/_/buckets/threatprism-marketing-assets-v2",
       "serviceData": {
         "@type": "type.googleapis.com/google.iam.v1.PolicyDelta",
         "bindingDeltas": [
@@ -2044,13 +2044,13 @@
     "resource": {
       "type": "gcs_bucket",
       "labels": {
-        "bucket_name": "purplelens-marketing-assets-v2",
+        "bucket_name": "threatprism-marketing-assets-v2",
         "location": "us-central1",
-        "project_id": "purplelens-lab-core"
+        "project_id": "threatprism-lab-core"
       }
     },
     "timestamp": "2026-01-04T12:30:00Z",
     "severity": "NOTICE",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity"
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity"
   }
 ]

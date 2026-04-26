@@ -59,7 +59,7 @@ If you can reason through this flow, you can reason about most security platform
 - AI operates on **structured, scoped artifacts**  
 - Evidence, traceability, and constraints are mandatory in security systems
 
-This aligns directly with the PurpleLens design philosophy.
+This aligns directly with the ThreatPrism design philosophy.
 
 ---
 
@@ -132,7 +132,7 @@ Outcome:
 
 ---
 
-### Week 3 — Mapping to PurpleLens (Interview Leverage)
+### Week 3 — Mapping to ThreatPrism (Interview Leverage)
 **Goal**: Connect cloud concepts to your existing system.
 
 Actions:
@@ -143,7 +143,7 @@ Actions:
   - Report → analyst-facing output
 
 Outcome:
-- Can explain how PurpleLens would extend to cloud logs without changing its philosophy
+- Can explain how ThreatPrism would extend to cloud logs without changing its philosophy
 
 ---
 

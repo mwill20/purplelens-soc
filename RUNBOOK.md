@@ -1,6 +1,6 @@
-# RUNBOOK - PurpleLens AIOps V1
+# RUNBOOK - ThreatPrism AIOps V1
 
-This runbook explains how to run PurpleLens, where to find artifacts, and how to debug failures.
+This runbook explains how to run ThreatPrism, where to find artifacts, and how to debug failures.
 
 ---
 

@@ -41,7 +41,7 @@ real_looking_log = {
         },
         "serviceName": "storage.googleapis.com",
         "methodName": "storage.setIamPolicy",
-        "resourceName": "projects/_/buckets/purplelens-marketing-assets-v2",
+        "resourceName": "projects/_/buckets/threatprism-marketing-assets-v2",
         "serviceData": {
             "@type": "type.googleapis.com/google.iam.v1.PolicyDelta",
             "bindingDeltas": [
@@ -57,14 +57,14 @@ real_looking_log = {
     "resource": {
         "type": "gcs_bucket",
         "labels": {
-            "bucket_name": "purplelens-marketing-assets-v2",
+            "bucket_name": "threatprism-marketing-assets-v2",
             "location": "us-central1",
-            "project_id": "purplelens-lab-core",
+            "project_id": "threatprism-lab-core",
         },
     },
     "timestamp": "2026-01-04T12:30:00Z",
     "severity": "NOTICE",
-    "logName": "projects/purplelens-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
+    "logName": "projects/threatprism-lab-core/logs/cloudaudit.googleapis.com%2Factivity",
 }
 
 # Append and write back as UTF-8 (no BOM)

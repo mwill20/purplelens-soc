@@ -3,7 +3,7 @@
 Small utilities that support dataset preparation, validation, and demos.
 
 ## Contents
-- `prep_evtx.ps1`: Convert Windows EVTX files to JSONL input for PurpleLens.
+- `prep_evtx.ps1`: Convert Windows EVTX files to JSONL input for ThreatPrism.
 - `aws_csv_to_jsonl.py`: Convert CloudTrail CSV (Kaggle Flaws dataset format) to JSONL.
 - `check_demo_db.py`: Print a short summary of the latest analysis run in `db/analysis.db`.
 - `verify_gcp_enrichment.py`: Print deterministic GCP enrichment signals for the mini-lab dataset.

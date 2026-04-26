@@ -63,11 +63,11 @@ ENTRYPOINT ["python", "scripts/gcp_job_wrapper.py"]
 Example (Artifact Registry):
 
 ```
-gcloud artifacts repositories create purplelens \
+gcloud artifacts repositories create threatprism \
   --repository-format=docker --location=us-central1
 
 gcloud builds submit --tag \
-  us-central1-docker.pkg.dev/<project>/purplelens/purplelens:latest .
+  us-central1-docker.pkg.dev/<project>/threatprism/threatprism:latest .
 ```
 
 ## Step 6: Create the Cloud Run Job
@@ -75,10 +75,10 @@ Use env vars for provider and model, and mount secrets for API keys. The job
 entrypoint expects arguments like `--input-gcs` and `--output-gcs`:
 
 ```
-gcloud run jobs create purplelens-job \
-  --image us-central1-docker.pkg.dev/<project>/purplelens/purplelens:latest \
+gcloud run jobs create threatprism-job \
+  --image us-central1-docker.pkg.dev/<project>/threatprism/threatprism:latest \
   --region us-central1 \
-  --service-account purplelens-sa@<project>.iam.gserviceaccount.com \
+  --service-account threatprism-sa@<project>.iam.gserviceaccount.com \
   --set-env-vars PROVIDER=gemini,MODEL=gemini-flash-latest \
   --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest
 ```
@@ -95,7 +95,7 @@ The wrapper in `scripts/gcp_job_wrapper.py` supports:
 Start a run and pass the input and output URIs:
 
 ```
-gcloud run jobs execute purplelens-job --region us-central1 \
+gcloud run jobs execute threatprism-job --region us-central1 \
   --args="--input-gcs=gs://<bucket>/inputs/sample.jsonl,--output-gcs=gs://<bucket>/outputs,--source=auto,--upload-logs"
 ```
 

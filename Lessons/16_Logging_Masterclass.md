@@ -1,6 +1,6 @@
-# Lesson 16: Logging Masterclass (PurpleLens)
+# Lesson 16: Logging Masterclass (ThreatPrism)
 
-This lesson is a complete guide to logging in the PurpleLens project. You will learn how logging is configured, how to read logs, how to add safe log statements, and how to use logs for debugging and forensic traceability.
+This lesson is a complete guide to logging in the ThreatPrism project. You will learn how logging is configured, how to read logs, how to add safe log statements, and how to use logs for debugging and forensic traceability.
 
 Prerequisites: Lesson 09 (Debugging Bootcamp) or Lesson 15 (Debugging Project Lab).
 
@@ -23,7 +23,7 @@ git checkout lessons-practice
 ## Learning Goals
 
 By the end of this lesson, you will be able to:
-- Explain how logging is configured in PurpleLens
+- Explain how logging is configured in ThreatPrism
 - Control verbosity with `--verbose` and `--debug`
 - Add safe, useful log statements without leaking sensitive data
 - Read run logs to trace a single pipeline execution end-to-end

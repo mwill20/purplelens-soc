@@ -1,1 +1,1 @@
-"""Operational support utilities for PurpleLens (AIOps V1)."""
+"""Operational support utilities for ThreatPrism (AIOps V1)."""
